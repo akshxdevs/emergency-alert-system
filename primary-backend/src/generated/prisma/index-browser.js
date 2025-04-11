@@ -130,7 +130,6 @@ exports.Prisma.LocationScalarFieldEnum = {
   id: 'id',
   lat: 'lat',
   long: 'long',
-  userId: 'userId',
   emergencyId: 'emergencyId'
 };
 

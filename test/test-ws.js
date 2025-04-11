@@ -1,17 +1,22 @@
-// test-socket.ts
-import { io } from "socket.io-client";
+const socket = new WebSocket("ws://localhost:3000/user123");
 
-const socket = io("http://localhost:3000");
+socket.onopen = () => {
+  console.log("✅ Connected to WebSocket server");
 
-socket.on("connect", () => {
-  console.log("✅ Connected:", socket.id);
-  socket.send("Hello from client!");
-});
+  const alert = {
+    id: "alert-001",
+    type: "CRIME",
+    reportedBy: "user123",
+    assignedTo: "POLICE",
+    status: "REPORT",
+    timeStamp: new Date().toISOString(),
+    description: "🚨 Suspicious activity spotted!"
+  };
 
-socket.on("message", (data) => {
-  console.log("📨 Message from server:", data);
-});
+  socket.send(JSON.stringify(alert));
+};
 
-socket.on("disconnect", () => {
-  console.log("❌ Disconnected from server");
-});
+socket.onmessage = (msg) => {
+  const data = JSON.parse(msg.data);
+  console.log("📡 Incoming message:", data);
+};

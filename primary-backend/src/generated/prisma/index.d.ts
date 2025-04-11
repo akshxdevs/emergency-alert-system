@@ -1094,37 +1094,6 @@ export namespace Prisma {
 
 
   /**
-   * Count Type UserCountOutputType
-   */
-
-  export type UserCountOutputType = {
-    location: number
-  }
-
-  export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    location?: boolean | UserCountOutputTypeCountLocationArgs
-  }
-
-  // Custom InputTypes
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the UserCountOutputType
-     */
-    select?: UserCountOutputTypeSelect<ExtArgs> | null
-  }
-
-  /**
-   * UserCountOutputType without action
-   */
-  export type UserCountOutputTypeCountLocationArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    where?: LocationWhereInput
-  }
-
-
-  /**
    * Count Type EmergencyCountOutputType
    */
 
@@ -1331,8 +1300,6 @@ export namespace Prisma {
     password?: boolean
     phoneNo?: boolean
     role?: boolean
-    location?: boolean | User$locationArgs<ExtArgs>
-    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1363,18 +1330,10 @@ export namespace Prisma {
   }
 
   export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "username" | "password" | "phoneNo" | "role", ExtArgs["result"]["user"]>
-  export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    location?: boolean | User$locationArgs<ExtArgs>
-    _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
-  }
-  export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
-  export type UserIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
 
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
-    objects: {
-      location: Prisma.$LocationPayload<ExtArgs>[]
-    }
+    objects: {}
     scalars: $Extensions.GetPayloadResult<{
       id: string
       name: string
@@ -1776,7 +1735,6 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    location<T extends User$locationArgs<ExtArgs> = {}>(args?: Subset<T, User$locationArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LocationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1829,10 +1787,6 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter, which User to fetch.
      */
     where: UserWhereUniqueInput
@@ -1851,10 +1805,6 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter, which User to fetch.
      */
     where: UserWhereUniqueInput
@@ -1872,10 +1822,6 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
     /**
      * Filter, which User to fetch.
      */
@@ -1925,10 +1871,6 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter, which User to fetch.
      */
     where?: UserWhereInput
@@ -1977,10 +1919,6 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter, which Users to fetch.
      */
     where?: UserWhereInput
@@ -2023,10 +1961,6 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
     /**
      * The data needed to create a User.
      */
@@ -2075,10 +2009,6 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
     /**
      * The data needed to update a User.
      */
@@ -2146,10 +2076,6 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * The filter to search for the User to update in case it exists.
      */
     where: UserWhereUniqueInput
@@ -2176,10 +2102,6 @@ export namespace Prisma {
      */
     omit?: UserOmit<ExtArgs> | null
     /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
-    /**
      * Filter which User to delete.
      */
     where: UserWhereUniqueInput
@@ -2200,30 +2122,6 @@ export namespace Prisma {
   }
 
   /**
-   * User.location
-   */
-  export type User$locationArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Location
-     */
-    select?: LocationSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Location
-     */
-    omit?: LocationOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: LocationInclude<ExtArgs> | null
-    where?: LocationWhereInput
-    orderBy?: LocationOrderByWithRelationInput | LocationOrderByWithRelationInput[]
-    cursor?: LocationWhereUniqueInput
-    take?: number
-    skip?: number
-    distinct?: LocationScalarFieldEnum | LocationScalarFieldEnum[]
-  }
-
-  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2235,10 +2133,6 @@ export namespace Prisma {
      * Omit specific fields from the User
      */
     omit?: UserOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: UserInclude<ExtArgs> | null
   }
 
 
@@ -2268,7 +2162,6 @@ export namespace Prisma {
     id: string | null
     lat: number | null
     long: number | null
-    userId: string | null
     emergencyId: string | null
   }
 
@@ -2276,7 +2169,6 @@ export namespace Prisma {
     id: string | null
     lat: number | null
     long: number | null
-    userId: string | null
     emergencyId: string | null
   }
 
@@ -2284,7 +2176,6 @@ export namespace Prisma {
     id: number
     lat: number
     long: number
-    userId: number
     emergencyId: number
     _all: number
   }
@@ -2304,7 +2195,6 @@ export namespace Prisma {
     id?: true
     lat?: true
     long?: true
-    userId?: true
     emergencyId?: true
   }
 
@@ -2312,7 +2202,6 @@ export namespace Prisma {
     id?: true
     lat?: true
     long?: true
-    userId?: true
     emergencyId?: true
   }
 
@@ -2320,7 +2209,6 @@ export namespace Prisma {
     id?: true
     lat?: true
     long?: true
-    userId?: true
     emergencyId?: true
     _all?: true
   }
@@ -2415,7 +2303,6 @@ export namespace Prisma {
     id: string
     lat: number
     long: number
-    userId: string
     emergencyId: string
     _count: LocationCountAggregateOutputType | null
     _avg: LocationAvgAggregateOutputType | null
@@ -2442,65 +2329,53 @@ export namespace Prisma {
     id?: boolean
     lat?: boolean
     long?: boolean
-    userId?: boolean
     emergencyId?: boolean
     alert?: boolean | EmergencyDefaultArgs<ExtArgs>
-    user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["location"]>
 
   export type LocationSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     lat?: boolean
     long?: boolean
-    userId?: boolean
     emergencyId?: boolean
     alert?: boolean | EmergencyDefaultArgs<ExtArgs>
-    user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["location"]>
 
   export type LocationSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     lat?: boolean
     long?: boolean
-    userId?: boolean
     emergencyId?: boolean
     alert?: boolean | EmergencyDefaultArgs<ExtArgs>
-    user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["location"]>
 
   export type LocationSelectScalar = {
     id?: boolean
     lat?: boolean
     long?: boolean
-    userId?: boolean
     emergencyId?: boolean
   }
 
-  export type LocationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "lat" | "long" | "userId" | "emergencyId", ExtArgs["result"]["location"]>
+  export type LocationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "lat" | "long" | "emergencyId", ExtArgs["result"]["location"]>
   export type LocationInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     alert?: boolean | EmergencyDefaultArgs<ExtArgs>
-    user?: boolean | UserDefaultArgs<ExtArgs>
   }
   export type LocationIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     alert?: boolean | EmergencyDefaultArgs<ExtArgs>
-    user?: boolean | UserDefaultArgs<ExtArgs>
   }
   export type LocationIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     alert?: boolean | EmergencyDefaultArgs<ExtArgs>
-    user?: boolean | UserDefaultArgs<ExtArgs>
   }
 
   export type $LocationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Location"
     objects: {
       alert: Prisma.$EmergencyPayload<ExtArgs>
-      user: Prisma.$UserPayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       lat: number
       long: number
-      userId: string
       emergencyId: string
     }, ExtArgs["result"]["location"]>
     composites: {}
@@ -2897,7 +2772,6 @@ export namespace Prisma {
   export interface Prisma__LocationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     alert<T extends EmergencyDefaultArgs<ExtArgs> = {}>(args?: Subset<T, EmergencyDefaultArgs<ExtArgs>>): Prisma__EmergencyClient<$Result.GetResult<Prisma.$EmergencyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2930,7 +2804,6 @@ export namespace Prisma {
     readonly id: FieldRef<"Location", 'String'>
     readonly lat: FieldRef<"Location", 'Float'>
     readonly long: FieldRef<"Location", 'Float'>
-    readonly userId: FieldRef<"Location", 'String'>
     readonly emergencyId: FieldRef<"Location", 'String'>
   }
     
@@ -4532,7 +4405,6 @@ export namespace Prisma {
     id: 'id',
     lat: 'lat',
     long: 'long',
-    userId: 'userId',
     emergencyId: 'emergencyId'
   };
 
@@ -4694,7 +4566,6 @@ export namespace Prisma {
     password?: StringFilter<"User"> | string
     phoneNo?: StringFilter<"User"> | string
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
-    location?: LocationListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -4704,7 +4575,6 @@ export namespace Prisma {
     password?: SortOrder
     phoneNo?: SortOrder
     role?: SortOrder
-    location?: LocationOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -4717,7 +4587,6 @@ export namespace Prisma {
     password?: StringFilter<"User"> | string
     phoneNo?: StringFilter<"User"> | string
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
-    location?: LocationListRelationFilter
   }, "id" | "username">
 
   export type UserOrderByWithAggregationInput = {
@@ -4751,20 +4620,16 @@ export namespace Prisma {
     id?: StringFilter<"Location"> | string
     lat?: FloatFilter<"Location"> | number
     long?: FloatFilter<"Location"> | number
-    userId?: StringFilter<"Location"> | string
     emergencyId?: StringFilter<"Location"> | string
     alert?: XOR<EmergencyScalarRelationFilter, EmergencyWhereInput>
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
 
   export type LocationOrderByWithRelationInput = {
     id?: SortOrder
     lat?: SortOrder
     long?: SortOrder
-    userId?: SortOrder
     emergencyId?: SortOrder
     alert?: EmergencyOrderByWithRelationInput
-    user?: UserOrderByWithRelationInput
   }
 
   export type LocationWhereUniqueInput = Prisma.AtLeast<{
@@ -4774,17 +4639,14 @@ export namespace Prisma {
     NOT?: LocationWhereInput | LocationWhereInput[]
     lat?: FloatFilter<"Location"> | number
     long?: FloatFilter<"Location"> | number
-    userId?: StringFilter<"Location"> | string
     emergencyId?: StringFilter<"Location"> | string
     alert?: XOR<EmergencyScalarRelationFilter, EmergencyWhereInput>
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id">
 
   export type LocationOrderByWithAggregationInput = {
     id?: SortOrder
     lat?: SortOrder
     long?: SortOrder
-    userId?: SortOrder
     emergencyId?: SortOrder
     _count?: LocationCountOrderByAggregateInput
     _avg?: LocationAvgOrderByAggregateInput
@@ -4800,7 +4662,6 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Location"> | string
     lat?: FloatWithAggregatesFilter<"Location"> | number
     long?: FloatWithAggregatesFilter<"Location"> | number
-    userId?: StringWithAggregatesFilter<"Location"> | string
     emergencyId?: StringWithAggregatesFilter<"Location"> | string
   }
 
@@ -4888,7 +4749,6 @@ export namespace Prisma {
     password: string
     phoneNo: string
     role: $Enums.UserRole
-    location?: LocationCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -4898,7 +4758,6 @@ export namespace Prisma {
     password: string
     phoneNo: string
     role: $Enums.UserRole
-    location?: LocationUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -4908,7 +4767,6 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     phoneNo?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-    location?: LocationUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -4918,7 +4776,6 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     phoneNo?: StringFieldUpdateOperationsInput | string
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-    location?: LocationUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -4953,14 +4810,12 @@ export namespace Prisma {
     lat: number
     long: number
     alert: EmergencyCreateNestedOneWithoutLocationInput
-    user: UserCreateNestedOneWithoutLocationInput
   }
 
   export type LocationUncheckedCreateInput = {
     id?: string
     lat: number
     long: number
-    userId: string
     emergencyId: string
   }
 
@@ -4969,14 +4824,12 @@ export namespace Prisma {
     lat?: FloatFieldUpdateOperationsInput | number
     long?: FloatFieldUpdateOperationsInput | number
     alert?: EmergencyUpdateOneRequiredWithoutLocationNestedInput
-    user?: UserUpdateOneRequiredWithoutLocationNestedInput
   }
 
   export type LocationUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     lat?: FloatFieldUpdateOperationsInput | number
     long?: FloatFieldUpdateOperationsInput | number
-    userId?: StringFieldUpdateOperationsInput | string
     emergencyId?: StringFieldUpdateOperationsInput | string
   }
 
@@ -4984,7 +4837,6 @@ export namespace Prisma {
     id?: string
     lat: number
     long: number
-    userId: string
     emergencyId: string
   }
 
@@ -4998,7 +4850,6 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     lat?: FloatFieldUpdateOperationsInput | number
     long?: FloatFieldUpdateOperationsInput | number
-    userId?: StringFieldUpdateOperationsInput | string
     emergencyId?: StringFieldUpdateOperationsInput | string
   }
 
@@ -5112,16 +4963,6 @@ export namespace Prisma {
     not?: NestedEnumUserRoleFilter<$PrismaModel> | $Enums.UserRole
   }
 
-  export type LocationListRelationFilter = {
-    every?: LocationWhereInput
-    some?: LocationWhereInput
-    none?: LocationWhereInput
-  }
-
-  export type LocationOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -5193,16 +5034,10 @@ export namespace Prisma {
     isNot?: EmergencyWhereInput
   }
 
-  export type UserScalarRelationFilter = {
-    is?: UserWhereInput
-    isNot?: UserWhereInput
-  }
-
   export type LocationCountOrderByAggregateInput = {
     id?: SortOrder
     lat?: SortOrder
     long?: SortOrder
-    userId?: SortOrder
     emergencyId?: SortOrder
   }
 
@@ -5215,7 +5050,6 @@ export namespace Prisma {
     id?: SortOrder
     lat?: SortOrder
     long?: SortOrder
-    userId?: SortOrder
     emergencyId?: SortOrder
   }
 
@@ -5223,7 +5057,6 @@ export namespace Prisma {
     id?: SortOrder
     lat?: SortOrder
     long?: SortOrder
-    userId?: SortOrder
     emergencyId?: SortOrder
   }
 
@@ -5310,9 +5143,19 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
+  export type LocationListRelationFilter = {
+    every?: LocationWhereInput
+    some?: LocationWhereInput
+    none?: LocationWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
+  }
+
+  export type LocationOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type EmergencyCountOrderByAggregateInput = {
@@ -5441,20 +5284,6 @@ export namespace Prisma {
     _max?: NestedIntFilter<$PrismaModel>
   }
 
-  export type LocationCreateNestedManyWithoutUserInput = {
-    create?: XOR<LocationCreateWithoutUserInput, LocationUncheckedCreateWithoutUserInput> | LocationCreateWithoutUserInput[] | LocationUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: LocationCreateOrConnectWithoutUserInput | LocationCreateOrConnectWithoutUserInput[]
-    createMany?: LocationCreateManyUserInputEnvelope
-    connect?: LocationWhereUniqueInput | LocationWhereUniqueInput[]
-  }
-
-  export type LocationUncheckedCreateNestedManyWithoutUserInput = {
-    create?: XOR<LocationCreateWithoutUserInput, LocationUncheckedCreateWithoutUserInput> | LocationCreateWithoutUserInput[] | LocationUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: LocationCreateOrConnectWithoutUserInput | LocationCreateOrConnectWithoutUserInput[]
-    createMany?: LocationCreateManyUserInputEnvelope
-    connect?: LocationWhereUniqueInput | LocationWhereUniqueInput[]
-  }
-
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
@@ -5463,44 +5292,10 @@ export namespace Prisma {
     set?: $Enums.UserRole
   }
 
-  export type LocationUpdateManyWithoutUserNestedInput = {
-    create?: XOR<LocationCreateWithoutUserInput, LocationUncheckedCreateWithoutUserInput> | LocationCreateWithoutUserInput[] | LocationUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: LocationCreateOrConnectWithoutUserInput | LocationCreateOrConnectWithoutUserInput[]
-    upsert?: LocationUpsertWithWhereUniqueWithoutUserInput | LocationUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: LocationCreateManyUserInputEnvelope
-    set?: LocationWhereUniqueInput | LocationWhereUniqueInput[]
-    disconnect?: LocationWhereUniqueInput | LocationWhereUniqueInput[]
-    delete?: LocationWhereUniqueInput | LocationWhereUniqueInput[]
-    connect?: LocationWhereUniqueInput | LocationWhereUniqueInput[]
-    update?: LocationUpdateWithWhereUniqueWithoutUserInput | LocationUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: LocationUpdateManyWithWhereWithoutUserInput | LocationUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: LocationScalarWhereInput | LocationScalarWhereInput[]
-  }
-
-  export type LocationUncheckedUpdateManyWithoutUserNestedInput = {
-    create?: XOR<LocationCreateWithoutUserInput, LocationUncheckedCreateWithoutUserInput> | LocationCreateWithoutUserInput[] | LocationUncheckedCreateWithoutUserInput[]
-    connectOrCreate?: LocationCreateOrConnectWithoutUserInput | LocationCreateOrConnectWithoutUserInput[]
-    upsert?: LocationUpsertWithWhereUniqueWithoutUserInput | LocationUpsertWithWhereUniqueWithoutUserInput[]
-    createMany?: LocationCreateManyUserInputEnvelope
-    set?: LocationWhereUniqueInput | LocationWhereUniqueInput[]
-    disconnect?: LocationWhereUniqueInput | LocationWhereUniqueInput[]
-    delete?: LocationWhereUniqueInput | LocationWhereUniqueInput[]
-    connect?: LocationWhereUniqueInput | LocationWhereUniqueInput[]
-    update?: LocationUpdateWithWhereUniqueWithoutUserInput | LocationUpdateWithWhereUniqueWithoutUserInput[]
-    updateMany?: LocationUpdateManyWithWhereWithoutUserInput | LocationUpdateManyWithWhereWithoutUserInput[]
-    deleteMany?: LocationScalarWhereInput | LocationScalarWhereInput[]
-  }
-
   export type EmergencyCreateNestedOneWithoutLocationInput = {
     create?: XOR<EmergencyCreateWithoutLocationInput, EmergencyUncheckedCreateWithoutLocationInput>
     connectOrCreate?: EmergencyCreateOrConnectWithoutLocationInput
     connect?: EmergencyWhereUniqueInput
-  }
-
-  export type UserCreateNestedOneWithoutLocationInput = {
-    create?: XOR<UserCreateWithoutLocationInput, UserUncheckedCreateWithoutLocationInput>
-    connectOrCreate?: UserCreateOrConnectWithoutLocationInput
-    connect?: UserWhereUniqueInput
   }
 
   export type FloatFieldUpdateOperationsInput = {
@@ -5517,14 +5312,6 @@ export namespace Prisma {
     upsert?: EmergencyUpsertWithoutLocationInput
     connect?: EmergencyWhereUniqueInput
     update?: XOR<XOR<EmergencyUpdateToOneWithWhereWithoutLocationInput, EmergencyUpdateWithoutLocationInput>, EmergencyUncheckedUpdateWithoutLocationInput>
-  }
-
-  export type UserUpdateOneRequiredWithoutLocationNestedInput = {
-    create?: XOR<UserCreateWithoutLocationInput, UserUncheckedCreateWithoutLocationInput>
-    connectOrCreate?: UserCreateOrConnectWithoutLocationInput
-    upsert?: UserUpsertWithoutLocationInput
-    connect?: UserWhereUniqueInput
-    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutLocationInput, UserUpdateWithoutLocationInput>, UserUncheckedUpdateWithoutLocationInput>
   }
 
   export type LocationCreateNestedManyWithoutAlertInput = {
@@ -5825,57 +5612,6 @@ export namespace Prisma {
     _max?: NestedIntFilter<$PrismaModel>
   }
 
-  export type LocationCreateWithoutUserInput = {
-    id?: string
-    lat: number
-    long: number
-    alert: EmergencyCreateNestedOneWithoutLocationInput
-  }
-
-  export type LocationUncheckedCreateWithoutUserInput = {
-    id?: string
-    lat: number
-    long: number
-    emergencyId: string
-  }
-
-  export type LocationCreateOrConnectWithoutUserInput = {
-    where: LocationWhereUniqueInput
-    create: XOR<LocationCreateWithoutUserInput, LocationUncheckedCreateWithoutUserInput>
-  }
-
-  export type LocationCreateManyUserInputEnvelope = {
-    data: LocationCreateManyUserInput | LocationCreateManyUserInput[]
-    skipDuplicates?: boolean
-  }
-
-  export type LocationUpsertWithWhereUniqueWithoutUserInput = {
-    where: LocationWhereUniqueInput
-    update: XOR<LocationUpdateWithoutUserInput, LocationUncheckedUpdateWithoutUserInput>
-    create: XOR<LocationCreateWithoutUserInput, LocationUncheckedCreateWithoutUserInput>
-  }
-
-  export type LocationUpdateWithWhereUniqueWithoutUserInput = {
-    where: LocationWhereUniqueInput
-    data: XOR<LocationUpdateWithoutUserInput, LocationUncheckedUpdateWithoutUserInput>
-  }
-
-  export type LocationUpdateManyWithWhereWithoutUserInput = {
-    where: LocationScalarWhereInput
-    data: XOR<LocationUpdateManyMutationInput, LocationUncheckedUpdateManyWithoutUserInput>
-  }
-
-  export type LocationScalarWhereInput = {
-    AND?: LocationScalarWhereInput | LocationScalarWhereInput[]
-    OR?: LocationScalarWhereInput[]
-    NOT?: LocationScalarWhereInput | LocationScalarWhereInput[]
-    id?: StringFilter<"Location"> | string
-    lat?: FloatFilter<"Location"> | number
-    long?: FloatFilter<"Location"> | number
-    userId?: StringFilter<"Location"> | string
-    emergencyId?: StringFilter<"Location"> | string
-  }
-
   export type EmergencyCreateWithoutLocationInput = {
     id?: string
     type: $Enums.HazardType
@@ -5903,29 +5639,6 @@ export namespace Prisma {
   export type EmergencyCreateOrConnectWithoutLocationInput = {
     where: EmergencyWhereUniqueInput
     create: XOR<EmergencyCreateWithoutLocationInput, EmergencyUncheckedCreateWithoutLocationInput>
-  }
-
-  export type UserCreateWithoutLocationInput = {
-    id?: string
-    name: string
-    username: string
-    password: string
-    phoneNo: string
-    role: $Enums.UserRole
-  }
-
-  export type UserUncheckedCreateWithoutLocationInput = {
-    id?: string
-    name: string
-    username: string
-    password: string
-    phoneNo: string
-    role: $Enums.UserRole
-  }
-
-  export type UserCreateOrConnectWithoutLocationInput = {
-    where: UserWhereUniqueInput
-    create: XOR<UserCreateWithoutLocationInput, UserUncheckedCreateWithoutLocationInput>
   }
 
   export type EmergencyUpsertWithoutLocationInput = {
@@ -5963,47 +5676,16 @@ export namespace Prisma {
     priority?: IntFieldUpdateOperationsInput | number
   }
 
-  export type UserUpsertWithoutLocationInput = {
-    update: XOR<UserUpdateWithoutLocationInput, UserUncheckedUpdateWithoutLocationInput>
-    create: XOR<UserCreateWithoutLocationInput, UserUncheckedCreateWithoutLocationInput>
-    where?: UserWhereInput
-  }
-
-  export type UserUpdateToOneWithWhereWithoutLocationInput = {
-    where?: UserWhereInput
-    data: XOR<UserUpdateWithoutLocationInput, UserUncheckedUpdateWithoutLocationInput>
-  }
-
-  export type UserUpdateWithoutLocationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    phoneNo?: StringFieldUpdateOperationsInput | string
-    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  }
-
-  export type UserUncheckedUpdateWithoutLocationInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    name?: StringFieldUpdateOperationsInput | string
-    username?: StringFieldUpdateOperationsInput | string
-    password?: StringFieldUpdateOperationsInput | string
-    phoneNo?: StringFieldUpdateOperationsInput | string
-    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
-  }
-
   export type LocationCreateWithoutAlertInput = {
     id?: string
     lat: number
     long: number
-    user: UserCreateNestedOneWithoutLocationInput
   }
 
   export type LocationUncheckedCreateWithoutAlertInput = {
     id?: string
     lat: number
     long: number
-    userId: string
   }
 
   export type LocationCreateOrConnectWithoutAlertInput = {
@@ -6032,60 +5714,38 @@ export namespace Prisma {
     data: XOR<LocationUpdateManyMutationInput, LocationUncheckedUpdateManyWithoutAlertInput>
   }
 
-  export type LocationCreateManyUserInput = {
-    id?: string
-    lat: number
-    long: number
-    emergencyId: string
-  }
-
-  export type LocationUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    lat?: FloatFieldUpdateOperationsInput | number
-    long?: FloatFieldUpdateOperationsInput | number
-    alert?: EmergencyUpdateOneRequiredWithoutLocationNestedInput
-  }
-
-  export type LocationUncheckedUpdateWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    lat?: FloatFieldUpdateOperationsInput | number
-    long?: FloatFieldUpdateOperationsInput | number
-    emergencyId?: StringFieldUpdateOperationsInput | string
-  }
-
-  export type LocationUncheckedUpdateManyWithoutUserInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    lat?: FloatFieldUpdateOperationsInput | number
-    long?: FloatFieldUpdateOperationsInput | number
-    emergencyId?: StringFieldUpdateOperationsInput | string
+  export type LocationScalarWhereInput = {
+    AND?: LocationScalarWhereInput | LocationScalarWhereInput[]
+    OR?: LocationScalarWhereInput[]
+    NOT?: LocationScalarWhereInput | LocationScalarWhereInput[]
+    id?: StringFilter<"Location"> | string
+    lat?: FloatFilter<"Location"> | number
+    long?: FloatFilter<"Location"> | number
+    emergencyId?: StringFilter<"Location"> | string
   }
 
   export type LocationCreateManyAlertInput = {
     id?: string
     lat: number
     long: number
-    userId: string
   }
 
   export type LocationUpdateWithoutAlertInput = {
     id?: StringFieldUpdateOperationsInput | string
     lat?: FloatFieldUpdateOperationsInput | number
     long?: FloatFieldUpdateOperationsInput | number
-    user?: UserUpdateOneRequiredWithoutLocationNestedInput
   }
 
   export type LocationUncheckedUpdateWithoutAlertInput = {
     id?: StringFieldUpdateOperationsInput | string
     lat?: FloatFieldUpdateOperationsInput | number
     long?: FloatFieldUpdateOperationsInput | number
-    userId?: StringFieldUpdateOperationsInput | string
   }
 
   export type LocationUncheckedUpdateManyWithoutAlertInput = {
     id?: StringFieldUpdateOperationsInput | string
     lat?: FloatFieldUpdateOperationsInput | number
     long?: FloatFieldUpdateOperationsInput | number
-    userId?: StringFieldUpdateOperationsInput | string
   }
 
 

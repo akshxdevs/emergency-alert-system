@@ -1,8 +1,8 @@
 import { Kafka } from "kafkajs";
 
 const kafka = new Kafka({
-    clientId:'chat-service',
+    clientId:'emergency-alert-service',
     brokers:['localhost:9092']
 });
 
-export const consumer = kafka.consumer({groupId:'chat-group'});
+export const consumer = kafka.consumer({groupId:'alert-group'});

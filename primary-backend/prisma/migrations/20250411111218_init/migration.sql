@@ -24,7 +24,6 @@ CREATE TABLE "Location" (
     "id" TEXT NOT NULL,
     "lat" DOUBLE PRECISION NOT NULL,
     "long" DOUBLE PRECISION NOT NULL,
-    "userId" TEXT NOT NULL,
     "emergencyId" TEXT NOT NULL,
 
     CONSTRAINT "Location_pkey" PRIMARY KEY ("id")
@@ -50,6 +49,3 @@ CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 
 -- AddForeignKey
 ALTER TABLE "Location" ADD CONSTRAINT "Location_emergencyId_fkey" FOREIGN KEY ("emergencyId") REFERENCES "Emergency"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Location" ADD CONSTRAINT "Location_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
