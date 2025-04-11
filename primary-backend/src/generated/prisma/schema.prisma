@@ -1,0 +1,69 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       String     @id @default(uuid())
+  name     String
+  username String     @unique
+  password String
+  phoneNo  String
+  role     UserRole
+  location Location[]
+}
+
+model Location {
+  id          String    @id @default(uuid())
+  lat         Float
+  long        Float
+  userId      String
+  emergencyId String
+  alert       Emergency @relation(fields: [emergencyId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
+}
+
+model Emergency {
+  id              String       @id @default(uuid())
+  type            HazardType
+  reportedBy      String
+  status          StatusReport
+  assignedTo      UserRole
+  timeStamp       DateTime     @default(now())
+  statusUpdatedAt DateTime?    @updatedAt
+  description     String?
+  priority        Int          @default(1)
+  location        Location[]
+}
+
+enum UserRole {
+  CIVILIAN
+  POLICE
+  FIRE
+  MEDICAL
+}
+
+enum HazardType {
+  FIRE
+  CRIME
+  ACCIDENT
+  MEDICAL
+  OTHER
+}
+
+enum StatusReport {
+  REPORT
+  IN_PROCRESS
+  RESOLVED
+}

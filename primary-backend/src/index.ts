@@ -1,14 +1,17 @@
+import http from "http";
 import express from "express";
 import cors from "cors";
+import { PORT } from "./config";
+import { setUpSocketServer } from "./routes/socket";
+
 const app = express();
-const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
-app.use("/api/v1/user",);
-app.use("/api/v1/alert",);
+const server = http.createServer(app);
+setUpSocketServer(server);
 
-app.listen(()=>{
-    console.log(`server running on port ${PORT}`);
+server.listen(PORT, () => {
+    console.log(`ws & http server running on port:${PORT}`);
 });
