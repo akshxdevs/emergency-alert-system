@@ -25,7 +25,6 @@ export const setUpSocketServer = (server: httpServer) => {
 
   wss.on("connection", (socket: WebSocket, userId: string) => {
     clients.set(userId, socket);
-
     socket.send(
       JSON.stringify({
         type: "welcome",
