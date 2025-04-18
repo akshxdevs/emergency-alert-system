@@ -5,7 +5,7 @@ export const LoginComponent = () =>{
     const [showPassword,setShowPassword] = useState(false);
     return <div>
         <div className="flex flex-col justify-center items-center h-screen">
-            <div className="bg-[#141a15ea] px-32 py-10 border-2 border-gray-950 rounded-lg">
+            <div className="bg-[#] px-32 py-10 border-2 border-gray-950 rounded-lg">
                 <div className="flex flex-col pb-5 text-2xl font-bold">
                     <span>Stay connected.</span>
                     <span>Stay alert.</span> 

@@ -4,12 +4,14 @@ import 'leaflet/dist/leaflet.css';
 import MapSelector from "../Components/MapSelector";
 import '../Components/LeafLetIcons';
 import { AppBar } from "../Components/AppBar";
-import SlideToConfirm from "../Components/SlideToConfirm";
+import { SlideToConfirm } from "../Components/SlideToConfirm";
 
 export default function(){
     const [isLogin,setIsLogin] = useState(true);
+    const [data,setData] = useState(false);
         const handleLocationSelect = (lat: number, lng: number) => {
-          console.log("Selected Location:", lat, lng);
+            setData(true);
+            console.log("Selected Location:", lat, lng);
         };
         const handleConfirm = () => {
             // alert("User confirmed!");
@@ -22,9 +24,11 @@ export default function(){
                     <h2 className="text-2xl font-semibold py-5">Select Location of Emergency</h2>
                     <MapSelector onLocationSelect={handleLocationSelect} />
                 </div>
-                <div className="py-2">
-                    <SlideToConfirm onConfirm={handleConfirm} />
-                </div>
+                {data && (
+                    <div className="py-2">
+                        <SlideToConfirm onConfirm={handleConfirm} />
+                    </div>
+                )}
             </div>
         )}
     </div>

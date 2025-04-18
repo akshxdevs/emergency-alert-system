@@ -1,61 +1,91 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
-const SlideToConfirm = ({ onConfirm }: { onConfirm: () => void }) => {
+export const SlideToConfirm = ({ onConfirm }: { onConfirm: () => void }) => {
   const [dragX, setDragX] = useState(0);
   const [confirmed, setConfirmed] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
 
-  const handleMouseDown = () => {
-    isDragging.current = true;
+  const knobWidth = 48;
+
+  const handleDrag = (clientX: number) => {
+    if (!isDragging.current || !containerRef.current) return;
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const newX = Math.min(
+      Math.max(clientX - rect.left, 0),
+      rect.width - knobWidth
+    );
+    setDragX(newX);
   };
 
-  const handleMouseUp = () => {
+  const handleMouseDown = () => {
+    if (!confirmed) {
+      isDragging.current = true;
+    }
+  };
+
+  const handleEnd = () => {
+    if (!containerRef.current) return;
     isDragging.current = false;
-    if (containerRef.current && dragX > containerRef.current.offsetWidth - 80) {
+
+    const rect = containerRef.current.getBoundingClientRect();
+    const threshold = rect.width - knobWidth - 10;
+
+    if (dragX >= threshold) {
       setConfirmed(true);
       onConfirm();
     } else {
-      setDragX(0); // Reset position if not fully dragged
+      setDragX(0);
     }
   };
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (isDragging.current && containerRef.current) {
-      const rect = containerRef.current.getBoundingClientRect();
-      const newX = Math.min(Math.max(e.clientX - rect.left, 0), rect.width - 60);
-      setDragX(newX);
-    }
-  };
+  const handleMouseMove = (e: React.MouseEvent) => handleDrag(e.clientX);
+  const handleTouchMove = (e: React.TouchEvent) => handleDrag(e.touches[0].clientX);
+
+  useEffect(() => {
+    const handleMouseUp = () => handleEnd();
+    window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('touchend', handleMouseUp);
+    return () => {
+      window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('touchend', handleMouseUp);
+    };
+  }, [dragX]);
 
   return (
     <div
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseUp}
-      onMouseUp={handleMouseUp}
-      className={`relative w-full h-12 ${confirmed ? "bg-red-700" : "bg-gray-200"} select-none overflow-hidden`}
+      onTouchMove={handleTouchMove}
+      className={`relative w-full max-w-md h-14 mx-auto px-2 rounded-full select-none overflow-hidden transition-colors duration-300 ${
+        confirmed ? 'bg-green-600' : 'bg-gray-200'
+      }`}
     >
-      {!confirmed && (
-        <p className="absolute left-0 right-0 top-1/2 transform -translate-y-1/2 text-center text-gray-900 text-md">
-          Slide to Report..
+      <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+        <p className={`text-sm font-medium ${confirmed ? 'text-white' : 'text-gray-700'}`}>
+          {confirmed ? 'Reported!' : 'Slide to Report'}
         </p>
-      )}
-      {confirmed && (
-        <p className="absolute left-0 right-0 top-1/2 transform -translate-y-1/2 text-center text-green-600 font-semibold">
-          Reported!
-        </p>
-      )}
+      </div>
 
       {!confirmed && (
         <div
           onMouseDown={handleMouseDown}
-          className="absolute top-1/2 transform -translate-y-1/2 left-0 w-12 h-12 bg-white mx-2 shadow-md cursor-pointer transition-all"
-          style={{ transform: `translate(${dragX}px, -50%)` }}
-        ></div>
+          onTouchStart={handleMouseDown}
+          style={{
+            transform: `translateX(${dragX}px)`,
+            transition: isDragging.current ? 'none' : 'transform 0.3s ease',
+          }}
+          className="absolute top-1 left-0 w-12 h-12 bg-white rounded-full shadow-md flex items-center justify-center cursor-pointer z-10"
+        >
+          <img
+            src="https://img.icons8.com/dotty/80/1A1A1A/forward.png"
+            alt="slide"
+            width="20"
+            height="20"
+          />
+        </div>
       )}
     </div>
   );
 };
-
-export default SlideToConfirm;

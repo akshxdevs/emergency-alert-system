@@ -10,29 +10,27 @@ const MapSelector = ({
 }) => {
   const [markerPos, setMarkerPos] = useState<{ lat: number; lng: number } | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [loadingLocation, setLoadingLocation] = useState<boolean>(true);  // To track if location is loading
+  const [loadingLocation, setLoadingLocation] = useState<boolean>(true);  
 
-  // Get the user's current location when the component mounts
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
           setUserLocation({ lat: latitude, lng: longitude });
-          setLoadingLocation(false);  // Once the location is fetched, stop loading
+          setLoadingLocation(false); 
         },
         (error) => {
           console.error('Error getting location:', error);
-          setLoadingLocation(false);  // Stop loading even if there's an error
+          setLoadingLocation(false); 
         }
       );
     } else {
       console.error('Geolocation is not supported by this browser.');
-      setLoadingLocation(false);  // If geolocation is not available
+      setLoadingLocation(false);  
     }
   }, []);
 
-  // Handling Map Event when the user clicks on the map
   const LocationMarker = () => {
     useMapEvents({
       click(e) {
@@ -45,16 +43,15 @@ const MapSelector = ({
     return markerPos ? <Marker position={markerPos} icon={customIcon} /> : null;
   };
 
-  // Fallback to a default center if userLocation is not yet available
   const defaultCenter = userLocation || { lat: 28.6139, lng: 77.2090 };
 
   return (
     <>
       {loadingLocation ? (
-        <div>Loading your location...</div> // You can display a loading message or spinner here
+        <div>Loading your location...</div>
       ) : (
         <MapContainer
-          center={[defaultCenter.lat, defaultCenter.lng]}  // Use user's location or fallback
+          center={[defaultCenter.lat, defaultCenter.lng]}
           zoom={13}
           scrollWheelZoom={true}
           style={{ height: '400px', width: '400px' }}
