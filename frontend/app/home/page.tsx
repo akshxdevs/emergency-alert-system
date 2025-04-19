@@ -8,7 +8,7 @@ import { AppBar } from "../Components/AppBar";
 import { SlideToConfirm } from "../Components/SlideToConfirm";
 import { useEmergencySocket } from "../Components/SocketComponenet";
 
-export default function EmergencyPage() {
+export default function () {
   const [isLogin, setIsLogin] = useState(true);
   const [showSlider, setShowSlider] = useState(false);
   const [showAlertModal, setShowAlertModal] = useState(false);
@@ -22,7 +22,7 @@ export default function EmergencyPage() {
   const { sendEmergency } = useEmergencySocket(userId);
 
   const handleLocationSelect = (lat: number, lng: number) => {
-    console.log("📍 Selected Location:", lat, lng);
+    console.log("Selected Location:", lat, lng);
     setLat(lat);
     setLng(lng);
     setShowSlider(true);
@@ -43,12 +43,12 @@ export default function EmergencyPage() {
     };
     sendEmergency(alertPayload);
 
-    console.log("✅ Emergency Confirmed!");  
+    console.log("Emergency Confirmed!");  
     setShowAlertModal(false);
   };
   useEffect(() => {
     if (hazardType) {
-      console.log("🚨 Hazard Type Selected:", hazardType);
+      console.log("Hazard Type Selected:", hazardType);
     }
   }, [hazardType]);
   return (

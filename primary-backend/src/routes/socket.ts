@@ -31,14 +31,12 @@ export const setUpSocketServer = (server: httpServer) => {
       roleClients.set(userRole, new Set<WebSocket>());
     }
     roleClients.get(userRole)?.add(socket);
-
     socket.send(
       JSON.stringify({
         type: `welcome ${userId}`,
         message: `Connected to Emergency Alert WS`,
       })
     );
-
     socket.on("message", async (messages) => {
       try {
         const data = JSON.parse(messages.toString());
@@ -66,10 +64,8 @@ export const setUpSocketServer = (server: httpServer) => {
             ],
           });
         }
-
         if (data.type === "UPDATE_ALERT_STATUS") {
           const { alertId, newStatus } = data.payload;
-
           if (!Object.values(StatusReport).includes(newStatus)) {
             socket.send(
               JSON.stringify({
@@ -108,7 +104,6 @@ export const setUpSocketServer = (server: httpServer) => {
         );
       }
     });
-
     socket.on("close", () => {
       roleClients.forEach((sockets, role) => {
         sockets.delete(socket);
@@ -118,7 +113,6 @@ export const setUpSocketServer = (server: httpServer) => {
       });
     });
   });
-
   function broadcast(data: any) {
     const payload = JSON.stringify(data);
     wss.clients.forEach((client) => {
@@ -127,7 +121,6 @@ export const setUpSocketServer = (server: httpServer) => {
       }
     });
   }
-
   function roleBroadcast(role: string, data: any) {
     const payload = JSON.stringify(data);
     const sockets = roleClients.get(role);
@@ -140,7 +133,6 @@ export const setUpSocketServer = (server: httpServer) => {
       }
     });
   }
-
   const updateAlertStatus = async (alertId: string, newStatus: StatusReport) => {
     try {
       const updated = await prismaClient.emergency.update({
@@ -154,7 +146,6 @@ export const setUpSocketServer = (server: httpServer) => {
       throw err;
     }
   };
-
   (async () => {
     await producer.connect();
     await consumer.connect();
