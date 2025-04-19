@@ -17,24 +17,31 @@ const init_1 = require("./redis/init");
 const db_1 = require("../db/db");
 const client_1 = require("@prisma/client");
 const clients = new Map();
+const roleClients = new Map();
 const setUpSocketServer = (server) => {
     const wss = new ws_1.WebSocketServer({ noServer: true });
     server.on("upgrade", (req, socket, head) => {
-        var _a;
+        var _a, _b;
         const userId = (_a = req.url) === null || _a === void 0 ? void 0 : _a.split("/")[1];
-        if (!userId) {
+        const userRole = (_b = req.url) === null || _b === void 0 ? void 0 : _b.split("/?")[1];
+        if (!userId || !userRole) {
             socket.destroy();
             return;
         }
         wss.handleUpgrade(req, socket, head, (ws) => {
-            wss.emit("connection", ws, userId);
+            wss.emit("connection", ws, userId, userRole);
         });
     });
-    wss.on("connection", (socket, userId) => {
+    wss.on("connection", (socket, userId, userRole) => {
+        var _a;
         clients.set(userId, socket);
+        if (!roleClients.has(userRole)) {
+            roleClients.set(userRole, new Set());
+        }
+        (_a = roleClients.get(userRole)) === null || _a === void 0 ? void 0 : _a.add(socket);
         socket.send(JSON.stringify({
-            type: "welcome",
-            message: "Connected to Emergency Alert WS",
+            type: `welcome ${userId}`,
+            message: `Connected to Emergency Alert WS`,
         }));
         socket.on("message", (messages) => __awaiter(void 0, void 0, void 0, function* () {
             try {
@@ -93,10 +100,29 @@ const setUpSocketServer = (server) => {
                 }));
             }
         }));
+        socket.on("close", () => {
+            roleClients.forEach((sockets, role) => {
+                sockets.delete(socket);
+                if (sockets.size === 0) {
+                    roleClients.delete(role);
+                }
+            });
+        });
     });
     function broadcast(data) {
         const payload = JSON.stringify(data);
         wss.clients.forEach((client) => {
+            if (client.readyState === ws_1.WebSocket.OPEN) {
+                client.send(payload);
+            }
+        });
+    }
+    function roleBroadcast(role, data) {
+        const payload = JSON.stringify(data);
+        const sockets = roleClients.get(role);
+        if (!sockets)
+            return;
+        sockets.forEach((client) => {
             if (client.readyState === ws_1.WebSocket.OPEN) {
                 client.send(payload);
             }
@@ -152,6 +178,7 @@ const setUpSocketServer = (server) => {
                     if (alert.priority === "HIGH") {
                         broadcast({ type: "HIGH_PRIORITY_ALERT", payload: alert });
                     }
+                    roleBroadcast(alert.assignedTo, { type: alert.type, payload: alert });
                 }
                 if (topic === "alert-updates") {
                     const { id, newStatus } = JSON.parse(message.value.toString());

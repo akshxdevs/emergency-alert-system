@@ -59,8 +59,8 @@
   }
 
   enum StatusReport {
-    REPORT
-    IN_PROCRESS
+    REPORTED
+    IN_PROCESS
     RESOLVED
   }
 
