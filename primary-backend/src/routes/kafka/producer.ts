@@ -1,7 +1,7 @@
 import { Kafka } from "kafkajs";
 
 const kafka = new Kafka({
-    clientId:'chat-service',
+    clientId:'emergency-alerts',
     brokers:['localhost:9092']
 });
 

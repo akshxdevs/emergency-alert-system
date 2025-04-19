@@ -1,41 +1,65 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
 import MapSelector from "../Components/MapSelector";
 import "../Components/LeafLetIcons";
 import { AppBar } from "../Components/AppBar";
 import { SlideToConfirm } from "../Components/SlideToConfirm";
+import { useEmergencySocket } from "../Components/SocketComponenet";
 
 export default function EmergencyPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [showSlider, setShowSlider] = useState(false);
   const [showAlertModal, setShowAlertModal] = useState(false);
-  const [description,setDescription] = useState("");
-  const [showDescription,setShowDescription] = useState(false)
+  const [lat, setLat] = useState<number | null>(null);
+  const [lng, setLng] = useState<number | null>(null);
+  const [hazardType, setHazardType] = useState("");
+  const [showDescription, setShowDescription] = useState(false);
+  const [description, setDescription] = useState("");
+  const [priority, setPriority] = useState("");
+  const [userId,setUserId] = useState("user123");
+  const { sendEmergency } = useEmergencySocket(userId);
 
   const handleLocationSelect = (lat: number, lng: number) => {
-    setShowAlertModal(true)
-    setShowSlider(true);
     console.log("📍 Selected Location:", lat, lng);
-  };
-
-  const handleConfirm = () => {
-    console.log("✅ Emergency Confirmed!");
+    setLat(lat);
+    setLng(lng);
+    setShowSlider(true);
     setShowAlertModal(true);
   };
+  const handleConfirm = async() => {
+    console.log(priority);
+    const alertPayload = {
+      type: hazardType,
+      priority: priority,
+      status: "IN_PROCRESS",
+      description: description,
+      assignedTo: "POLICE",
+      location: {
+        lat: lat,
+        long: lng,
+      },
+    };
+    sendEmergency(alertPayload);
 
+    console.log("✅ Emergency Confirmed!");  
+    setShowAlertModal(false);
+  };
+  useEffect(() => {
+    if (hazardType) {
+      console.log("🚨 Hazard Type Selected:", hazardType);
+    }
+  }, [hazardType]);
   return (
-    <div className="flex flex-col justify-center items-center h-screen relative">
+    <div className="flex flex-col justify-center items-center h-screen relative bg-[#0f0f0f]">
       {isLogin && (
-        <div className="bg-[#141a15ea] p-10 rounded-md z-10">
+        <div className="bg-[#141a15ea] p-10 rounded-md z-10 shadow-md">
           <AppBar />
-          <div>
-            <h2 className="text-2xl font-semibold py-5 text-white">
-              Select Location of Emergency
-            </h2>
-            <MapSelector onLocationSelect={handleLocationSelect} />
-          </div>
+          <h2 className="text-2xl font-semibold py-5 text-white">
+            Select Location of Emergency
+          </h2>
+          <MapSelector onLocationSelect={handleLocationSelect} />
 
           {showSlider && (
             <div className="py-5">
@@ -44,31 +68,79 @@ export default function EmergencyPage() {
           )}
         </div>
       )}
-
       {showAlertModal && (
-        <div className="fixed inset-x-[530px] px-10 inset-y-[145px] flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm z-20">
-          <div className="bg-[#141a15ea] py-10 rounded-lg shadow-lg text-center">
-            <h1>Hazard Type*</h1>
-            <div>
-                <button className="border p-2 rounded-lg border-orange-500 m-2 focus-within:border-slate-200">FIRE 🔥</button>
-                <button className="border p-2 rounded-lg border-red-500 m-2 focus-within:border-slate-200">CRIME</button>
-                <button className="border p-2 rounded-lg border-yellow-500 m-2 focus-within:border-slate-200">ACCIDENT</button>
-                <button className="border p-2 rounded-lg border-blue-500 m-2 focus-within:border-slate-200">MEDICAL</button>
-                <button className="border p-2 rounded-lg m-2 border-green-500 focus-within:border-slate-200" onClick={()=>{
-                    setShowDescription(true)
-                }}>OTHER</button>
+        <div className="fixed inset-x-[490px] inset-y-[145px] flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm z-20">
+          <div className="bg-[#141a15ea] p-10 rounded-lg shadow-lg text-center">
+            <h1 className="text-xl font-bold mb-4">Hazard Type *</h1>
+            <div className="flex flex-wrap gap-2 justify-center mb-4">
+              {["FIRE", "CRIME", "ACCIDENT", "MEDICAL"].map((type) => (
+                <button
+                  key={type}
+                  className={`px-4 py-2 rounded-lg border transition-all ${
+                    hazardType === type
+                      ? "bg-white text-black border-white"
+                      : {
+                          FIRE: "border-orange-500",
+                          CRIME: "border-red-500",
+                          ACCIDENT: "border-yellow-500",
+                          MEDICAL: "border-blue-500",
+                        }[type]
+                  }`}
+                  onClick={() => {
+                    setHazardType(type);
+                    setShowDescription(false);
+                    setDescription("");
+                  }}
+                >
+                  {type}
+                </button>
+              ))}
+              <button
+                className={`px-4 py-2 rounded-lg border ${
+                  hazardType === "OTHER"
+                    ? "bg-white text-black border-white"
+                    : "border-green-500"
+                }`}
+                onClick={() => {
+                  setHazardType("OTHER");
+                  setShowDescription(true);
+                }}
+              >
+                OTHER
+              </button>
             </div>
             {showDescription && (
-                <div>
-                    <h1>Give us a short brief!</h1>
-                    <input className="border bg-[#141a15ea] p-2 rounded-lg my-2" type="text" placeholder="Tell us what happened here..." value={description} onChange={(e)=>setDescription(e.target.value)} />
-                </div>
+              <div className="mb-4">
+                <h2 className="text-md font-semibold mb-1">
+                  Give us a short brief
+                </h2>
+                <input
+                  type="text"
+                  className="w-full p-2 rounded-md border border-gray-600 bg-[#1f1f1f] text-white placeholder-gray-400"
+                  placeholder="Tell us what happened..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+              </div>
             )}
-            <div>
-                <h1>Priority Level</h1>
-                <button className="border border-gray-900 p-2 rounded-lg bg-red-500 m-2 focus-within:border-slate-200">LOW</button>
-                <button className="border border-gray-900  p-2 rounded-lg m-2 bg-red-700 focus-within:border-slate-200">MEDIUM</button>
-                <button className="border border-gray-900  p-2 rounded-lg m-2 bg-red-900 focus-within:border-slate-200">HIGH</button>
+
+            <div className="mt-4">
+              <h2 className="text-md font-bold mb-2">Priority Level</h2>
+              <div className="flex justify-center gap-2">
+                {["LOW", "MEDIUM", "HIGH"].map((level, idx) => (
+                  <button
+                    key={level}
+                    className={`px-4 py-2 rounded-lg border border-gray-900 text-white ${
+                      priority === level
+                        ? "ring-2 ring-white"
+                        : ["bg-red-500", "bg-red-700", "bg-red-900"][idx]
+                    }`}
+                    onClick={() => setPriority(level)}
+                  >
+                    {level}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
