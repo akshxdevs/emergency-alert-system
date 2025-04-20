@@ -19,10 +19,84 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const db_1 = require("../db/db");
 const config_1 = require("../config");
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const types_1 = require("../types");
 const router = (0, express_1.Router)();
 const redis = new ioredis_1.default();
 const OTP_LIMIT = 3;
 const OTP_EXPIRY = 100;
+router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const parsedBody = types_1.SigninSchema.safeParse(req.body);
+        if (!parsedBody.success) {
+            return res.status(400).json({ message: "Invalid Input", error: parsedBody.error.errors });
+        }
+        const { email, password, userRole } = parsedBody.data;
+        const role = String(userRole).toLocaleLowerCase();
+        const generateUsername = String(role + (Math.floor(Math.random() * 1000000))).padStart(6, "7");
+        const existingUser = yield db_1.prismaClient.user.findFirst({
+            where: {
+                email: email
+            }
+        });
+        if (existingUser) {
+            return res.status(402).send({ message: "User already exist" });
+        }
+        const HashedPassword = yield bcrypt_1.default.hash(password, 10);
+        const user = yield db_1.prismaClient.user.create({
+            data: {
+                username: generateUsername,
+                email: email,
+                password: HashedPassword,
+                role: userRole
+            }
+        });
+        res.json({
+            message: "User Created Sucessfully",
+            user: user
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(403).send({ message: "Something went wrong!" });
+    }
+}));
+router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const parsedBody = types_1.SigninSchema.safeParse(req.body);
+        if (!parsedBody.success) {
+            return res.status(400).json({ message: "Invalid Input", error: parsedBody.error.errors });
+        }
+        const { email, password } = parsedBody.data;
+        const user = yield db_1.prismaClient.user.findFirst({
+            where: {
+                email,
+            }
+        });
+        if (!user) {
+            return res.status(401).send({ message: "Invalid Email Or Password!" });
+        }
+        const passwordValidation = yield bcrypt_1.default.compare(password, user.password);
+        if (!passwordValidation) {
+            return res.status(401).send({ message: "Password Mismatch!" });
+        }
+        const token = jsonwebtoken_1.default.sign({
+            id: user.id
+        }, config_1.JWT_SECRET, { expiresIn: "1h" });
+        res.json({
+            user: {
+                name: user.username,
+                email: user.email,
+                id: user.id
+            },
+            token,
+            message: "User Login Sucessfully"
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(403).send({ message: "Something went wrong!" });
+    }
+}));
 router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { phoneNo } = req.body;

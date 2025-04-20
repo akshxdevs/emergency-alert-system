@@ -52,7 +52,7 @@ export default function () {
     }
   }, [hazardType]);
   return (
-    <div className="flex flex-col justify-center items-center h-screen relative bg-[#0f0f0f]">
+    <div className="flex flex-col justify-center items-center h-screen relative">
       {isLogin && (
         <div className="bg-[#141a15ea] p-10 rounded-md z-10 shadow-md">
           <AppBar />
@@ -69,7 +69,7 @@ export default function () {
         </div>
       )}
       {showAlertModal && (
-        <div className="fixed inset-x-[490px] inset-y-[145px] flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm z-20">
+        <div className="fixed inset-x-[530px] inset-y-[140px] flex items-center justify-center p-10 bg-black bg-opacity-60 backdrop-blur-sm z-20">
           <div className="bg-[#141a15ea] p-10 rounded-lg shadow-lg text-center">
             <h1 className="text-xl font-bold mb-4">Hazard Type *</h1>
             <div className="flex flex-wrap gap-2 justify-center mb-4">

@@ -4,11 +4,85 @@ import jwt from "jsonwebtoken";
 import { prismaClient } from "../db/db";
 import { JWT_SECRET } from "../config";
 import bcrypt from "bcrypt";
+import { SigninSchema } from "../types";
 const router = Router();
 const redis = new Redis();
 const OTP_LIMIT = 3;
 const OTP_EXPIRY = 100;
 
+router.post("/signup",async(req,res)=>{
+    try {
+        const parsedBody = SigninSchema.safeParse(req.body);
+        
+        if (!parsedBody.success) {
+            return res.status(400).json({message:"Invalid Input",error:parsedBody.error.errors})
+        }
+        const {email,password,userRole} = parsedBody.data;
+        const role = String(userRole).toLocaleLowerCase();
+        const generateUsername:string = String(role + (Math.floor(Math.random()*1000000))).padStart(6,"7");
+        const existingUser = await prismaClient.user.findFirst({
+            where:{
+                email:email
+            }
+        })
+        if (existingUser){
+            return res.status(402).send({message:"User already exist"})
+        }
+        const HashedPassword = await bcrypt.hash(password,10)
+        const user = await prismaClient.user.create({
+            data:{
+                username:generateUsername,
+                email:email,
+                password:HashedPassword,
+                role:userRole
+            }
+        })
+        res.json({
+            message:"User Created Sucessfully",
+            user:user
+        })
+    } catch (error) {
+        console.error(error);
+        res.status(403).send({message:"Something went wrong!"})
+    }
+})
+
+router.post("/signin",async(req,res)=>{
+    try {
+        const parsedBody = SigninSchema.safeParse(req.body);
+        if (!parsedBody.success) {
+            return res.status(400).json({message:"Invalid Input",error:parsedBody.error.errors})
+        }
+        const {email,password} = parsedBody.data
+        const user = await prismaClient.user.findFirst({
+            where:{
+                email,
+            }
+        })
+        if (!user) {
+            return res.status(401).send({message:"Invalid Email Or Password!"})
+        }
+        const passwordValidation = await bcrypt.compare(password,user.password);
+        if (!passwordValidation) {
+            return res.status(401).send({message:"Password Mismatch!"}) 
+        }
+        const token = jwt.sign({
+            id:user.id
+        },JWT_SECRET as string,{expiresIn:"1h"})
+        res.json({
+            user:{
+                name:user.username,
+                email:user.email,
+                id:user.id
+            },
+            token,
+            message:"User Login Sucessfully"
+        })  
+    } catch (error) {
+        console.error(error);
+        res.status(403).send({message:"Something went wrong!"})
+    }
+})
 router.post("/login",async(req,res)=>{
     try {
         const {phoneNo} = req.body;
