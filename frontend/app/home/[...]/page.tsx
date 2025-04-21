@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import "leaflet/dist/leaflet.css";
-import MapSelector from "../Components/MapSelector";
-import "../Components/LeafLetIcons";
-import { AppBar } from "../Components/AppBar";
-import { SlideToConfirm } from "../Components/SlideToConfirm";
-import { useEmergencySocket } from "../Components/SocketComponenet";
+import MapSelector from "../../Components/MapSelector";
+import "../../Components/LeafLetIcons";
+import { AppBar } from "../../Components/AppBar";
+import { SlideToConfirm } from "../../Components/SlideToConfirm";
+import { useEmergencySocket } from "../../Components/SocketComponenet";
+import { useParams } from "next/navigation";
 
 export default function () {
   const [isLogin, setIsLogin] = useState(true);
@@ -19,7 +20,15 @@ export default function () {
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("");
   const [userId,setUserId] = useState("user123");
-  const { sendEmergency } = useEmergencySocket(userId);
+  const [userRole,setUserRole] = useState<string | any>();
+  const params = useParams();
+
+  useEffect(()=>{
+    const role: string = params[""]?.[0] as string;
+    setUserRole(role);
+  },[userRole])
+
+  const { sendEmergency } = useEmergencySocket(userId,userRole);
 
   const handleLocationSelect = (lat: number, lng: number) => {
     console.log("Selected Location:", lat, lng);

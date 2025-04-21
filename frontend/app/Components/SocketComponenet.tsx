@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 
-export const useEmergencySocket = (userId: string) => {
+export const useEmergencySocket = (userId: string,userRole:string) => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
 
   useEffect(() => {
-    const ws = new WebSocket(`ws://localhost:3000/${userId}`);
+    const ws = new WebSocket(`ws://localhost:3000/${userId}/?${userRole}`);
     console.log(userId);
     ws.onopen = () => {
       console.log("WebSocket connected");
