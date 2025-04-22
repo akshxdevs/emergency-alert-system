@@ -42,7 +42,7 @@ export default function () {
     const alertPayload = {
       type: hazardType,
       priority: priority,
-      status: "IN_PROCRESS",
+      status: "REPORTED",
       description: description,
       assignedTo: "POLICE",
       location: {

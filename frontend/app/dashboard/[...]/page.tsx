@@ -8,26 +8,29 @@ export default function AlertListener() {
   const userId: string = params[""]?.[0] || "";
   const userRole: string = params[""]?.[1] || "";
   const [receivedAlert, setReceivedAlert] = useState<string>("");
-
   const handleMessage = useCallback((data: any) => {
     console.log("Received:", data.payload);
     if (data.type === "HIGH_PRIORITY_ALERT") {
       alert("HIGH PRIORITY ALERT: " + JSON.stringify(data.payload));
     }
-
     if (data.type === "ALERT_UPDATED") {
       console.log("ALERT UPDATED:", data.payload);
     }
-
     setReceivedAlert(JSON.stringify(data.payload));
+    console.log(receivedAlert);
   }, []);
-
   UseAlertListener(userId, userRole, handleMessage);
-
+  const parsedAlert = JSON.parse(receivedAlert || "{}");
+  console.log(parsedAlert.type);  
   return (
     <div className="flex flex-col justify-center items-center h-screen text-black">
-      <div className="p-10 bg-white">Listening for role: {userRole}</div>
-      <p>{receivedAlert}</p>
+      <div className="p-10 bg-white">Listening for role: {userRole}
+        <p>{receivedAlert}</p>
+        <div className="border p-5">
+          <h1>Emergency Type: {parsedAlert.type}</h1>
+          <h2>Priority: {parsedAlert.priority}</h2>
+        </div>
+      </div>
     </div>
   );
 }
