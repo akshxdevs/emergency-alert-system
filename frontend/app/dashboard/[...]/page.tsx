@@ -24,11 +24,23 @@ export default function AlertListener() {
   console.log(parsedAlert.type);  
   return (
     <div className="flex flex-col justify-center items-center h-screen text-black">
-      <div className="p-10 bg-white">Listening for role: {userRole}
+      <div className="p-10 bg-white">Listening for role: {userRole === "police" || "POLICE" ? "👮🏻" : "NO ONE"}
         <p>{receivedAlert}</p>
-        <div className="border p-5">
-          <h1>Emergency Type: {parsedAlert.type}</h1>
-          <h2>Priority: {parsedAlert.priority}</h2>
+        <div className="flex justify-between gap-3 border">
+        <div className="p-5">
+          <h1>Emergency Type: {parsedAlert.type || "asdasdasd"}</h1>
+          <h2>Priority: {parsedAlert.priority || "adsasdasdads"}</h2>
+          <p>Description: {parsedAlert.description || "Asdsadasdasd"}</p> 
+          <p>ReportedBy : {parsedAlert.reportedBy || "adfadsfadfadsf"}</p>
+        </div>
+          <div className="flex py-5">
+            <div className="py-2 my-6">
+              <button className="border p-1 border-gray-900 rounded-md mx-2">✅</button>
+            </div>
+            <div className="py-2 my-6">
+              <button className="border p-1 border-gray-900 rounded-md mx-2">❌</button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
