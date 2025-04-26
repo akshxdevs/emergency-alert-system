@@ -1,204 +1,211 @@
-import { WebSocket, WebSocketServer } from "ws";
-import { Server as httpServer } from "http";
-import { producer } from "./kafka/producer";
-import { consumer } from "./kafka/consumer";
-import { redisClient } from "./redis/init";
-import { prismaClient } from "../db/db";
-import { StatusReport } from "@prisma/client";
+  import { WebSocket, WebSocketServer } from "ws";
+  import { Server as httpServer } from "http";
+  import { producer } from "./kafka/producer";
+  import { consumer } from "./kafka/consumer";
+  import { redisClient } from "./redis/init";
+  import { prismaClient } from "../db/db";
+  import { StatusReport } from "@prisma/client";
 
-const clients = new Map<string, WebSocket>();
-const roleClients = new Map<string, Set<WebSocket>>();
+  const clients = new Map<string, WebSocket>();
+  const roleClients = new Map<string, Set<WebSocket>>();
 
-export const setUpSocketServer = (server: httpServer) => {
-  const wss = new WebSocketServer({ noServer: true });
+  export const setUpSocketServer = (server: httpServer) => {
+    const wss = new WebSocketServer({ noServer: true });
 
-  server.on("upgrade", (req, socket, head) => {
-    const userId = req.url?.split("/")[1] as string;
-    const userRole = req.url?.split("/?")[1] as string;
-    if (!userId || !userRole) {
-      socket.destroy();
-      return;
-    }
+    server.on("upgrade", (req, socket, head) => {
+      const userId = req.url?.split("/")[1] as string;
+      const userRole = req.url?.split("/?")[1] as string;
+      if (!userId || !userRole) {
+        socket.destroy();
+        return;
+      }
 
-    wss.handleUpgrade(req, socket, head, (ws) => {
-      wss.emit("connection", ws, userId, userRole);
+      wss.handleUpgrade(req, socket, head, (ws) => {
+        wss.emit("connection", ws, userId, userRole);
+      });
     });
-  });
 
-  wss.on("connection", (socket: WebSocket, userId: string, userRole: string) => {
-    clients.set(userId, socket);
-    if (!roleClients.has(userRole)) {
-      roleClients.set(userRole, new Set<WebSocket>());
+    wss.on("connection", (socket: WebSocket, userId: string, userRole: string) => {
+      clients.set(userId, socket);
+      if (!roleClients.has(userRole)) {
+        roleClients.set(userRole, new Set<WebSocket>());
+      }
+      roleClients.get(userRole)?.add(socket);
+      socket.send(
+        JSON.stringify({
+          type: `welcome ${userId}`,
+          message: `Connected to Emergency Alert WS`,
+        })
+      );
+      socket.on("message", async (messages) => {
+        try {
+          const data = JSON.parse(messages.toString());
+
+          if (data.type === "NEW_ALERT") {
+            const alert = data.payload;
+            const allowedPriorities = ["LOW", "MEDIUM", "HIGH"];
+            if (!allowedPriorities.includes(alert.priority)) {
+              socket.send(
+                JSON.stringify({
+                  type: "error",
+                  message: "Invalid priority value",
+                })
+              );
+              return;
+            }
+            const fullAlert = { ...alert, reportedBy: userId };
+            await producer.send({
+              topic: "emergency-alerts",
+              messages: [
+                {
+                  key: "alert",
+                  value: JSON.stringify(fullAlert),
+                },
+              ],
+            });
+          }
+          if (data.type === "UPDATE_ALERT_STATUS") {
+            const { alertId, newStatus } = data.payload;
+            if (!Object.values(StatusReport).includes(newStatus)) {
+              socket.send(
+                JSON.stringify({
+                  type: "error",
+                  message: `Invalid status. Must be one of: ${Object.values(StatusReport).join(",")}`,
+                })
+              );
+              return;
+            }
+
+            try {
+              const updatedAlert = await updateAlertStatus(alertId, newStatus);
+              await redisClient.set(`alert:${alertId}`, JSON.stringify(updatedAlert));
+              broadcast({ type: "ALERT_UPDATED", payload: updatedAlert });
+              socket.send(
+                JSON.stringify({
+                  type: "success",
+                  message: `Alert ${alertId} updated to ${newStatus}`,
+                })
+              );
+            } catch (error) {
+              socket.send(
+                JSON.stringify({
+                  type: "error",
+                  message: "Failed to update alert",
+                })
+              );
+            }
+          }
+        } catch (err) {
+          socket.send(
+            JSON.stringify({
+              type: "error",
+              message: "Invalid message format",
+            })
+          );
+        }
+      });
+      socket.on("close", () => {
+        roleClients.forEach((sockets, role) => {
+          sockets.delete(socket);
+          if (sockets.size === 0) {
+            roleClients.delete(role);
+          }
+        });
+      });
+    });
+    function broadcast(data: any) {
+      const payload = JSON.stringify(data);
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(payload);
+        }
+      });
     }
-    roleClients.get(userRole)?.add(socket);
-    socket.send(
-      JSON.stringify({
-        type: `welcome ${userId}`,
-        message: `Connected to Emergency Alert WS`,
-      })
-    );
-    socket.on("message", async (messages) => {
+    function roleBroadcast(role: string, data: any) {
+      const payload = JSON.stringify(data);
+      const sockets = roleClients.get(role);
+
+      if (!sockets) return;
+
+      sockets.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(payload);
+        }
+      });
+    }
+    const updateAlertStatus = async (alertId: string, newStatus: StatusReport) => {
       try {
-        const data = JSON.parse(messages.toString());
-
-        if (data.type === "NEW_ALERT") {
-          const alert = data.payload;
-          const allowedPriorities = ["LOW", "MEDIUM", "HIGH"];
-          if (!allowedPriorities.includes(alert.priority)) {
-            socket.send(
-              JSON.stringify({
-                type: "error",
-                message: "Invalid priority value",
-              })
-            );
-            return;
-          }
-          const fullAlert = { ...alert, reportedBy: userId };
-          await producer.send({
-            topic: "emergency-alerts",
-            messages: [
-              {
-                key: "alert",
-                value: JSON.stringify(fullAlert),
-              },
-            ],
-          });
-        }
-        if (data.type === "UPDATE_ALERT_STATUS") {
-          const { alertId, newStatus } = data.payload;
-          if (!Object.values(StatusReport).includes(newStatus)) {
-            socket.send(
-              JSON.stringify({
-                type: "error",
-                message: `Invalid status. Must be one of: ${Object.values(StatusReport).join(",")}`,
-              })
-            );
-            return;
-          }
-
-          try {
-            const updatedAlert = await updateAlertStatus(alertId, newStatus);
-            await redisClient.set(`alert:${alertId}`, JSON.stringify(updatedAlert));
-            broadcast({ type: "ALERT_UPDATED", payload: updatedAlert });
-            socket.send(
-              JSON.stringify({
-                type: "success",
-                message: `Alert ${alertId} updated to ${newStatus}`,
-              })
-            );
-          } catch (error) {
-            socket.send(
-              JSON.stringify({
-                type: "error",
-                message: "Failed to update alert",
-              })
-            );
-          }
-        }
+        const updated = await prismaClient.emergency.update({
+          where: { id: alertId },
+          data: {
+            status: { set: newStatus },
+          },
+        });
+        return updated;
       } catch (err) {
-        socket.send(
-          JSON.stringify({
-            type: "error",
-            message: "Invalid message format",
-          })
-        );
+        throw err;
       }
-    });
-    socket.on("close", () => {
-      roleClients.forEach((sockets, role) => {
-        sockets.delete(socket);
-        if (sockets.size === 0) {
-          roleClients.delete(role);
-        }
-      });
-    });
-  });
-  function broadcast(data: any) {
-    const payload = JSON.stringify(data);
-    wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(payload);
-      }
-    });
-  }
-  function roleBroadcast(role: string, data: any) {
-    const payload = JSON.stringify(data);
-    const sockets = roleClients.get(role);
+    };
+    (async () => {
+      await producer.connect();
+      await consumer.connect();
+      await consumer.subscribe({ topic: "emergency-alerts", fromBeginning: true });
+      await consumer.subscribe({ topic: 'alert-updates' });
 
-    if (!sockets) return;
+      await consumer.run({
+        eachMessage: async ({ message, topic }) => {
+          if (!message.value) return;
+          const alert = JSON.parse(message.value.toString());
 
-    sockets.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(payload);
-      }
-    });
-  }
-  const updateAlertStatus = async (alertId: string, newStatus: StatusReport) => {
-    try {
-      const updated = await prismaClient.emergency.update({
-        where: { id: alertId },
-        data: {
-          status: { set: newStatus },
-        },
-      });
-      return updated;
-    } catch (err) {
-      throw err;
-    }
-  };
-  (async () => {
-    await producer.connect();
-    await consumer.connect();
-    await consumer.subscribe({ topic: "emergency-alerts", fromBeginning: true });
-    await consumer.subscribe({ topic: 'alert-updates' });
+          if (topic === "emergency-alerts") {
+            try {
+              await redisClient.set(`alert:${alert.id}`, JSON.stringify(alert));
 
-    await consumer.run({
-      eachMessage: async ({ message, topic }) => {
-        if (!message.value) return;
-        const alert = JSON.parse(message.value.toString());
-
-        if (topic === "emergency-alerts") {
-          try {
-            await redisClient.set(`alert:${alert.id}`, JSON.stringify(alert));
-
-            await prismaClient.emergency.create({
-              data: {
-                type: alert.type,
-                reportedBy: alert.reportedBy,
-                status: alert.status,
-                assignedTo: alert.assignedTo,
-                description: alert.description,
-                priority: alert.priority,
-                location: {
-                  create: {
-                    lat: alert.location.lat,
-                    long: alert.location.long,
+              const createAlert = await prismaClient.emergency.create({
+                data: {
+                  type: alert.type,
+                  reportedBy: alert.reportedBy,
+                  status: alert.status,
+                  assignedTo: alert.assignedTo,
+                  description: alert.description,
+                  priority: alert.priority,
+                  location: {
+                    create: {
+                      lat: alert.location.lat,
+                      long: alert.location.long,
+                    },
                   },
                 },
-              },
-            });
-          } catch (error) {
-            console.error("Failed to store alert:", error);
+              });
+
+            if (alert.priority === "HIGH") {
+              broadcast({ type: "HIGH_PRIORITY_ALERT", payload: createAlert });
+            }
+            roleBroadcast(alert.assignedTo, { type: alert.type, payload: createAlert });
+            } catch (error) {
+              console.error("Failed to store alert:", error);
+            }
           }
 
-          if (alert.priority === "HIGH") {
-            broadcast({ type: "HIGH_PRIORITY_ALERT", payload: alert });
-          }
-          roleBroadcast(alert.assignedTo, { type: alert.type, payload: alert });
-        }
+            if (topic === "alert-updates") {
+              try {
+                console.log("entered updates");
+                
+                const { id, newStatus } = JSON.parse(message.value.toString());
 
-        if (topic === "alert-updates") {
-          const { id, newStatus } = JSON.parse(message.value.toString());
+                const updated = await prismaClient.emergency.update({
+                  where: { id },
+                  data: { status: newStatus },
+                });
+                console.log("Prisma update successful:", updated);
+                await redisClient.set(`alert:${id}`, JSON.stringify(updated));
+                broadcast({ type: "ALERT_UPDATED", payload: updated });
+              } catch (error) {
+                console.error("Prisma update failed:", error);
+              }
 
-          const updated = await prismaClient.emergency.update({
-            where: { id },
-            data: { status: newStatus },
-          });
-
-          await redisClient.set(`alert:${id}`, JSON.stringify(updated));
-          broadcast({ type: "ALERT_UPDATED", payload: updated });
-        }
-      },
-    });
-  })();
-};
+            }
+          },
+      });
+    })();
+  };

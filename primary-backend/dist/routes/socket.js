@@ -155,7 +155,7 @@ const setUpSocketServer = (server) => {
                 if (topic === "emergency-alerts") {
                     try {
                         yield init_1.redisClient.set(`alert:${alert.id}`, JSON.stringify(alert));
-                        yield db_1.prismaClient.emergency.create({
+                        const createAlert = yield db_1.prismaClient.emergency.create({
                             data: {
                                 type: alert.type,
                                 reportedBy: alert.reportedBy,
@@ -171,23 +171,30 @@ const setUpSocketServer = (server) => {
                                 },
                             },
                         });
+                        if (alert.priority === "HIGH") {
+                            broadcast({ type: "HIGH_PRIORITY_ALERT", payload: createAlert });
+                        }
+                        roleBroadcast(alert.assignedTo, { type: alert.type, payload: createAlert });
                     }
                     catch (error) {
                         console.error("Failed to store alert:", error);
                     }
-                    if (alert.priority === "HIGH") {
-                        broadcast({ type: "HIGH_PRIORITY_ALERT", payload: alert });
-                    }
-                    roleBroadcast(alert.assignedTo, { type: alert.type, payload: alert });
                 }
                 if (topic === "alert-updates") {
-                    const { id, newStatus } = JSON.parse(message.value.toString());
-                    const updated = yield db_1.prismaClient.emergency.update({
-                        where: { id },
-                        data: { status: newStatus },
-                    });
-                    yield init_1.redisClient.set(`alert:${id}`, JSON.stringify(updated));
-                    broadcast({ type: "ALERT_UPDATED", payload: updated });
+                    try {
+                        console.log("entered updates");
+                        const { id, newStatus } = JSON.parse(message.value.toString());
+                        const updated = yield db_1.prismaClient.emergency.update({
+                            where: { id },
+                            data: { status: newStatus },
+                        });
+                        console.log("Prisma update successful:", updated);
+                        yield init_1.redisClient.set(`alert:${id}`, JSON.stringify(updated));
+                        broadcast({ type: "ALERT_UPDATED", payload: updated });
+                    }
+                    catch (error) {
+                        console.error("Prisma update failed:", error);
+                    }
                 }
             }),
         });

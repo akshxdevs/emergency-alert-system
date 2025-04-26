@@ -29,6 +29,9 @@ export const useEmergencySocket = (userId: string,userRole:string) => {
       if (data.type === "HIGH_PRIORITY_ALERT") {
         alert("HIGH PRIORITY ALERT: " + JSON.stringify(data.payload));
       }
+      if (data.type === "UPDATE_ALERT_STATUS") {
+        alert("UPDATE_ALERT_STATUS: " + JSON.stringify(data.payload));
+      }
     };
 
     ws.onerror = (err) => {
@@ -51,7 +54,6 @@ export const useEmergencySocket = (userId: string,userRole:string) => {
       console.error("Socket not open");
       return;
     }
-
     socket.send(
       JSON.stringify({
         type: "NEW_ALERT",
@@ -59,6 +61,18 @@ export const useEmergencySocket = (userId: string,userRole:string) => {
       })
     );
   };
-
-  return { sendEmergency };
+  const sendEmergencyUpdate = (alert: any) => {
+    if (!socket || socket.readyState !== WebSocket.OPEN) {
+      console.error("Socket not open");
+      return;
+    }
+    console.log(alert);
+    socket.send(
+      JSON.stringify({
+        type: "UPDATE_ALERT_STATUS",
+        payload: alert,
+      })
+    );
+  };
+  return { sendEmergency, sendEmergencyUpdate };
 };
