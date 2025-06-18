@@ -13,7 +13,7 @@ export default function Home() {
         router.push("/login/police")
       }}>POLICE</button>
       <button onClick={()=>{
-        router.push("/login/fireman")
+        router.push("/login/fire")
       }}>FIRE-MAN</button>
       <button onClick={()=>{
         router.push("/login/medical")

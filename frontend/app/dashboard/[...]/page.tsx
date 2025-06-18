@@ -41,8 +41,7 @@ export default function AlertListener() {
 
   return (
     <div className="flex flex-col justify-center items-center h-screen text-black">
-      <div className="p-10 bg-white">Listening for role: {["police", "POLICE"].includes(userRole) ? "👮🏻" : "NO ONE"}
-
+      <div className="p-10 bg-white">Listening for role: {userRole.toLocaleUpperCase()==="POLICE" ? "👮🏻" : userRole.toLocaleUpperCase() === "MEDICAl" ? "🧑‍⚕️" : "🧑🏻‍🚒"}
         <p>{receivedAlert}</p>
         <div className="flex justify-between gap-3 border">
         <div className="p-5">

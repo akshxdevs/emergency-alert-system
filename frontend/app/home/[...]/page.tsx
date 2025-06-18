@@ -23,6 +23,12 @@ export default function () {
   const [userRole,setUserRole] = useState<string | any>();
   const params = useParams();
 
+  const roleAssignedTo:Record<string,string> = {
+    "CRIME":"POLICE",
+    "FIRE":"FIRE",
+    "MEDICAL":"MEDICAL"
+  }
+
   useEffect(()=>{
     const role: string = params[""]?.[0] as string;
     setUserRole(role);
@@ -38,13 +44,14 @@ export default function () {
     setShowAlertModal(true);
   };
   const handleConfirm = async() => {
+    const assignedTo = roleAssignedTo[hazardType] || "OTHER"
     console.log(priority);
     const alertPayload = {
       type: hazardType,
       priority: priority,
       status: "REPORTED",
       description: description,
-      assignedTo: "POLICE",
+      assignedTo: assignedTo,
       location: {
         lat: lat,
         long: lng,

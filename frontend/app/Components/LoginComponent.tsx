@@ -10,7 +10,7 @@ export const LoginComponent = () =>{
     const [policeLoginModel,setPoliceLoginModel] = useState(false);
     const [medicalLoginModel,setmedicalLoginModel] = useState(false);
     const [fireLoginModel,setFireLoginModel] = useState(false);
-    const [userRole,setUserRole] = useState("CIVILIAN");
+    const [userRole,setUserRole] = useState("");
     const [email,setEmail] = useState<string>("");
     const [password,setPassword] = useState<string>("");
     const router = useRouter();
@@ -210,8 +210,9 @@ export const LoginComponent = () =>{
                                     userRole:userRole
                                 })
                                 if (res.data) {
+                                    const userId = res.data.user.id;
                                     console.log("Login Successfull!");
-                                    router.push(`/home`)
+                                    router.push(`/dashboard/${userId}/${userRole}`)
                                 }
                             }}>Lock In 🔒</button>
                         </div>
@@ -268,8 +269,9 @@ export const LoginComponent = () =>{
                                     userRole:userRole
                                 })
                                 if (res.data) {
+                                    const userId = res.data.user.id;
                                     console.log("Login Successfull!");
-                                    router.push(`/home`)
+                                    router.push(`/dashboard/${userId}/${userRole}`)
                                 }
                             }}>Lock In 🔒</button>
                         </div>
