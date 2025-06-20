@@ -12,6 +12,19 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      fontFamily: {
+        Ultra: ['Ultra', 'serif'], // 👈 define your font
+      },
+      animation: {
+        'spin-conic': 'spin-conic 3s linear infinite',
+      },
+      keyframes: {
+        'spin-conic': {
+          to: {
+            '--angle': '360deg',
+          },
+        },
+      },
     },
   },
   plugins: [],
