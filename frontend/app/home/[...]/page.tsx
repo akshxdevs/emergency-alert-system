@@ -11,8 +11,8 @@ import { useParams } from "next/navigation";
 
 export default function () {
   const [isLogin, setIsLogin] = useState(true);
-  const [showSlider, setShowSlider] = useState(false);
-  const [showAlertModal, setShowAlertModal] = useState(false);
+  const [showSlider, setShowSlider] = useState(true);
+  const [showAlertModal, setShowAlertModal] = useState(true);
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
   const [hazardType, setHazardType] = useState("");
@@ -58,7 +58,6 @@ export default function () {
       },
     };
     sendEmergency(alertPayload);
-
     console.log("Emergency Confirmed!");  
     setShowAlertModal(false);
   };
@@ -85,7 +84,7 @@ export default function () {
         </div>
       )}
       {showAlertModal && (
-        <div className="fixed inset-x-[530px] inset-y-[140px] flex items-center justify-center p-10 bg-black bg-opacity-60 backdrop-blur-sm z-20">
+        <div className="fixed xs:inset-x-[510px] xs:inset-y-[790px]  sm:inset-x-[120px] sm:inset-y-[390px] md:inset-x-[400px] md:inset-y-[440px] inset-x-[530px] inset-y-[140px] flex items-center justify-center p-10 bg-black bg-opacity-60 backdrop-blur-sm z-20">
           <div className="bg-[#141a15ea] p-10 rounded-lg shadow-lg text-center">
             <h1 className="text-xl font-bold mb-4">Hazard Type *</h1>
             <div className="flex flex-wrap gap-2 justify-center mb-4">

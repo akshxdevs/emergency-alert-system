@@ -1,3 +1,4 @@
+import { useRouter } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 
 export const SlideToConfirm = ({ onConfirm }: { onConfirm: () => void }) => {
@@ -5,7 +6,7 @@ export const SlideToConfirm = ({ onConfirm }: { onConfirm: () => void }) => {
   const [confirmed, setConfirmed] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
-
+  const router = useRouter();
   const knobWidth = 48;
 
   const handleDrag = (clientX: number) => {
@@ -35,6 +36,8 @@ export const SlideToConfirm = ({ onConfirm }: { onConfirm: () => void }) => {
     if (dragX >= threshold) {
       setConfirmed(true);
       onConfirm();
+      router.refresh();
+
     } else {
       setDragX(0);
     }
