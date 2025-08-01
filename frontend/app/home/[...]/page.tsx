@@ -1,13 +1,13 @@
 "use client";
-
-import { useEffect, useState } from "react";
-import "leaflet/dist/leaflet.css";
-import MapSelector from "../../Components/MapSelector";
-import "../../Components/LeafLetIcons";
-import { AppBar } from "../../Components/AppBar";
-import { SlideToConfirm } from "../../Components/SlideToConfirm";
-import { useEmergencySocket } from "../../Components/SocketComponenet";
+import { AlertHeaderCard } from "@/app/Components/AlertModel/AlertHeaderCard";
+import { AlertLevelSetter } from "@/app/Components/AlertModel/AlertLevelSetter";
+import { AppBar } from "@/app/Components/AppBar";
+import MapSelector from "@/app/Components/MapSelector";
+import { SlideToConfirm } from "@/app/Components/SlideToConfirm";
+import { useEmergencySocket } from "@/app/Components/SocketComponenet";
+import { motion } from "framer-motion";
 import { useParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function () {
   const [isLogin, setIsLogin] = useState(true);
@@ -19,22 +19,22 @@ export default function () {
   const [showDescription, setShowDescription] = useState(false);
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("");
-  const [userId,] = useState("user123");
-  const [userRole,setUserRole] = useState<string | any>();
+  const [userId] = useState("user123");
+  const [userRole, setUserRole] = useState<string | any>();
   const params = useParams();
 
-  const roleAssignedTo:Record<string,string> = {
-    "CRIME":"POLICE",
-    "FIRE":"FIRE",
-    "MEDICAL":"MEDICAL"
-  }
+  const roleAssignedTo: Record<string, string> = {
+    CRIME: "POLICE",
+    FIRE: "FIRE",
+    MEDICAL: "MEDICAL",
+  };
 
-  useEffect(()=>{
+  useEffect(() => {
     const role: string = params[""]?.[0] as string;
     setUserRole(role);
-  },[userRole])
+  }, [userRole]);
 
-  const { sendEmergency } = useEmergencySocket(userId,userRole);
+  const { sendEmergency } = useEmergencySocket(userId, userRole);
 
   const handleLocationSelect = (lat: number, lng: number) => {
     console.log("Selected Location:", lat, lng);
@@ -43,8 +43,9 @@ export default function () {
     setShowSlider(true);
     setShowAlertModal(true);
   };
-  const handleConfirm = async() => {
-    const assignedTo = roleAssignedTo[hazardType] || "OTHER"
+
+  const handleConfirm = async () => {
+    const assignedTo = roleAssignedTo[hazardType] || "OTHER";
     console.log(priority);
     const alertPayload = {
       type: hazardType,
@@ -58,108 +59,56 @@ export default function () {
       },
     };
     sendEmergency(alertPayload);
-    console.log("Emergency Confirmed!");  
+    console.log("Emergency Confirmed!");
     setShowAlertModal(false);
   };
+
   useEffect(() => {
     if (hazardType) {
       console.log("Hazard Type Selected:", hazardType);
     }
   }, [hazardType]);
+
   return (
-    <div className="flex flex-col justify-center items-center h-screen relative">
-      {isLogin && (
-        <div className="bg-[#141a15ea] p-10 rounded-md z-10 shadow-md">
+    <div className="min-h-screen bg-gray-50">
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="h-full"
+      >
+        <div className="relative z-50">
           <AppBar />
-          <h2 className="text-2xl font-semibold py-5 text-white">
-            Select Location of Emergency
-          </h2>
-          <MapSelector onLocationSelect={handleLocationSelect} />
-
-          {showSlider && (
-            <div className="py-5">
-              <SlideToConfirm onConfirm={handleConfirm} />
-            </div>
-          )}
         </div>
-      )}
-      {showAlertModal && (
-        <div className="fixed xs:inset-x-[510px] xs:inset-y-[790px]  sm:inset-x-[120px] sm:inset-y-[390px] md:inset-x-[400px] md:inset-y-[440px] inset-x-[530px] inset-y-[140px] flex items-center justify-center p-10 bg-black bg-opacity-60 backdrop-blur-sm z-20">
-          <div className="bg-[#141a15ea] p-10 rounded-lg shadow-lg text-center">
-            <h1 className="text-xl font-bold mb-4">Hazard Type *</h1>
-            <div className="flex flex-wrap gap-2 justify-center mb-4">
-              {["FIRE", "CRIME", "ACCIDENT", "MEDICAL"].map((type) => (
-                <button
-                  key={type}
-                  className={`px-4 py-2 rounded-lg border transition-all ${
-                    hazardType === type
-                      ? "bg-white text-black border-white"
-                      : {
-                          FIRE: "border-orange-500",
-                          CRIME: "border-red-500",
-                          ACCIDENT: "border-yellow-500",
-                          MEDICAL: "border-blue-500",
-                        }[type]
-                  }`}
-                  onClick={() => {
-                    setHazardType(type);
-                    setShowDescription(false);
-                    setDescription("");
-                  }}
-                >
-                  {type}
-                </button>
-              ))}
-              <button
-                className={`px-4 py-2 rounded-lg border ${
-                  hazardType === "OTHER"
-                    ? "bg-white text-black border-white"
-                    : "border-green-500"
-                }`}
-                onClick={() => {
-                  setHazardType("OTHER");
-                  setShowDescription(true);
-                }}
-              >
-                OTHER
-              </button>
+        <div className="flex justify-between">
+          <div className="w-[800px] h-ful">
+            <div>
+              <AlertHeaderCard/>
             </div>
-            {showDescription && (
-              <div className="mb-4">
-                <h2 className="text-md font-semibold mb-1">
-                  Give us a short brief
-                </h2>
-                <input
-                  type="text"
-                  className="w-full p-2 rounded-md border border-gray-600 bg-[#1f1f1f] text-white placeholder-gray-400"
-                  placeholder="Tell us what happened..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-              </div>
-            )}
-
-            <div className="mt-4">
-              <h2 className="text-md font-bold mb-2">Priority Level</h2>
-              <div className="flex justify-center gap-2">
-                {["LOW", "MEDIUM", "HIGH"].map((level, idx) => (
-                  <button
-                    key={level}
-                    className={`px-4 py-2 rounded-lg border border-gray-900 text-white ${
-                      priority === level
-                        ? "ring-2 ring-white"
-                        : ["bg-red-500", "bg-red-700", "bg-red-900"][idx]
-                    }`}
-                    onClick={() => setPriority(level)}
-                  >
-                    {level}
-                  </button>
-                ))}
-              </div>
+            <div>
+              <AlertLevelSetter/>
+            </div>
+            <div>
+              <AddMoreAlertDetails/>
+            </div>
+            <div>
+              <AlertCategorySelector/>
+            </div>
+            <div>
+              <OtherOptions/>
             </div>
           </div>
+          <div className="relative z-0 w-full h-screen">
+            <MapSelector onLocationSelect={handleLocationSelect} />
+            
+            {showSlider && (
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
+                <SlideToConfirm onConfirm={handleConfirm} />
+              </div>
+            )}
+          </div>
         </div>
-      )}
+      </motion.div>
     </div>
   );
 }

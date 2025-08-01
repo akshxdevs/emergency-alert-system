@@ -28,15 +28,16 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
     try {
         const parsedBody = types_1.SigninSchema.safeParse(req.body);
         if (!parsedBody.success) {
-            return res.status(400).json({ message: "Invalid Input", error: parsedBody.error.errors });
+            return res
+                .status(400)
+                .json({ message: "Invalid Input", error: parsedBody.error.errors });
         }
-        const { email, password, userRole } = parsedBody.data;
-        const role = String(userRole).toLocaleLowerCase();
-        const generateUsername = String(role + (Math.floor(Math.random() * 1000000))).padStart(6, "7");
+        const { email, password } = parsedBody.data;
+        const generateUsername = String("role" + Math.floor(Math.random() * 1000000)).padStart(6, "7");
         const existingUser = yield db_1.prismaClient.user.findFirst({
             where: {
-                email: email
-            }
+                email: email,
+            },
         });
         if (existingUser) {
             return res.status(402).send({ message: "User already exist" });
@@ -47,12 +48,11 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
                 username: generateUsername,
                 email: email,
                 password: HashedPassword,
-                role: userRole
-            }
+            },
         });
         res.json({
             message: "User Created Sucessfully",
-            user: user
+            user: user,
         });
     }
     catch (error) {
@@ -64,13 +64,15 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
     try {
         const parsedBody = types_1.SigninSchema.safeParse(req.body);
         if (!parsedBody.success) {
-            return res.status(400).json({ message: "Invalid Input", error: parsedBody.error.errors });
+            return res
+                .status(400)
+                .json({ message: "Invalid Input", error: parsedBody.error.errors });
         }
         const { email, password } = parsedBody.data;
         const user = yield db_1.prismaClient.user.findFirst({
             where: {
                 email,
-            }
+            },
         });
         if (!user) {
             return res.status(401).send({ message: "Invalid Email Or Password!" });
@@ -80,16 +82,16 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
             return res.status(401).send({ message: "Password Mismatch!" });
         }
         const token = jsonwebtoken_1.default.sign({
-            id: user.id
+            id: user.id,
         }, config_1.JWT_SECRET, { expiresIn: "1h" });
         res.json({
             user: {
                 name: user.username,
                 email: user.email,
-                id: user.id
+                id: user.id,
             },
             token,
-            message: "User Login Sucessfully"
+            message: "User Login Sucessfully",
         });
     }
     catch (error) {
@@ -100,7 +102,7 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
 router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { phoneNo } = req.body;
-        const generateOtp = String((Math.floor(Math.random() * 1000000))).padStart(6, "7");
+        const generateOtp = String(Math.floor(Math.random() * 1000000)).padStart(6, "7");
         const optKey = `otp:${String(phoneNo)}`;
         const otpReqCnts = yield redis.get(`otp_counts:${phoneNo}`);
         if (otpReqCnts && Number(otpReqCnts) >= OTP_LIMIT)
@@ -108,7 +110,9 @@ router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* 
         yield redis.setex(optKey, OTP_EXPIRY, generateOtp);
         yield redis.incr(`otp_count:${phoneNo}`);
         yield redis.expire(`opt_count:${phoneNo}`, OTP_EXPIRY);
-        res.json({ message: `Otp: ${generateOtp} Generated Sucessfully for ${phoneNo}` });
+        res.json({
+            message: `Otp: ${generateOtp} Generated Sucessfully for ${phoneNo}`,
+        });
     }
     catch (error) {
         res.status(411).json({ message: "Something Went Wrong!!" });
@@ -118,7 +122,7 @@ router.post("/login/customer/verify-otp", (req, res) => __awaiter(void 0, void 0
     try {
         const { phoneNo, userRole, otp, password, email } = req.body;
         const role = String(userRole).toLocaleLowerCase();
-        const generateUsername = String(role + (Math.floor(Math.random() * 1000000))).padStart(6, "7");
+        const generateUsername = String(role + Math.floor(Math.random() * 1000000)).padStart(6, "7");
         if (!phoneNo || !otp) {
             return res.status(403).json({ message: "Invalid inputs!" });
         }
@@ -129,20 +133,20 @@ router.post("/login/customer/verify-otp", (req, res) => __awaiter(void 0, void 0
         }
         const existingUser = yield db_1.prismaClient.user.findFirst({
             where: {
-                phoneNo: phoneNo
-            }
+                phoneNo: phoneNo,
+            },
         });
         console.log(userRole);
         if (existingUser) {
             const userToken = jsonwebtoken_1.default.sign({
-                id: existingUser === null || existingUser === void 0 ? void 0 : existingUser.id
-            }, config_1.JWT_SECRET, { expiresIn: '7d' });
+                id: existingUser === null || existingUser === void 0 ? void 0 : existingUser.id,
+            }, config_1.JWT_SECRET, { expiresIn: "7d" });
             yield redis.del(`otp:${phoneNo}`);
             yield redis.del(`otp_count:${phoneNo}`);
             res.json({
                 message: "User Login Successfully!",
                 token: userToken,
-                user: existingUser
+                user: existingUser,
             });
         }
         if (!existingUser) {
@@ -152,18 +156,18 @@ router.post("/login/customer/verify-otp", (req, res) => __awaiter(void 0, void 0
                     username: generateUsername,
                     email: email,
                     password: hashedPassword,
-                    role: userRole
-                }
+                    role: userRole,
+                },
             });
             const token = jsonwebtoken_1.default.sign({
-                id: user.id
-            }, config_1.JWT_SECRET, { expiresIn: '7d' });
+                id: user.id,
+            }, config_1.JWT_SECRET, { expiresIn: "7d" });
             yield redis.del(`otp:${phoneNo}`);
             yield redis.del(`otp_count:${phoneNo}`);
             return res.json({
                 message: "User Login Successfully!",
                 token: token,
-                user: user
+                user: user,
             });
         }
     }

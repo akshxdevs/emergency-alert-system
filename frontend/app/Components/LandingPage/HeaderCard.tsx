@@ -1,9 +1,10 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export const HeaderCard = () => {
-      const [isScrolled, setIsScrolled] = useState(false);
-
+  const [isScrolled, setIsScrolled] = useState(false);
+  const router = useRouter();
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
@@ -47,11 +48,12 @@ export const HeaderCard = () => {
         className="finisher-header relative w-full h-[500px]"
         id="finisher-header"
         >
-        <div className="absolute top-[0px] left-1/2 transform -translate-x-1/2 w-full max-w-full pt-40 ">
-            <div className="flex flex-col justify-center items-center text-center gap-2 text-slate-50">
+        <div className="absolute top-[0px] left-1/2 transform -translate-x-1/2 w-full max-w-full">
+            <div className="flex flex-col justify-center items-center text-center gap-2 text-slate-50 pt-44">
+                <img width="62" height="62" src="https://img.icons8.com/color-pixels/32/siren.png" alt="siren"/>
                 <h1 className="font-gilroyBold text-6xl font-semibold">Stay Safe and Informed With Real-Time Emergency Alerts, Always Reliable</h1>
                 <p className="font-gilroyLight">Built to protect. Designed to alert. Trusted in every crisis.</p>
-                <button className="flex font-gilroy gap-2 mt-8 text-slate-100 font-bold bg-red-500 px-4 py-3 rounded-full">
+                <button onClick={()=>router.push("/login")} className="flex font-gilroy gap-2 mt-8 text-slate-100 font-bold bg-red-500 px-4 py-3 rounded-full">
                     Begin Setup
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />

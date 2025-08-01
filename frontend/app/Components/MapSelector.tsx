@@ -54,7 +54,7 @@ const MapSelector = ({
           center={[defaultCenter.lat, defaultCenter.lng]}
           zoom={13}
           scrollWheelZoom={true}
-          style={{ height: '400px', width: '400px' }}
+          style={{ height: '100%', width: '100%' }}
         >
           <TileLayer
             attribution='&copy; OpenStreetMap contributors'
