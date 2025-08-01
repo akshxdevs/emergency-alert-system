@@ -11,8 +11,8 @@ import { useParams } from "next/navigation";
 
 export default function () {
   const [isLogin, setIsLogin] = useState(true);
-  const [showSlider, setShowSlider] = useState(true);
-  const [showAlertModal, setShowAlertModal] = useState(true);
+  const [showSlider, setShowSlider] = useState(false);
+  const [showAlertModal, setShowAlertModal] = useState(false);
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
   const [hazardType, setHazardType] = useState("");
