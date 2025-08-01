@@ -1,0 +1,167 @@
+"use client";
+import { useState } from "react";
+
+interface Category {
+  id: string;
+  name: string;
+  icon: string;
+  color: string;
+  bgColor: string;
+  borderColor: string;
+  available: boolean;
+}
+
+const categories: Category[] = [
+  {
+    id: "police",
+    name: "Police",
+    icon: "🚔",
+    color: "#1e40af",
+    bgColor: "bg-blue-600",
+    borderColor: "border-blue-600",
+    available: true
+  },
+  {
+    id: "fire",
+    name: "Fire",
+    icon: "🚒",
+    color: "#dc2626",
+    bgColor: "bg-red-600",
+    borderColor: "border-red-600",
+    available: true
+  },
+  {
+    id: "medical",
+    name: "Medical",
+    icon: "🚑",
+    color: "#059669",
+    bgColor: "bg-emerald-600",
+    borderColor: "border-emerald-600",
+    available: true
+  },
+  {
+    id: "blood",
+    name: "Blood Donate",
+    icon: "🩸",
+    color: "#7c3aed",
+    bgColor: "bg-violet-600",
+    borderColor: "border-violet-600",
+    available: false
+  }
+];
+
+export const AlertCategorySelector = () => {
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
+
+  const handleCategoryClick = (categoryId: string) => {
+    if (!categories.find(cat => cat.id === categoryId)?.available) return;
+    
+    setSelectedCategory(categoryId);
+    // Add a brief animation delay
+    setTimeout(() => {
+      // You can add navigation or other actions here
+      console.log(`Selected category: ${categoryId}`);
+    }, 300);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="text-center">
+        <h3 className="text-lg font-semibold text-gray-800 mb-2">Select Category</h3>
+        <p className="text-sm text-gray-600">Choose the type of emergency</p>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-4">
+        {categories.map((category) => {
+          const isSelected = selectedCategory === category.id;
+          const isHovered = hoveredCategory === category.id;
+          const isAvailable = category.available;
+          
+          return (
+            <button
+              key={category.id}
+              onClick={() => handleCategoryClick(category.id)}
+              onMouseEnter={() => setHoveredCategory(category.id)}
+              onMouseLeave={() => setHoveredCategory(null)}
+              disabled={!isAvailable}
+              className={`
+                relative group p-4 rounded-xl border-2 transition-all duration-300 ease-in-out
+                ${isSelected 
+                  ? `${category.bgColor} text-white shadow-lg scale-105` 
+                  : isAvailable 
+                    ? 'bg-white hover:bg-gray-50 border-gray-200 hover:border-gray-300 hover:scale-105' 
+                    : 'bg-gray-100 border-gray-200 cursor-not-allowed opacity-60'
+                }
+                ${isHovered && isAvailable ? 'shadow-md' : ''}
+                transform transition-transform duration-200
+              `}
+            >
+              {/* Coming Soon Badge */}
+              {!isAvailable && (
+                <div className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                  Coming Soon
+                </div>
+              )}
+              
+              {/* Icon */}
+              <div className={`
+                text-4xl mb-3 transition-all duration-300
+                ${isSelected ? 'animate-bounce' : isHovered && isAvailable ? 'animate-pulse' : ''}
+              `}>
+                {category.icon}
+              </div>
+              
+              {/* Category Name */}
+              <div className="text-center">
+                <h4 className={`
+                  font-semibold transition-colors duration-300
+                  ${isSelected ? 'text-white' : isAvailable ? 'text-gray-800' : 'text-gray-500'}
+                `}>
+                  {category.name}
+                </h4>
+                
+                {/* Status Text */}
+                {!isAvailable && (
+                  <p className="text-xs text-gray-500 mt-1">Available Soon</p>
+                )}
+              </div>
+              
+              {/* Selection Indicator */}
+              {isSelected && (
+                <div className={`
+                  absolute -top-1 -right-1 w-6 h-6 rounded-full ${category.bgColor}
+                  flex items-center justify-center text-white text-sm font-bold
+                  animate-pulse
+                `}>
+                  ✓
+                </div>
+              )}
+              
+              {/* Hover Effect */}
+              {isHovered && isAvailable && !isSelected && (
+                <div className={`
+                  absolute inset-0 rounded-xl border-2 ${category.borderColor}
+                  opacity-50 transition-opacity duration-300
+                `} />
+              )}
+            </button>
+          );
+        })}
+      </div>
+      
+      {/* Selected Category Info */}
+      {selectedCategory && (
+        <div className={`
+          mt-4 p-3 rounded-lg border-l-4 transition-all duration-300
+          ${categories.find(cat => cat.id === selectedCategory)?.bgColor} bg-opacity-10
+          ${categories.find(cat => cat.id === selectedCategory)?.borderColor}
+        `}>
+          <p className="text-sm font-medium text-gray-700">
+            Selected: <span className="font-bold">{categories.find(cat => cat.id === selectedCategory)?.name}</span>
+          </p>
+        </div>
+      )}
+    </div>
+  );
+};

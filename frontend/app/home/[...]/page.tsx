@@ -1,6 +1,9 @@
 "use client";
+import { AddMoreAlertDetails } from "@/app/Components/AlertModel/AddMoreAlertDetails";
+import { AlertCategorySelector } from "@/app/Components/AlertModel/AlertCategorySelector";
 import { AlertHeaderCard } from "@/app/Components/AlertModel/AlertHeaderCard";
 import { AlertLevelSetter } from "@/app/Components/AlertModel/AlertLevelSetter";
+import { OtherOptions } from "@/app/Components/AlertModel/OtherOptions";
 import { AppBar } from "@/app/Components/AppBar";
 import MapSelector from "@/app/Components/MapSelector";
 import { SlideToConfirm } from "@/app/Components/SlideToConfirm";
@@ -80,32 +83,25 @@ export default function () {
         <div className="relative z-50">
           <AppBar />
         </div>
-        <div className="flex justify-between">
-          <div className="w-[800px] h-ful">
-            <div>
-              <AlertHeaderCard/>
+        
+        {/* Full Page Map - Base Layer */}
+        <div className="w-full h-screen relative z-0">
+          <MapSelector onLocationSelect={handleLocationSelect} />
+          {showSlider && (
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
+              <SlideToConfirm onConfirm={handleConfirm} />
             </div>
-            <div>
-              <AlertLevelSetter/>
-            </div>
-            <div>
-              <AddMoreAlertDetails/>
-            </div>
-            <div>
-              <AlertCategorySelector/>
-            </div>
-            <div>
-              <OtherOptions/>
-            </div>
-          </div>
-          <div className="relative z-0 w-full h-screen">
-            <MapSelector onLocationSelect={handleLocationSelect} />
-            
-            {showSlider && (
-              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 z-10">
-                <SlideToConfirm onConfirm={handleConfirm} />
-              </div>
-            )}
+          )} 
+        </div>
+        
+        {/* Alert Model Overlay - Floating on top */}
+        <div className="absolute top-[200px] left-28 w-[450px] bg-white/95 backdrop-blur-sm text-zinc-900 shadow-xl rounded-lg border border-gray-200 overflow-y-auto max-h-[calc(100vh-120px)] z-40">
+          <div className="p-4 space-y-4">
+            <AlertHeaderCard lat={lat} lng={lng}/>
+            <AlertLevelSetter/>
+            <AddMoreAlertDetails/>
+            <AlertCategorySelector/>
+            <OtherOptions/>
           </div>
         </div>
       </motion.div>
