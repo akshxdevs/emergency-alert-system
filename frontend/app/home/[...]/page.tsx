@@ -19,7 +19,7 @@ export default function () {
   const [showDescription, setShowDescription] = useState(false);
   const [description, setDescription] = useState("");
   const [priority, setPriority] = useState("");
-  const [userId,setUserId] = useState("user123");
+  const [userId,] = useState("user123");
   const [userRole,setUserRole] = useState<string | any>();
   const params = useParams();
 
