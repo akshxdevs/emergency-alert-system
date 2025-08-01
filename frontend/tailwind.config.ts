@@ -13,15 +13,19 @@ const config: Config = {
         foreground: "var(--foreground)",
       },
       fontFamily: {
-        Ultra: ['Ultra', 'serif'], // 👈 define your font
+        Ultra: ["Ultra", "serif"],
+        gilroy: ["var(--font-gilroy)"],
+        gilroyBold: ["var(--font-gilroyBold)"],
+        gilroyLight: ["var(--font-gilroyLight)"],
+        martianmono: ["var(--font-martianmono)"], // 👈 define your font
       },
       animation: {
-        'spin-conic': 'spin-conic 3s linear infinite',
+        "spin-conic": "spin-conic 3s linear infinite",
       },
       keyframes: {
-        'spin-conic': {
+        "spin-conic": {
           to: {
-            '--angle': '360deg',
+            "--angle": "360deg",
           },
         },
       },
