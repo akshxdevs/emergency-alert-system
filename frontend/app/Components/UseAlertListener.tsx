@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 
 export const UseAlertListener = (userId:string,userRole:string,onMessage:(data:any)=>void) => {
     useEffect(()=>{
