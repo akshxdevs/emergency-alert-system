@@ -66,13 +66,13 @@ export const AlertCategorySelector = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="text-center">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">Select Category</h3>
-        <p className="text-sm text-gray-600">Choose the type of emergency</p>
+        <h3 className="text-base font-semibold text-gray-800 mb-1">Select Category</h3>
+        <p className="text-xs text-gray-600">Choose the type of emergency</p>
       </div>
       
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         {categories.map((category) => {
           const isSelected = selectedCategory === category.id;
           const isHovered = hoveredCategory === category.id;
@@ -86,7 +86,7 @@ export const AlertCategorySelector = () => {
               onMouseLeave={() => setHoveredCategory(null)}
               disabled={!isAvailable}
               className={`
-                relative group p-4 rounded-xl border-2 transition-all duration-300 ease-in-out
+                relative group p-3 rounded-lg border-2 transition-all duration-300 ease-in-out
                 ${isSelected 
                   ? `${category.bgColor} text-white shadow-lg scale-105` 
                   : isAvailable 
@@ -99,14 +99,14 @@ export const AlertCategorySelector = () => {
             >
               {/* Coming Soon Badge */}
               {!isAvailable && (
-                <div className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full font-medium">
+                <div className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded-full font-medium">
                   Coming Soon
                 </div>
               )}
               
               {/* Icon */}
               <div className={`
-                text-4xl mb-3 transition-all duration-300
+                text-2xl mb-2 transition-all duration-300
                 ${isSelected ? 'animate-bounce' : isHovered && isAvailable ? 'animate-pulse' : ''}
               `}>
                 {category.icon}
@@ -115,7 +115,7 @@ export const AlertCategorySelector = () => {
               {/* Category Name */}
               <div className="text-center">
                 <h4 className={`
-                  font-semibold transition-colors duration-300
+                  text-sm font-semibold transition-colors duration-300
                   ${isSelected ? 'text-white' : isAvailable ? 'text-gray-800' : 'text-gray-500'}
                 `}>
                   {category.name}
@@ -123,15 +123,15 @@ export const AlertCategorySelector = () => {
                 
                 {/* Status Text */}
                 {!isAvailable && (
-                  <p className="text-xs text-gray-500 mt-1">Available Soon</p>
+                  <p className="text-xs text-gray-500 mt-0.5">Available Soon</p>
                 )}
               </div>
               
               {/* Selection Indicator */}
               {isSelected && (
                 <div className={`
-                  absolute -top-1 -right-1 w-6 h-6 rounded-full ${category.bgColor}
-                  flex items-center justify-center text-white text-sm font-bold
+                  absolute -top-1 -right-1 w-5 h-5 rounded-full ${category.bgColor}
+                  flex items-center justify-center text-white text-xs font-bold
                   animate-pulse
                 `}>
                   ✓
@@ -141,7 +141,7 @@ export const AlertCategorySelector = () => {
               {/* Hover Effect */}
               {isHovered && isAvailable && !isSelected && (
                 <div className={`
-                  absolute inset-0 rounded-xl border-2 ${category.borderColor}
+                  absolute inset-0 rounded-lg border-2 ${category.borderColor}
                   opacity-50 transition-opacity duration-300
                 `} />
               )}
@@ -153,11 +153,11 @@ export const AlertCategorySelector = () => {
       {/* Selected Category Info */}
       {selectedCategory && (
         <div className={`
-          mt-4 p-3 rounded-lg border-l-4 transition-all duration-300
+          mt-3 p-2 rounded-lg border-l-4 transition-all duration-300
           ${categories.find(cat => cat.id === selectedCategory)?.bgColor} bg-opacity-10
           ${categories.find(cat => cat.id === selectedCategory)?.borderColor}
         `}>
-          <p className="text-sm font-medium text-gray-700">
+          <p className="text-xs font-medium text-gray-700">
             Selected: <span className="font-bold">{categories.find(cat => cat.id === selectedCategory)?.name}</span>
           </p>
         </div>

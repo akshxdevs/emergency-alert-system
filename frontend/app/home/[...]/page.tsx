@@ -4,6 +4,7 @@ import { AlertCategorySelector } from "@/app/Components/AlertModel/AlertCategory
 import { AlertHeaderCard } from "@/app/Components/AlertModel/AlertHeaderCard";
 import { AlertLevelSetter } from "@/app/Components/AlertModel/AlertLevelSetter";
 import { OtherOptions } from "@/app/Components/AlertModel/OtherOptions";
+import { ReportButton } from "@/app/Components/AlertModel/ReportButton";
 import { AppBar } from "@/app/Components/AppBar";
 import MapSelector from "@/app/Components/MapSelector";
 import { SlideToConfirm } from "@/app/Components/SlideToConfirm";
@@ -95,13 +96,14 @@ export default function () {
         </div>
         
         {/* Alert Model Overlay - Floating on top */}
-        <div className="absolute top-[200px] left-28 w-[450px] bg-white/95 backdrop-blur-sm text-zinc-900 shadow-xl rounded-lg border border-gray-200 overflow-y-auto max-h-[calc(100vh-120px)] z-40">
-          <div className="p-4 space-y-4">
+        <div className="absolute top-[100px] left-28 w-[450px] bg-white/95 backdrop-blur-sm text-zinc-900 shadow-xl rounded-lg border border-gray-200 overflow-y-auto max-h-[calc(100vh-120px)] z-40">
+          <div className="p-3 space-y-3">
             <AlertHeaderCard lat={lat} lng={lng}/>
             <AlertLevelSetter/>
             <AddMoreAlertDetails/>
             <AlertCategorySelector/>
             <OtherOptions/>
+            <ReportButton/>
           </div>
         </div>
       </motion.div>
