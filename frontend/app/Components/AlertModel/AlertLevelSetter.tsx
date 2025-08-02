@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-type ThreatLevel = "high" | "moderate" | "low";
+type ThreatLevel = "high" | "medium" | "low";
 
 interface ThreatLevelConfig {
   color: string;
@@ -17,7 +17,7 @@ const threatLevels: Record<ThreatLevel, ThreatLevelConfig> = {
     borderColor: "border-red-500",
     textColor: "text-red-500"
   },
-  moderate: {
+  medium: {
     color: "#f59e0b", // amber-500
     bgColor: "bg-amber-500",
     borderColor: "border-amber-500",
@@ -31,15 +31,22 @@ const threatLevels: Record<ThreatLevel, ThreatLevelConfig> = {
   }
 };
 
-const levelOrder: ThreatLevel[] = ["low", "moderate", "high"];
-
-export const AlertLevelSetter = () => {
-  const [levelSelected, setLevelSelected] = useState<ThreatLevel>("moderate");
+const levelOrder: ThreatLevel[] = ["low", "medium", "high"];
+interface AlertLevelSelectorProps {
+  onLevelChange?: (category: string | null) => void;
+}
+export const AlertLevelSetter:React.FC<AlertLevelSelectorProps> = ({onLevelChange}) => {
+  const [levelSelected, setLevelSelected] = useState<ThreatLevel>("medium");
   const [isAnimating, setIsAnimating] = useState(false);
+
+  useEffect(()=>{
+    if (onLevelChange) {
+      onLevelChange(levelSelected)
+    }
+  },[levelSelected,onLevelChange])
 
   const handleImageClick = () => {
     setIsAnimating(true);
-    
     // Find current index and move to next level
     const currentIndex = levelOrder.indexOf(levelSelected);
     const nextIndex = (currentIndex + 1) % levelOrder.length;
@@ -48,6 +55,7 @@ export const AlertLevelSetter = () => {
     setTimeout(() => {
       setLevelSelected(nextLevel);
       setIsAnimating(false);
+      console.log(levelSelected);      
     }, 200);
   };
 

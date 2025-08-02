@@ -4,7 +4,7 @@ export const useEmergencySocket = (userId: string,userRole:string) => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
 
   useEffect(() => {
-    const ws = new WebSocket(`ws://localhost:3000/${userId}/?${userRole}`);
+    const ws = new WebSocket(`ws://localhost:5000/${userId}/?${userRole}`);
     console.log(userId);
     ws.onopen = () => {
       console.log("WebSocket connected");

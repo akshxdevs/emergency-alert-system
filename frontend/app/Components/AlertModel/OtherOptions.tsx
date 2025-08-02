@@ -1,10 +1,20 @@
 "use client";
-import { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-export const OtherOptions = () => {
+interface AlertAddMoreDetailsProps {
+  onAddingMoreDetails?: (moreDetails: string | null) => void;
+}
+
+export const OtherOptions:React.FC<AlertAddMoreDetailsProps> = ({onAddingMoreDetails}) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [description, setDescription] = useState("");
   const [isFocused, setIsFocused] = useState(false);
+
+  useEffect(()=>{
+    if (onAddingMoreDetails) {
+      onAddingMoreDetails(description);
+    }
+  },[description,onAddingMoreDetails])
 
   const handleToggle = () => {
     setIsExpanded(!isExpanded);

@@ -1,7 +1,11 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 
-export const ReportButton = () => {
+interface ReportButtonProps {
+  onConfirm?: () => void;
+}
+
+export const ReportButton = ({ onConfirm }: ReportButtonProps) => {
   const [isSliding, setIsSliding] = useState(false);
   const [slideProgress, setSlideProgress] = useState(0);
   const [isConfirmed, setIsConfirmed] = useState(false);
@@ -42,19 +46,23 @@ export const ReportButton = () => {
     setIsSliding(false);
     
     if (slideProgress >= 85) {
-      // Success animation
       setIsAnimating(true);
       setTimeout(() => {
         setIsConfirmed(true);
         setIsAnimating(false);
         setShowSuccess(true);
         setShowFullScreenSuccess(true);
-        // Trigger the emergency report
+        
+        // Trigger the emergency report from parent component
+        if (onConfirm) {
+          onConfirm();
+        }
         console.log("Emergency reported successfully!");
         
+        // Auto reset after 30 seconds
         resetTimeoutRef.current = setTimeout(() => {
           resetToInitial();
-        }, 30000);
+        }, 5000);
       }, 500);
     } else {
       // Reset to start
@@ -119,7 +127,7 @@ export const ReportButton = () => {
     <>
       {/* Full Screen Success Animation */}
       {showFullScreenSuccess && (
-        <div className="fixed top-[-12px] left-0 right-0 bottom-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center">
+        <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/80 backdrop-blur-md z-[9999] flex items-center justify-center">
           <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md w-full mx-4 text-center animate-in slide-in-from-bottom-4 duration-500">
             <div className="relative mb-6">
               <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mx-auto animate-pulse">
@@ -137,10 +145,10 @@ export const ReportButton = () => {
       )}
 
       {/* Normal Alert Components (Hidden during success) */}
-      <div className={`${showFullScreenSuccess ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+      <div className={`space-y-3 ${showFullScreenSuccess ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         <div className="text-center">
           <h3 className="text-base font-semibold text-gray-800 mb-1">Report Emergency</h3>
-          <p className="text-xs text-gray-600 pb-5">Slide to confirm and send alert</p>
+          <p className="text-xs text-gray-600">Slide to confirm and send alert</p>
         </div>
 
         {/* Enhanced Slider Container */}
@@ -237,11 +245,21 @@ export const ReportButton = () => {
               </div>
               <div className="flex items-center gap-2 text-xs text-green-600">
                 <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span>Auto-resetting in 10 seconds...</span>
+                <span>Auto-resetting in 30 seconds...</span>
               </div>
             </div>
           )}
         </div>
+
+        {/* Enhanced Reset Button */}
+        {showSuccess && (
+          <button
+            onClick={resetToInitial}
+            className="w-full px-4 py-3 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
+          >
+            Report Another Emergency Now
+          </button>
+        )}
       </div>
     </>
   );

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface Category {
   id: string;
@@ -9,6 +9,10 @@ interface Category {
   bgColor: string;
   borderColor: string;
   available: boolean;
+}
+
+interface AlertCategorySelectorProps {
+  onCategoryChange?: (category: string | null) => void;
 }
 
 const categories: Category[] = [
@@ -50,19 +54,20 @@ const categories: Category[] = [
   }
 ];
 
-export const AlertCategorySelector = () => {
+export const AlertCategorySelector: React.FC<AlertCategorySelectorProps> = ({ onCategoryChange }) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
 
+  // Call onCategoryChange when selectedCategory changes
+  useEffect(() => {
+    if (onCategoryChange) {
+      onCategoryChange(selectedCategory);
+    }
+  }, [selectedCategory, onCategoryChange]);
+
   const handleCategoryClick = (categoryId: string) => {
     if (!categories.find(cat => cat.id === categoryId)?.available) return;
-    
     setSelectedCategory(categoryId);
-    // Add a brief animation delay
-    setTimeout(() => {
-      // You can add navigation or other actions here
-      console.log(`Selected category: ${categoryId}`);
-    }, 300);
   };
 
   return (

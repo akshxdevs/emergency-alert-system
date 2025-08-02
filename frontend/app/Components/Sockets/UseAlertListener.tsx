@@ -3,7 +3,7 @@ import { useEffect } from "react"
 export const UseAlertListener = (userId:string,userRole:string,onMessage:(data:any)=>void) => {
     useEffect(()=>{
         if (!userId || !userRole) return;
-        const ws = new WebSocket(`ws://localhost:3000/${userId}/?${userRole}`);
+        const ws = new WebSocket(`ws://localhost:5000/${userId}/?${userRole}`);
         ws.onopen = () => {
             console.log("Websocket Connected");
         };

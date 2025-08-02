@@ -1,6 +1,6 @@
 "use client";
-import { useEmergencySocket } from "@/app/Components/SocketComponenet";
-import { UseAlertListener } from "@/app/Components/UseAlertListener";
+import { useEmergencySocket } from "@/app/Components/Sockets/SocketComponenet";
+import { UseAlertListener } from "@/app/Components/Sockets/UseAlertListener";
 import { useParams } from "next/navigation";
 import { useState, useCallback } from "react";
 
