@@ -168,6 +168,7 @@ export const OtherOptions = () => {
             onClick={() => {
               // You can add save functionality here
               console.log("Description saved:", description);
+              setIsExpanded(false);
             }}
             className="px-2 py-1 text-xs bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200"
           >
