@@ -17,7 +17,7 @@ export const AlertHeaderCard = ({lat,lng}:Location) => {
                    "User";
     const userProfilePic = session?.user?.image;
     
-    return <div className="py-2">
+    return <div>
         <div className="flex justify-between items-center">
             <div className="flex items-center gap-2">
                <button className="p-1">

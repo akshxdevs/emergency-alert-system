@@ -1,5 +1,4 @@
 "use client";
-import { AddMoreAlertDetails } from "@/app/Components/AlertModel/AddMoreAlertDetails";
 import { AlertCategorySelector } from "@/app/Components/AlertModel/AlertCategorySelector";
 import { AlertHeaderCard } from "@/app/Components/AlertModel/AlertHeaderCard";
 import { AlertLevelSetter } from "@/app/Components/AlertModel/AlertLevelSetter";
@@ -100,7 +99,6 @@ export default function () {
           <div className="p-3 space-y-3">
             <AlertHeaderCard lat={lat} lng={lng}/>
             <AlertLevelSetter/>
-            <AddMoreAlertDetails/>
             <AlertCategorySelector/>
             <OtherOptions/>
             <ReportButton/>

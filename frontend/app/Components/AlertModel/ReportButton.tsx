@@ -52,10 +52,9 @@ export const ReportButton = () => {
         // Trigger the emergency report
         console.log("Emergency reported successfully!");
         
-        // Auto reset after 10 seconds
         resetTimeoutRef.current = setTimeout(() => {
           resetToInitial();
-        }, 5000);
+        }, 30000);
       }, 500);
     } else {
       // Reset to start
@@ -120,21 +119,17 @@ export const ReportButton = () => {
     <>
       {/* Full Screen Success Animation */}
       {showFullScreenSuccess && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+        <div className="fixed top-[-12px] left-0 right-0 bottom-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center">
           <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md w-full mx-4 text-center animate-in slide-in-from-bottom-4 duration-500">
-            {/* Success Icon */}
             <div className="relative mb-6">
               <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mx-auto animate-pulse">
                 <svg className="w-12 h-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              {/* Ring Animation */}
               <div className="absolute left-32 inset-0 w-24 h-24 border-4 border-green-400 rounded-full animate-ping opacity-75"></div>
               <div className="absolute left-32 inset-0 w-24 h-24 border-2 border-green-300 rounded-full animate-ping opacity-50" style={{ animationDelay: '0.5s' }}></div>
             </div>
-
-            {/* Success Text */}
             <h2 className="text-2xl font-bold text-gray-800 mb-2">Emergency Reported!</h2>
             <p className="text-gray-600 mb-4">Response team has been notified and is on the way.</p>
           </div>
@@ -142,10 +137,10 @@ export const ReportButton = () => {
       )}
 
       {/* Normal Alert Components (Hidden during success) */}
-      <div className={`space-y-3 ${showFullScreenSuccess ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
+      <div className={`${showFullScreenSuccess ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         <div className="text-center">
           <h3 className="text-base font-semibold text-gray-800 mb-1">Report Emergency</h3>
-          <p className="text-xs text-gray-600">Slide to confirm and send alert</p>
+          <p className="text-xs text-gray-600 pb-5">Slide to confirm and send alert</p>
         </div>
 
         {/* Enhanced Slider Container */}
@@ -226,27 +221,6 @@ export const ReportButton = () => {
             )}
           </div>
 
-          {/* Enhanced Progress Indicator  no need*/}
-          {!isConfirmed && slideProgress > 0 && (
-            <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-blue-700">Progress</span>
-                <span className="text-xs text-blue-600">{Math.round(slideProgress)}%</span>
-              </div>
-              <div className="w-full bg-blue-200 rounded-full h-2">
-                <div 
-                  className="bg-blue-500 h-2 rounded-full transition-all duration-150 ease-out"
-                  style={{ width: `${slideProgress}%` }}
-                />
-              </div>
-              <div className="mt-2 text-center">
-                <span className={`text-xs font-medium ${slideProgress >= 85 ? 'text-green-600' : 'text-blue-600'}`}>
-                  {slideProgress >= 85 ? 'Release to confirm!' : 'Keep sliding...'}
-                </span>
-              </div>
-            </div>
-          )}
-
           {/* Enhanced Success Message */}
           {showSuccess && (
             <div className="mt-3 p-4 bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg shadow-lg">
@@ -268,16 +242,6 @@ export const ReportButton = () => {
             </div>
           )}
         </div>
-
-        {/* Enhanced Reset Button */}
-        {showSuccess && (
-          <button
-            onClick={resetToInitial}
-            className="w-full px-4 py-3 text-sm bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-300 transform hover:scale-105 shadow-md hover:shadow-lg"
-          >
-            Report Another Emergency Now
-          </button>
-        )}
       </div>
     </>
   );
