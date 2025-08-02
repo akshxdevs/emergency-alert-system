@@ -137,9 +137,9 @@ export default function () {
         </div>
         
         {/* Alert Model Overlay - Floating on top */}
-        <div className="absolute top-[120px] left-5 w-[400px] bg-white/95 backdrop-blur-sm text-zinc-900 shadow-xl rounded-lg border border-gray-200 overflow-y-auto max-h-[calc(100vh-120px)] z-40">
+        <div className="absolute top-[100px] left-5 w-[400px] bg-white/95 backdrop-blur-sm text-zinc-900 shadow-xl rounded-lg border border-gray-200 overflow-y-auto max-h-[calc(100vh-120px)] z-40">
           {showAlertModel && (
-            <div className="p-3 space-y-3">
+            <div className="p-3 space-y-3 font-martianmono">
               <AlertHeaderCard lat={lat} lng={lng}/>
               <AlertLevelSetter onLevelChange={handleLevelChange}/>
               <AlertCategorySelector onCategoryChange={handleCategoryChange}/>

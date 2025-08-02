@@ -21,7 +21,7 @@ router.post("/signup", async (req, res) => {
     }
     const { email, password } = parsedBody.data;
     const generateUsername: string = String(
-      "role" + Math.floor(Math.random() * 1000000)
+      "civilian" + Math.floor(Math.random() * 1000000)
     ).padStart(6, "7");
     const existingUser = await prismaClient.user.findFirst({
       where: {

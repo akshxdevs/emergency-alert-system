@@ -31,7 +31,7 @@ const myFont2 = localFont({
   variable: '--font-gilroyLight',
 });
 const myfont3 = localFont({
-  src: './fonts/MartianMono[wdth,wght].ttf',
+  src: './fonts/MartianMono-VariableFont_wdth,wght.ttf',
   display: 'swap',
   variable: '--font-martianmono',
 });
