@@ -39,29 +39,7 @@ export default function AlertListener() {
     console.log("Emergency Update Confirmed!"); 
   }
 
-  return (
-    <div className="flex flex-col justify-center items-center h-screen text-black">
-      <div className="p-10 bg-white">Listening for role: {userRole.toLocaleUpperCase()==="POLICE" ? "👮🏻" : userRole.toLocaleUpperCase() === "MEDICAl" ? "🧑‍⚕️" : "🧑🏻‍🚒"}
-        <p>{receivedAlert}</p>
-        <div className="flex justify-between gap-3 border">
-        <div className="p-5">
-          <h1>Emergency Type: {parsedAlert.type || ""}</h1>
-          <h2>Priority: {parsedAlert.priority || ""}</h2>
-          <p>Description: {parsedAlert.description || ""}</p> 
-          <p>ReportedBy : {parsedAlert.reportedBy || ""}</p>
-        </div>
-          <div className="flex py-5">
-            <div className="py-2 my-6">
-              <button className="border p-1 border-gray-900 rounded-md mx-2" onClick={()=>{
-                handleUpdateAlert();
-              }}>✅</button>
-            </div>
-            <div className="py-2 my-6">
-              <button className="border p-1 border-gray-900 rounded-md mx-2">❌</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+  return <div>
+    
+  </div>
 }

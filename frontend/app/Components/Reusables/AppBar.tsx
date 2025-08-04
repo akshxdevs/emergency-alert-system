@@ -63,28 +63,28 @@ export const AppBar = () => {
 
                         {/* Branding Button */}
                         <div className="relative group">
-                            <button 
-                                onClick={() => router.push("/login")} 
-                                className="flex items-center gap-2 text-white px-4 py-1.5 rounded-lg shadow-lg transition-all duration-300 ease-out hover:scale-105 hover:shadow-xl transform group-hover:from-red-600 group-hover:via-red-700 group-hover:to-orange-600"
-                            >
-                                <div className="flex items-center gap-1.5">
-                                    <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="12" cy="7" r="4"></circle>
-                                        </svg>
+                            <a href="https://x.com/akshxdevs">
+                                <button 
+                                    className="flex items-center gap-2 text-white px-4 py-1.5 rounded-lg shadow-lg transition-all duration-300 ease-out hover:scale-105 hover:shadow-xl transform group-hover:from-red-600 group-hover:via-red-700 group-hover:to-orange-600"
+                                >
+                                    <div className="flex items-center gap-1.5">
+                                        <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                                <circle cx="12" cy="7" r="4"></circle>
+                                            </svg>
+                                        </div>
+                                        <div className="text-left">
+                                            <div className="text-[10px] opacity-90">Backed by</div>
+                                            <div className="text-xs font-semibold">@akshxdevs</div>
+                                        </div>
                                     </div>
-                                    <div className="text-left">
-                                        <div className="text-[10px] opacity-90">Backed by</div>
-                                        <div className="text-xs font-semibold">@akshxdevs</div>
-                                    </div>
-                                </div>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:translate-x-1">
-                                    <path d="M5 12h14"></path>
-                                    <path d="m12 5 7 7-7 7"></path>
-                                </svg>
-                            </button>
-                            
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="transition-transform duration-300 group-hover:translate-x-1">
+                                        <path d="M5 12h14"></path>
+                                        <path d="m12 5 7 7-7 7"></path>
+                                    </svg>
+                                </button>
+                            </a>
                             {/* Hover Effect Glow */}
                             <div className="absolute inset-0 bg-gradient-to-r from-red-500 to-orange-500 rounded-lg blur-lg opacity-0 group-hover:opacity-30 transition-opacity duration-300 -z-10"></div>
                         </div>
