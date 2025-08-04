@@ -5,7 +5,7 @@ interface ReportButtonProps {
   onConfirm?: () => void;
 }
 
-export const ReportButton = ({ onConfirm }: ReportButtonProps) => {
+export const AlertReportButton = ({ onConfirm }: ReportButtonProps) => {
   const [isSliding, setIsSliding] = useState(false);
   const [slideProgress, setSlideProgress] = useState(0);
   const [isConfirmed, setIsConfirmed] = useState(false);
@@ -146,8 +146,8 @@ export const ReportButton = ({ onConfirm }: ReportButtonProps) => {
       {/* Normal Alert Components (Hidden during success) */}
       <div className={`space-y-3 ${showFullScreenSuccess ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         <div className="text-center">
-          <h3 className="text-base font-semibold text-gray-800 mb-1">Report Emergency</h3>
-          <p className="text-xs text-gray-600">Slide to confirm and send alert</p>
+          <h3 className="text-base font-semibold text-gray-800 mb-1">Act on Emergency</h3>
+          <p className="text-xs text-gray-600">Slide to start and process alert</p>
         </div>
 
         {/* Enhanced Slider Container */}
@@ -184,7 +184,7 @@ export const ReportButton = ({ onConfirm }: ReportButtonProps) => {
                 text-sm font-semibold transition-all duration-300
                 ${isConfirmed ? 'text-green-700' : 'text-gray-600'}
               `}>
-                {isConfirmed ? 'Emergency Reported!' : 'Slide to Report Emergency'}
+                {isConfirmed ? 'Emergency is in Process!' : 'Slide to act on Emergency'}
               </span>
             </div>
 
