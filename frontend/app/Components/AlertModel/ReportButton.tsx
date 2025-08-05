@@ -126,7 +126,7 @@ export const ReportButton = ({ onConfirm }: ReportButtonProps) => {
     <>
       {/* Full Screen Success Animation */}
       {showFullScreenSuccess && (
-        <div className="fixed top-0 left-0 right-0 bottom-0 bg-black/80 backdrop-blur-md z-[9999] flex items-center justify-center">
+        <div className="fixed top-[-15px] left-0 right-0 bottom-0 bg-black/80 backdrop-blur-md z-[9999] flex items-center justify-center">
           <div className="bg-white rounded-2xl p-8 shadow-2xl max-w-md w-full mx-4 text-center animate-in slide-in-from-bottom-4 duration-500">
             <div className="relative mb-6">
               <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mx-auto animate-pulse">
@@ -134,8 +134,8 @@ export const ReportButton = ({ onConfirm }: ReportButtonProps) => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <div className="absolute left-32 inset-0 w-24 h-24 border-4 border-green-400 rounded-full animate-ping opacity-75"></div>
-              <div className="absolute left-32 inset-0 w-24 h-24 border-2 border-green-300 rounded-full animate-ping opacity-50" style={{ animationDelay: '0.5s' }}></div>
+              <div className="absolute left-[103px] inset-0 w-24 h-24 border-4 border-green-400 rounded-full animate-ping opacity-75"></div>
+              <div className="absolute left-[103px] inset-0 w-24 h-24 border-2 border-green-300 rounded-full animate-ping opacity-50" style={{ animationDelay: '0.5s' }}></div>
             </div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">Emergency Reported!</h2>
             <p className="text-gray-600 mb-4">Response team has been notified and is on the way.</p>

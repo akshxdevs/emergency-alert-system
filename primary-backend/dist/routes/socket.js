@@ -33,16 +33,24 @@ const setUpSocketServer = (server) => {
         });
     });
     wss.on("connection", (socket, userId, userRole) => {
-        var _a;
+        var _a, _b;
+        console.log(`🔌 New connection: userId=${userId}, userRole=${userRole}`);
         clients.set(userId, socket);
         if (!roleClients.has(userRole)) {
             roleClients.set(userRole, new Set());
+            console.log(`📝 Created new role group for: ${userRole}`);
         }
         (_a = roleClients.get(userRole)) === null || _a === void 0 ? void 0 : _a.add(socket);
+        console.log(`✅ Added client to role group: ${userRole}`);
+        console.log(`📊 Total clients for role ${userRole}: ${(_b = roleClients.get(userRole)) === null || _b === void 0 ? void 0 : _b.size}`);
         socket.send(JSON.stringify({
             type: `welcome ${userId}`,
             message: `Connected to Emergency Alert WS`,
         }));
+        // Send pending alerts from database to dashboard users
+        if (userId.includes('dashboard')) {
+            sendPendingAlerts(socket, userRole);
+        }
         socket.on("message", (messages) => __awaiter(void 0, void 0, void 0, function* () {
             try {
                 const data = JSON.parse(messages.toString());
@@ -66,6 +74,11 @@ const setUpSocketServer = (server) => {
                             },
                         ],
                     });
+                    // Send success response to client
+                    socket.send(JSON.stringify({
+                        type: "success",
+                        message: "Emergency alert sent successfully",
+                    }));
                 }
                 if (data.type === "UPDATE_ALERT_STATUS") {
                     const { alertId, newStatus } = data.payload;
@@ -89,6 +102,24 @@ const setUpSocketServer = (server) => {
                         socket.send(JSON.stringify({
                             type: "error",
                             message: "Failed to update alert",
+                        }));
+                    }
+                }
+                if (data.type === "CANCEL_ALERT") {
+                    const { alertId } = data.payload;
+                    try {
+                        const cancelledAlert = yield cancelAlert(alertId);
+                        yield init_1.redisClient.del(`alert:${alertId}`);
+                        broadcast({ type: "ALERT_CANCELLED", payload: cancelledAlert });
+                        socket.send(JSON.stringify({
+                            type: "success",
+                            message: `Alert ${alertId} cancelled successfully`,
+                        }));
+                    }
+                    catch (error) {
+                        socket.send(JSON.stringify({
+                            type: "error",
+                            message: "Failed to cancel alert",
                         }));
                     }
                 }
@@ -120,13 +151,25 @@ const setUpSocketServer = (server) => {
     function roleBroadcast(role, data) {
         const payload = JSON.stringify(data);
         const sockets = roleClients.get(role);
-        if (!sockets)
+        console.log(`🔍 RoleBroadcast called for role: ${role}`);
+        console.log(`🔍 Available roles: ${Array.from(roleClients.keys())}`);
+        console.log(`🔍 Sockets for role ${role}:`, sockets ? sockets.size : 0);
+        if (!sockets) {
+            console.log(`❌ No sockets found for role: ${role}`);
             return;
+        }
+        let sentCount = 0;
         sockets.forEach((client) => {
             if (client.readyState === ws_1.WebSocket.OPEN) {
                 client.send(payload);
+                sentCount++;
+                console.log(`✅ Sent alert to ${role} client`);
+            }
+            else {
+                console.log(`❌ Client not ready, state: ${client.readyState}`);
             }
         });
+        console.log(`📊 Sent alert to ${sentCount} ${role} clients`);
     }
     const updateAlertStatus = (alertId, newStatus) => __awaiter(void 0, void 0, void 0, function* () {
         try {
@@ -142,11 +185,59 @@ const setUpSocketServer = (server) => {
             throw err;
         }
     });
+    const cancelAlert = (alertId) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            const cancelled = yield db_1.prismaClient.emergency.update({
+                where: { id: alertId },
+                data: {
+                    status: client_1.StatusReport.RESOLVED, // Use RESOLVED instead of CANCELLED
+                },
+            });
+            return cancelled;
+        }
+        catch (err) {
+            throw err;
+        }
+    });
+    const sendPendingAlerts = (socket, userRole) => __awaiter(void 0, void 0, void 0, function* () {
+        try {
+            // Fetch alerts that are IN_PROCESS (pending) for the specific role
+            const pendingAlerts = yield db_1.prismaClient.emergency.findMany({
+                where: {
+                    status: client_1.StatusReport.IN_PROCESS,
+                    assignedTo: userRole, // Type assertion for UserRole
+                },
+                include: {
+                    location: true,
+                },
+            });
+            if (pendingAlerts.length > 0) {
+                console.log(`📋 Sending ${pendingAlerts.length} pending alerts to ${userRole} dashboard`);
+                // Send each pending alert individually
+                pendingAlerts.forEach((alert) => {
+                    const alertWithLocation = Object.assign(Object.assign({}, alert), { location: alert.location.map(loc => ({
+                            lat: loc.lat,
+                            long: loc.long,
+                        })) });
+                    socket.send(JSON.stringify({
+                        type: alert.type, // Send as the alert type (CRIME, FIRE, etc.)
+                        payload: alertWithLocation,
+                    }));
+                });
+            }
+        }
+        catch (err) {
+            console.error("Failed to send pending alerts:", err);
+        }
+    });
     (() => __awaiter(void 0, void 0, void 0, function* () {
         yield producer_1.producer.connect();
         yield consumer_1.consumer.connect();
-        yield consumer_1.consumer.subscribe({ topic: "emergency-alerts", fromBeginning: true });
-        yield consumer_1.consumer.subscribe({ topic: 'alert-updates' });
+        yield consumer_1.consumer.subscribe({
+            topic: "emergency-alerts",
+            fromBeginning: true,
+        });
+        yield consumer_1.consumer.subscribe({ topic: "alert-updates" });
         yield consumer_1.consumer.run({
             eachMessage: (_a) => __awaiter(void 0, [_a], void 0, function* ({ message, topic }) {
                 if (!message.value)
@@ -154,6 +245,7 @@ const setUpSocketServer = (server) => {
                 const alert = JSON.parse(message.value.toString());
                 if (topic === "emergency-alerts") {
                     try {
+                        console.log("Processing emergency alert:", alert);
                         yield init_1.redisClient.set(`alert:${alert.id}`, JSON.stringify(alert));
                         const createAlert = yield db_1.prismaClient.emergency.create({
                             data: {
@@ -171,10 +263,23 @@ const setUpSocketServer = (server) => {
                                 },
                             },
                         });
+                        console.log("Alert created in DB:", createAlert);
+                        // Send high priority broadcast to all clients
                         if (alert.priority === "HIGH") {
+                            console.log("Broadcasting HIGH_PRIORITY_ALERT to all clients");
                             broadcast({ type: "HIGH_PRIORITY_ALERT", payload: createAlert });
                         }
-                        roleBroadcast(alert.assignedTo, { type: alert.type, payload: createAlert });
+                        // Send role-specific alert
+                        console.log(`Broadcasting ${alert.type} alert to ${alert.assignedTo} role`);
+                        roleBroadcast(alert.assignedTo, {
+                            type: alert.type,
+                            payload: Object.assign(Object.assign({}, createAlert), { location: [
+                                    {
+                                        lat: alert.location.lat,
+                                        long: alert.location.long,
+                                    },
+                                ] }),
+                        });
                     }
                     catch (error) {
                         console.error("Failed to store alert:", error);

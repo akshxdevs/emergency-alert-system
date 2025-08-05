@@ -4,11 +4,116 @@ import jwt from "jsonwebtoken";
 import { prismaClient } from "../db/db";
 import { JWT_SECRET } from "../config";
 import bcrypt from "bcrypt";
-import { SigninSchema } from "../types";
+import { SigninSchema, GoogleSignupSchema, LoginSchema } from "../types";
+import { UserRole } from "@prisma/client";
 const router = Router();
 const redis = new Redis();
 const OTP_LIMIT = 3;
 const OTP_EXPIRY = 100;
+
+// Check if user exists by email (for Google auth)
+router.get("/check-email", async (req, res) => {
+  try {
+    const { email } = req.query;
+    
+    if (!email || typeof email !== 'string') {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const existingUser = await prismaClient.user.findFirst({
+      where: { email: email },
+    });
+
+    res.json({ exists: !!existingUser });
+  } catch (error) {
+    console.error("Error checking email:", error);
+    res.status(500).json({ message: "Something went wrong!" });
+  }
+});
+
+// Get user by email (for Google auth)
+router.get("/by-email", async (req, res) => {
+  try {
+    const { email } = req.query;
+    
+    if (!email || typeof email !== 'string') {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const user = await prismaClient.user.findFirst({
+      where: { email: email },
+    });
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({ user });
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    res.status(500).json({ message: "Something went wrong!" });
+  }
+});
+
+// Google signup with role selection
+router.post("/google-signup", async (req, res) => {
+  try {
+    const parsedBody = GoogleSignupSchema.safeParse(req.body);
+    
+    if (!parsedBody.success) {
+      return res
+        .status(400)
+        .json({ message: "Invalid Input", error: parsedBody.error.errors });
+    }
+
+    const { email, name, image, role } = parsedBody.data;
+
+    // Check if user already exists
+    const existingUser = await prismaClient.user.findFirst({
+      where: { email: email },
+    });
+
+    if (existingUser) {
+      return res.status(409).json({ message: "User already exists" });
+    }
+
+    // Generate username based on role
+    const generateUsername: string = String(
+      role + Math.floor(Math.random() * 1000000)
+    ).padStart(6, "7");
+
+    // Create new user
+    const user = await prismaClient.user.create({
+      data: {
+        username: generateUsername,
+        email: email,
+        password: "", // Google users don't need password
+        role: role as UserRole,
+      },
+    });
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { id: user.id },
+      JWT_SECRET as string,
+      { expiresIn: "7d" }
+    );
+
+    res.json({
+      message: "User created successfully",
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
+      token,
+    });
+  } catch (error) {
+    console.error("Google signup error:", error);
+    res.status(500).json({ message: "Something went wrong!" });
+  }
+});
 
 router.post("/signup", async (req, res) => {
   try {
@@ -19,9 +124,9 @@ router.post("/signup", async (req, res) => {
         .status(400)
         .json({ message: "Invalid Input", error: parsedBody.error.errors });
     }
-    const { email, password } = parsedBody.data;
+    const { email, password, role } = parsedBody.data;
     const generateUsername: string = String(
-      "civilian" + Math.floor(Math.random() * 1000000)
+      role + Math.floor(Math.random() * 1000000)
     ).padStart(6, "7");
     const existingUser = await prismaClient.user.findFirst({
       where: {
@@ -37,6 +142,7 @@ router.post("/signup", async (req, res) => {
         username: generateUsername,
         email: email,
         password: HashedPassword,
+        role: role as UserRole,
       },
     });
     res.json({
@@ -51,25 +157,37 @@ router.post("/signup", async (req, res) => {
 
 router.post("/signin", async (req, res) => {
   try {
-    const parsedBody = SigninSchema.safeParse(req.body);
+    console.log("Signin request received:", req.body);
+    
+    const parsedBody = LoginSchema.safeParse(req.body);
     if (!parsedBody.success) {
+      console.log("Validation error:", parsedBody.error.errors);
       return res
         .status(400)
         .json({ message: "Invalid Input", error: parsedBody.error.errors });
     }
     const { email, password } = parsedBody.data;
+    console.log("Looking for user with email:", email);
+    
     const user = await prismaClient.user.findFirst({
       where: {
         email,
       },
     });
+    
+    console.log("Found user:", user ? "Yes" : "No");
+    
     if (!user) {
       return res.status(401).send({ message: "Invalid Email Or Password!" });
     }
+    
     const passwordValidation = await bcrypt.compare(password, user.password);
+    console.log("Password validation:", passwordValidation ? "Success" : "Failed");
+    
     if (!passwordValidation) {
       return res.status(401).send({ message: "Password Mismatch!" });
     }
+    
     const token = jwt.sign(
       {
         id: user.id,
@@ -77,17 +195,23 @@ router.post("/signin", async (req, res) => {
       JWT_SECRET as string,
       { expiresIn: "1h" }
     );
-    res.json({
+    
+    const response = {
       user: {
-        name: user.username,
-        email: user.email,
         id: user.id,
+        email: user.email,
+        name: user.username, // Use username as name for NextAuth
+        username: user.username,
+        role: user.role,
       },
       token,
       message: "User Login Sucessfully",
-    });
+    };
+    
+    console.log("Sending response:", response);
+    res.json(response);
   } catch (error) {
-    console.error(error);
+    console.error("Signin error:", error);
     res.status(403).send({ message: "Something went wrong!" });
   }
 });

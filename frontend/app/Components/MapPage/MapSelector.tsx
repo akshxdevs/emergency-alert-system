@@ -1,9 +1,9 @@
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { customIcon } from './LeafLetIcons';
 
-const MapSelector = ({
+const MapSelector = memo(({
   onLocationSelect,
   externalLat,
   externalLng,
@@ -20,6 +20,16 @@ const MapSelector = ({
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [loadingLocation, setLoadingLocation] = useState<boolean>(true);
   const [isDragging, setIsDragging] = useState<boolean>(false);
+
+  // Memoize the default center to prevent unnecessary re-renders
+  const defaultCenter = useMemo(() => {
+    return userLocation || { lat: 28.6139, lng: 77.2090 };
+  }, [userLocation]);
+
+  // Memoize the map center to prevent unnecessary re-renders
+  const mapCenter = useMemo(() => {
+    return [defaultCenter.lat, defaultCenter.lng] as [number, number];
+  }, [defaultCenter]);
 
   useEffect(() => {
     if (navigator.geolocation) {
@@ -47,49 +57,51 @@ const MapSelector = ({
     }
   }, [clearMarker]);
 
+  // Memoize the location select callback
+  const handleLocationSelect = useCallback((lat: number, lng: number) => {
+    setMarkerPos({ lat, lng });
+    onLocationSelect(lat, lng);
+  }, [onLocationSelect]);
+
+  // Memoize the drag change callback
+  const handleDragChange = useCallback((dragging: boolean) => {
+    setIsDragging(dragging);
+    onDragChange?.(dragging);
+  }, [onDragChange]);
+
   // Component to update map center when external coordinates change
-  const MapUpdater = () => {
+  const MapUpdater = memo(() => {
     const map = useMap();
     
     useEffect(() => {
       if (externalLat && externalLng) {
         map.setView([externalLat, externalLng], 15);
         setMarkerPos({ lat: externalLat, lng: externalLng });
-        // Don't call onLocationSelect here to avoid interfering with manual clicking
-        // The parent already has these coordinates from the geolocation
       }
     }, [externalLat, externalLng, map]);
 
     return null;
-  };
+  });
 
-  const LocationMarker = () => {
+  const LocationMarker = memo(() => {
     useMapEvents({
       click(e) {
         const { lat, lng } = e.latlng;
-        setMarkerPos({ lat, lng });
-        onLocationSelect(lat, lng);
+        handleLocationSelect(lat, lng);
       },
       dragstart() {
-        setIsDragging(true);
-        onDragChange?.(true);
-        console.log('Map dragging started: true');
+        handleDragChange(true);
       },
       drag() {
-        onDragChange?.(true);
-        console.log('Map is being dragged: true');
+        handleDragChange(true);
       },
       dragend() {
-        setIsDragging(false);
-        onDragChange?.(false);
-        console.log('Map dragging ended: true');
+        handleDragChange(false);
       },
     });
 
     return markerPos ? <Marker position={markerPos} icon={customIcon} /> : null;
-  };
-
-  const defaultCenter = userLocation || { lat: 28.6139, lng: 77.2090 };
+  });
 
   return (
     <>
@@ -97,9 +109,10 @@ const MapSelector = ({
         <div>Loading your location...</div>
       ) : (
         <MapContainer
-          center={[defaultCenter.lat, defaultCenter.lng]}
+          center={mapCenter}
           zoom={13}
           style={{ height: '100%', width: '100%' }}
+          key={`map-${mapCenter[0]}-${mapCenter[1]}`} // Add key to prevent unnecessary re-renders
         >
           <TileLayer
             attribution='&copy; OpenStreetMap contributors'
@@ -111,6 +124,8 @@ const MapSelector = ({
       )}
     </>
   );
-};
+});
+
+MapSelector.displayName = 'MapSelector';
 
 export default MapSelector;

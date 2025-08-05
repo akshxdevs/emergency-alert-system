@@ -17,7 +17,7 @@ interface AlertCategorySelectorProps {
 
 const categories: Category[] = [
   {
-    id: "police",
+    id: "crime",
     name: "Police",
     icon: "🚔",
     color: "#1e40af",

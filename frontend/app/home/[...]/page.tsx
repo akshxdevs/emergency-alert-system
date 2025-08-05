@@ -10,7 +10,7 @@ import { useEmergencySocket } from "@/app/Components/Sockets/SocketComponenet";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 
 export default function () {
   const {data:session} = useSession();
@@ -31,6 +31,8 @@ export default function () {
     CRIME: "POLICE",
     FIRE: "FIRE",
     MEDICAL: "MEDICAL",
+    ACCIDENT: "POLICE", // Accidents can also be handled by police
+    OTHER: "POLICE", // Other emergencies default to police
   };
 
   useEffect(() => {
@@ -49,45 +51,47 @@ export default function () {
   
   const { sendEmergency } = useEmergencySocket(userId || "anonymous-user", userRole);
 
-  const handleLocationSelect = (lat: number, lng: number) => {
+  // Memoize handlers to prevent unnecessary re-renders
+  const handleLocationSelect = useCallback((lat: number, lng: number) => {
     console.log("Selected Location:", lat, lng);
     setLat(lat);
     setLng(lng);
     setShowAlertModel(true);
-  };
+  }, []);
 
-  const handleCategoryChange = (category: string | null) => {
+  const handleCategoryChange = useCallback((category: string | null) => {
     if (category) {
       setHazardType(category.toUpperCase());
       console.log("Hazard type set to:", category.toUpperCase());
     } else {
       setHazardType("");
     }
-  };
+  }, []);
 
-  const handleLevelChange = (level:string | null) => {
+  const handleLevelChange = useCallback((level:string | null) => {
     if (level) {
       setPriority(level.toUpperCase());
       console.log("Priority Level set to: ",level.toUpperCase());
     }else{
       setHazardType("");
     }
-  };
-  const handleMoreDetails = (moreDetails:string | null) => {
+  }, []);
+
+  const handleMoreDetails = useCallback((moreDetails:string | null) => {
     if (moreDetails) {
       setDescription(moreDetails.toUpperCase());
       console.log("Description Details: ",moreDetails.toUpperCase());
     }else{
       setDescription("");
     }
-  }
+  }, []);
 
-  const handleDragChange = (isDragging: boolean) => {
+  const handleDragChange = useCallback((isDragging: boolean) => {
     setIsMapDragging(isDragging);
     console.log('Home page received drag state:', isDragging);
-  };
+  }, []);
 
-  const handleConfirm = async () => {
+  const handleConfirm = useCallback(async () => {
     const assignedTo = roleAssignedTo[hazardType] || "OTHER";
     console.log(priority);
     const alertPayload = {
@@ -103,7 +107,55 @@ export default function () {
     };
     sendEmergency(alertPayload);
     console.log("Emergency Confirmed!");
-  };
+  }, [hazardType, priority, description, lat, lng, roleAssignedTo, sendEmergency]);
+
+  // Memoize the location button handler
+  const handleLocationButtonClick = useCallback(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setLat(latitude);
+          setLng(longitude);
+        },
+        (error) => {
+          console.error("Location access denied:", error);
+          alert("Please allow location access to use this feature.");
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 60000
+        }
+      );
+    } else {
+      console.error("Geolocation is not supported by this browser.");
+      alert("Geolocation is not supported by your browser.");
+    }
+  }, []);
+
+  // Memoize the clear marker handler
+  const handleClearMarker = useCallback(() => {
+    setClearMarker(true);
+    setLat(null);
+    setLng(null);
+    // Reset clearMarker after a short delay
+    setTimeout(() => setClearMarker(false), 100);
+  }, []);
+
+  // Memoize the toggle alert model handler
+  const handleToggleAlertModel = useCallback(() => {
+    setShowAlertModel(!showAlertModel);
+  }, [showAlertModel]);
+
+  // Memoize the map props to prevent unnecessary re-renders
+  const mapProps = useMemo(() => ({
+    onLocationSelect: handleLocationSelect,
+    externalLat: lat,
+    externalLng: lng,
+    clearMarker,
+    onDragChange: handleDragChange,
+  }), [handleLocationSelect, lat, lng, clearMarker, handleDragChange]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -119,13 +171,7 @@ export default function () {
         {/* Full Page Map - Base Layer */}
         <div className="w-full h-screen relative z-0">
           <div className="relative h-full w-full">
-            <MapSelector
-              onLocationSelect={handleLocationSelect}
-              externalLat={lat}
-              externalLng={lng}
-              clearMarker={clearMarker}
-              onDragChange={handleDragChange}
-            />
+            <MapSelector {...mapProps} />
             
             {/* Drag Indicator */}
             {isMapDragging && (
@@ -172,45 +218,9 @@ export default function () {
                   </svg>
                 </button>
 
-                {/* Emergency Button */}
-                <button
-                  onClick={() => setShowAlertModel(!showAlertModel)}
-                  className="group relative p-3 rounded-full bg-red-50/80 hover:bg-red-100/90 transition-all duration-300 transform hover:scale-105 hover:shadow-md border border-red-200/50"
-                >
-                  <div className="relative">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-red-600 group-hover:text-red-700 transition-colors duration-300">
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z" />
-                    </svg>
-                    <div className="absolute inset-0 w-6 h-6 border-2 border-red-400 rounded-full animate-ping opacity-75"></div>
-                  </div>
-                </button>
-
                 {/* Location/Relocate Button */}
                 <button 
-                  onClick={() => {
-                    // Function to navigate to user's current location
-                    if (navigator.geolocation) {
-                      navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                          const { latitude, longitude } = position.coords;
-                          setLat(latitude);
-                          setLng(longitude);
-                        },
-                        (error) => {
-                          console.error("Location access denied:", error);
-                          alert("Please allow location access to use this feature.");
-                        },
-                        {
-                          enableHighAccuracy: true,
-                          timeout: 10000,
-                          maximumAge: 60000
-                        }
-                      );
-                    } else {
-                      console.error("Geolocation is not supported by this browser.");
-                      alert("Geolocation is not supported by your browser.");
-                    }
-                  }}
+                  onClick={handleLocationButtonClick}
                   className="group relative p-3 rounded-full bg-blue-500 hover:bg-blue-600 transition-all duration-300 transform hover:scale-105 hover:shadow-md border border-blue-400 shadow-lg"
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6 text-white group-hover:text-white transition-colors duration-300">
@@ -223,13 +233,7 @@ export default function () {
                 {/* Clear Marker Button */}
                 {(lat || lng) && (
                   <button
-                    onClick={() => {
-                      setClearMarker(true);
-                      setLat(null);
-                      setLng(null);
-                      // Reset clearMarker after a short delay
-                      setTimeout(() => setClearMarker(false), 100);
-                    }}
+                    onClick={handleClearMarker}
                     className={`group relative p-3 rounded-full bg-gray-50/80 hover:bg-gray-100/90 transition-all duration-300 transform hover:scale-105 hover:shadow-md border border-gray-200/50 ${
                       isMapDragging ? 'animate-shake' : ''
                     }`}
