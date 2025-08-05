@@ -108,21 +108,21 @@ export default function LoginLandingPage() {
       {/* Subtle Emergency Icons */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          className="absolute top-20 left-10 text-6xl opacity-5"
+          className="absolute top-20 left-10 text-4xl opacity-5"
           animate={{ y: [0, -10, 0] }}
           transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
         >
           🚨
         </motion.div>
         <motion.div
-          className="absolute top-40 right-20 text-5xl opacity-5"
+          className="absolute top-40 right-20 text-3xl opacity-5"
           animate={{ x: [0, 10, 0] }}
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         >
           🚔
         </motion.div>
         <motion.div
-          className="absolute bottom-40 left-20 text-5xl opacity-5"
+          className="absolute bottom-40 left-20 text-3xl opacity-5"
           animate={{ scale: [1, 1.1, 1] }}
           transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
         >
@@ -135,50 +135,50 @@ export default function LoginLandingPage() {
           initial={{ opacity: 0, y: 30, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl shadow-2xl w-full max-w-md p-8"
+          className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl w-full max-w-sm p-6"
         >
           {/* Header */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <motion.div
-              className="mb-6"
+              className="mb-4"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <div className="w-16 h-16 mx-auto bg-gradient-to-r from-red-600 to-red-500 rounded-xl flex items-center justify-center shadow-lg">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 mx-auto bg-gradient-to-r from-red-600 to-red-500 rounded-lg flex items-center justify-center shadow-lg">
+                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                 </svg>
               </div>
             </motion.div>
             <motion.h1 
-              className="text-3xl font-bold text-white mb-2 tracking-tight"
+              className="text-2xl font-bold text-white mb-1 tracking-tight"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              Emergency Response System
+              Emergency Response
             </motion.h1>
             <motion.p 
-              className="text-gray-300 text-sm"
+              className="text-gray-300 text-xs"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
             >
-              Access your emergency management dashboard
+              Access your dashboard
             </motion.p>
           </div>
 
           {/* Login Form */}
-          <form onSubmit={handleEmailSignIn} className="space-y-6">
+          <form onSubmit={handleEmailSignIn} className="space-y-4">
             {/* Email Field */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.5 }}
             >
-              <label className="block text-sm font-medium text-gray-200 mb-2">
-                Email Address
+              <label className="block text-xs font-medium text-gray-200 mb-1">
+                Email
               </label>
               <div className="relative">
                 <input
@@ -187,7 +187,7 @@ export default function LoginLandingPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   onFocus={() => setIsFocused("email")}
                   onBlur={() => setIsFocused(null)}
-                  className={`w-full px-4 py-3 bg-white/10 border rounded-lg transition-all duration-300 text-white placeholder-gray-400 ${
+                  className={`w-full px-3 py-2 bg-white/10 border rounded-lg transition-all duration-300 text-white placeholder-gray-400 text-sm ${
                     isFocused === "email" 
                       ? "border-red-400 ring-2 ring-red-400/20" 
                       : "border-white/20 hover:border-white/30"
@@ -196,7 +196,7 @@ export default function LoginLandingPage() {
                   required
                 />
                 <div className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                   </svg>
                 </div>
@@ -209,7 +209,7 @@ export default function LoginLandingPage() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.6 }}
             >
-              <label className="block text-sm font-medium text-gray-200 mb-2">
+              <label className="block text-xs font-medium text-gray-200 mb-1">
                 Password
               </label>
               <div className="relative">
@@ -219,7 +219,7 @@ export default function LoginLandingPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   onFocus={() => setIsFocused("password")}
                   onBlur={() => setIsFocused(null)}
-                  className={`w-full px-4 py-3 pr-12 bg-white/10 border rounded-lg transition-all duration-300 text-white placeholder-gray-400 ${
+                  className={`w-full px-3 py-2 pr-10 bg-white/10 border rounded-lg transition-all duration-300 text-white placeholder-gray-400 text-sm ${
                     isFocused === "password" 
                       ? "border-red-400 ring-2 ring-red-400/20" 
                       : "border-white/20 hover:border-white/30"
@@ -233,11 +233,11 @@ export default function LoginLandingPage() {
                   className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
                 >
                   {showPassword ? (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
                     </svg>
                   ) : (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
@@ -253,9 +253,9 @@ export default function LoginLandingPage() {
                   initial={{ opacity: 0, y: -10, scale: 0.95 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                  className="bg-red-500/20 border border-red-400/30 text-red-200 px-4 py-3 rounded-lg text-sm flex items-center space-x-2"
+                  className="bg-red-500/20 border border-red-400/30 text-red-200 px-3 py-2 rounded-lg text-xs flex items-center space-x-2"
                 >
-                  <svg className="w-5 h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                   <span>{error}</span>
@@ -269,7 +269,7 @@ export default function LoginLandingPage() {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-red-600 to-red-500 text-white py-3 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group"
+              className="w-full bg-gradient-to-r from-red-600 to-red-500 text-white py-2.5 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group text-sm"
             >
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-red-700 to-red-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -280,13 +280,13 @@ export default function LoginLandingPage() {
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                      className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
                     />
                     <span>Authenticating...</span>
                   </>
                 ) : (
                   <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
                     </svg>
                     <span>Sign In</span>
@@ -297,7 +297,7 @@ export default function LoginLandingPage() {
 
             {/* Divider */}
             <motion.div 
-              className="relative my-6"
+              className="relative my-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.7 }}
@@ -305,8 +305,8 @@ export default function LoginLandingPage() {
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-white/20" />
               </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-transparent text-gray-400 font-medium">Or continue with</span>
+              <div className="relative flex justify-center text-xs">
+                <span className="px-3 bg-transparent text-gray-400 font-medium">Or continue with</span>
               </div>
             </motion.div>
 
@@ -317,9 +317,9 @@ export default function LoginLandingPage() {
               type="button"
               onClick={handleGoogleSignIn}
               disabled={isLoading}
-              className="w-full bg-white/10 border border-white/20 text-white py-3 rounded-lg font-medium hover:bg-white/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-3 group"
+              className="w-full bg-white/10 border border-white/20 text-white py-2.5 rounded-lg font-medium hover:bg-white/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2 group text-sm"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -330,12 +330,12 @@ export default function LoginLandingPage() {
 
             {/* Signup Link */}
             <motion.div 
-              className="text-center mt-8"
+              className="text-center mt-6"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
             >
-              <p className="text-gray-400 text-sm">
+              <p className="text-gray-400 text-xs">
                 Don't have an account?{" "}
                 <motion.a 
                   href="/signup" 
