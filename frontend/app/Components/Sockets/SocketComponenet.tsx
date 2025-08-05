@@ -10,6 +10,8 @@ interface Alert {
   description: string;
   priority: string | number;
   location: Array<{ lat: number; long: number }>;
+  receivedAt?: number;
+  autoDisappearAt?: number;
 }
 
 export const useEmergencySocket = (userId: string, userRole: string) => {
@@ -299,6 +301,13 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
         return prev;
       }
       
+      // Add timestamp for auto-disappear functionality
+      const alertWithTimestamp = {
+        ...payload,
+        receivedAt: Date.now(),
+        autoDisappearAt: Date.now() + (2 * 60 * 1000) // 2 minutes from now
+      };
+      
       // Remove alerts older than 24 hours
       const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
       const filteredAlerts = prev.filter(alert => {
@@ -306,33 +315,88 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
         return alertTime > twentyFourHoursAgo;
       });
       
-      const newAlerts = [payload, ...filteredAlerts];
+      const newAlerts = [alertWithTimestamp, ...filteredAlerts];
       
       // Keep only the last 50 alerts to prevent memory issues
       if (newAlerts.length > 50) {
         newAlerts.splice(50);
       }
       
+      // Save to localStorage
+      localStorage.setItem(`dashboard-alerts-${userRole}`, JSON.stringify(newAlerts));
+      
       console.log("Dashboard updated receivedAlerts:", newAlerts);
       return newAlerts;
     });
-  }, []);
+  }, [userRole]);
 
   // Function to handle alert updates for dashboard
   const handleAlertUpdate = useCallback((payload: Alert) => {
-    setReceivedAlerts(prev => 
-      prev.map(alert => 
-        alert.id === payload.id ? payload : alert
-      )
-    );
-  }, []);
+    setReceivedAlerts(prev => {
+      const updated = prev.map(alert => 
+        alert.id === payload.id ? { ...payload, receivedAt: alert.receivedAt, autoDisappearAt: alert.autoDisappearAt } : alert
+      );
+      
+      // Save to localStorage
+      localStorage.setItem(`dashboard-alerts-${userRole}`, JSON.stringify(updated));
+      return updated;
+    });
+  }, [userRole]);
 
   // Function to handle alert cancellation for dashboard
   const handleAlertCancellation = useCallback((payload: Alert) => {
-    setReceivedAlerts(prev => 
-      prev.filter(alert => alert.id !== payload.id)
-    );
-  }, []);
+    setReceivedAlerts(prev => {
+      const filtered = prev.filter(alert => alert.id !== payload.id);
+      
+      // Save to localStorage
+      localStorage.setItem(`dashboard-alerts-${userRole}`, JSON.stringify(filtered));
+      return filtered;
+    });
+  }, [userRole]);
+
+  // Load alerts from localStorage on mount
+  useEffect(() => {
+    const savedAlerts = localStorage.getItem(`dashboard-alerts-${userRole}`);
+    if (savedAlerts) {
+      try {
+        const parsedAlerts = JSON.parse(savedAlerts);
+        console.log(`📋 Loading ${parsedAlerts.length} saved alerts for ${userRole}`);
+        setReceivedAlerts(parsedAlerts);
+      } catch (error) {
+        console.error("Error loading saved alerts:", error);
+        localStorage.removeItem(`dashboard-alerts-${userRole}`);
+      }
+    }
+  }, [userRole]);
+
+  // Auto-disappear timer for new alerts
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      setReceivedAlerts(prev => {
+        const filtered = prev.filter(alert => {
+          // Keep IN_PROCESS alerts until resolved
+          if (alert.status === 'IN_PROCESS') {
+            return true;
+          }
+          
+          // Remove alerts that have passed their auto-disappear time
+          if (alert.autoDisappearAt && now > alert.autoDisappearAt) {
+            console.log(`⏰ Auto-removing alert: ${alert.id}`);
+            return false;
+          }
+          
+          return true;
+        });
+        
+        // Save to localStorage
+        localStorage.setItem(`dashboard-alerts-${userRole}`, JSON.stringify(filtered));
+        return filtered;
+      });
+    }, 10000); // Check every 10 seconds
+
+    return () => clearInterval(interval);
+  }, [userRole]);
 
   const sendEmergencyUpdate = (alert: any) => {
     if (!socket || socket.readyState !== WebSocket.OPEN) {

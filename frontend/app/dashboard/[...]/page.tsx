@@ -23,6 +23,7 @@ interface Alert {
   description: string;
   priority: string | number;
   location: Array<{ lat: number; long: number }>;
+  autoDisappearAt?: number; // Added for auto-disappear functionality
 }
 
 export default function () {
@@ -237,6 +238,58 @@ export default function () {
 
   const roleConfig = getRoleConfig(userRole);
 
+  // Calculate remaining time for auto-disappear alerts
+  const getRemainingTime = (alert: any) => {
+    if (!alert.autoDisappearAt) return null;
+    const remaining = alert.autoDisappearAt - Date.now();
+    if (remaining <= 0) return null;
+    return Math.ceil(remaining / 1000); // Return seconds
+  };
+
+  // Format time for display
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  // Countdown timer component
+  const CountdownTimer = ({ alert }: { alert: any }) => {
+    const [timeLeft, setTimeLeft] = useState(getRemainingTime(alert));
+
+    useEffect(() => {
+      if (!alert.autoDisappearAt) return;
+
+      const interval = setInterval(() => {
+        const remaining = getRemainingTime(alert);
+        setTimeLeft(remaining);
+        
+        if (remaining === null || remaining <= 0) {
+          clearInterval(interval);
+        }
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }, [alert.autoDisappearAt]);
+
+    if (!timeLeft || !alert.autoDisappearAt) return null;
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="flex items-center space-x-1 px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-medium"
+      >
+        <motion.div
+          animate={{ scale: [1, 1.2, 1] }}
+          transition={{ duration: 1, repeat: Infinity }}
+          className="w-2 h-2 bg-orange-500 rounded-full"
+        />
+        <span>Auto-remove in {formatTime(timeLeft)}</span>
+      </motion.div>
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 font-martianmono">
       <motion.div
@@ -433,6 +486,31 @@ export default function () {
                           <p className="text-xs text-gray-500 mt-1">
                             🕐 {new Date(alert.timeStamp).toLocaleString()}
                           </p>
+                          
+                          {/* Countdown Timer for auto-disappear alerts */}
+                          {alert.autoDisappearAt && alert.status === 'REPORTED' && (
+                            <div className="mt-2">
+                              <CountdownTimer alert={alert} />
+                            </div>
+                          )}
+                          
+                          {/* Persistent Alert Indicator */}
+                          {alert.status === 'IN_PROCESS' && (
+                            <div className="mt-2">
+                              <motion.div
+                                initial={{ opacity: 0, scale: 0.8 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                className="flex items-center space-x-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium"
+                              >
+                                <motion.div
+                                  animate={{ rotate: 360 }}
+                                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                                  className="w-3 h-3 border-2 border-blue-500 border-t-transparent rounded-full"
+                                />
+                                <span>Persistent Alert - Will stay until resolved</span>
+                              </motion.div>
+                            </div>
+                          )}
                         </div>
                       </div>
                       
@@ -444,7 +522,7 @@ export default function () {
                             ? 'bg-blue-200 text-blue-800' :
                             'bg-green-200 text-green-800'
                         }`}>
-                          {alert.status}
+                          {alert.status === 'IN_PROCESS' ? '🔄 IN PROGRESS' : alert.status}
                         </span>
                         
                         <div className="flex space-x-2">
@@ -473,7 +551,7 @@ export default function () {
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => handleCancelAlert(alert.id)}
-                              className="px-3 py-1 text-xs bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors animate-pulse-red"
+                              className="px-3 py-1 text-xs bg-red-500 text-white rounded-lg"
                             >
                               Cancel
                             </motion.button>

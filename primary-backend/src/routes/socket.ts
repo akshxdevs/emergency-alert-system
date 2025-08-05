@@ -253,6 +253,8 @@ export const setUpSocketServer = (server: httpServer) => {
               lat: loc.lat,
               long: loc.long,
             })),
+            receivedAt: Date.now(),
+            autoDisappearAt: null, // IN_PROCESS alerts don't auto-disappear
           };
           
           socket.send(
@@ -262,6 +264,8 @@ export const setUpSocketServer = (server: httpServer) => {
             })
           );
         });
+      } else {
+        console.log(`📋 No pending alerts found for ${userRole} dashboard`);
       }
     } catch (err) {
       console.error("Failed to send pending alerts:", err);

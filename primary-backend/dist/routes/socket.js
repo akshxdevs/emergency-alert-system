@@ -218,12 +218,15 @@ const setUpSocketServer = (server) => {
                     const alertWithLocation = Object.assign(Object.assign({}, alert), { location: alert.location.map(loc => ({
                             lat: loc.lat,
                             long: loc.long,
-                        })) });
+                        })), receivedAt: Date.now(), autoDisappearAt: null });
                     socket.send(JSON.stringify({
                         type: alert.type, // Send as the alert type (CRIME, FIRE, etc.)
                         payload: alertWithLocation,
                     }));
                 });
+            }
+            else {
+                console.log(`📋 No pending alerts found for ${userRole} dashboard`);
             }
         }
         catch (err) {
