@@ -124,7 +124,7 @@ router.post("/signup", async (req, res) => {
         .status(400)
         .json({ message: "Invalid Input", error: parsedBody.error.errors });
     }
-    const { email, password, role } = parsedBody.data;
+    const { email, password, role, name } = parsedBody.data;
     const generateUsername: string = String(
       role + Math.floor(Math.random() * 1000000)
     ).padStart(6, "7");
@@ -143,11 +143,18 @@ router.post("/signup", async (req, res) => {
         email: email,
         password: HashedPassword,
         role: role as UserRole,
+        name: name || generateUsername,
       },
     });
     res.json({
       message: "User Created Sucessfully",
-      user: user,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
     });
   } catch (error) {
     console.error(error);

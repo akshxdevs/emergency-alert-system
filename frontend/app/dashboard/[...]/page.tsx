@@ -1,9 +1,5 @@
 "use client";
-import { AlertCategorySelector } from "@/app/Components/AlertModel/AlertCategorySelector";
 import { AlertHeaderCard } from "@/app/Components/AlertModel/AlertHeaderCard";
-import { AlertLevelSetter } from "@/app/Components/AlertModel/AlertLevelSetter";
-import { OtherOptions } from "@/app/Components/AlertModel/OtherOptions";
-import { ReportButton } from "@/app/Components/AlertModel/ReportButton";
 import { AppBar } from "@/app/Components/Reusables/AppBar";
 import MapSelector from "@/app/Components/MapPage/MapSelector";
 import { useDashboardSocket } from "@/app/Components/Sockets/SocketComponenet";
@@ -11,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import { useEffect, useState, useCallback, useMemo } from "react";
-import { AlertIndicator } from "@/app/Components/AdminAlertModel/AlertIndicator";
+import { AlertIndicator } from "@/app/Components/Dashboard/AlertIndicator";
 
 interface Alert {
   id: string;
@@ -23,7 +19,7 @@ interface Alert {
   description: string;
   priority: string | number;
   location: Array<{ lat: number; long: number }>;
-  autoDisappearAt?: number; // Added for auto-disappear functionality
+  autoDisappearAt?: number | null; // Added for auto-disappear functionality
 }
 
 export default function () {
@@ -31,7 +27,7 @@ export default function () {
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
   const [userId,setUserId] = useState<string|null>(null);
-  const [userRole, setUserRole] = useState<string | any>();
+  const [userRole, setUserRole] = useState<string | null>();
   const [showAlertModel,setShowAlertModel] = useState(true);
   const [isNotificationAvailable,setIsNotificationAvailable] = useState(false);
   const [clearMarker, setClearMarker] = useState(false);
@@ -46,50 +42,78 @@ export default function () {
 
   useEffect(() => {
     const sessionUserId = session?.user?.id;
+    const sessionUserRole = session?.user?.role;
+    
+    console.log("🔍 Session data:", {
+      userId: sessionUserId,
+      userRole: sessionUserRole,
+      fullSession: session
+    });
+    
+    // Set userId from session
     if (sessionUserId) {
       setUserId(sessionUserId);
     } else {
       setUserId("anonymous-user");
     }
     
-    // Extract role from URL parameters
-    const urlSegments = params[""] as string[];
-    console.log("Dashboard URL segments:", urlSegments);
+    // Determine user role with proper fallbacks
+    let determinedRole = null;
     
-    let role = "";
-    if (urlSegments && urlSegments.length > 0) {
-      role = urlSegments[0];
-    }
-    
-    console.log("Dashboard extracted role:", role);
-    
-    // Validate role and map common variations
-    const roleMapping: Record<string, string> = {
-      "police": "POLICE",
-      "fire": "FIRE", 
-      "medical": "MEDICAL",
-      "firefighter": "FIRE",
-      "medic": "MEDICAL",
-      "officer": "POLICE"
-    };
-    
-    const validRoles = ["POLICE", "FIRE", "MEDICAL"];
-    const normalizedRole = roleMapping[role.toLowerCase()] || role.toUpperCase();
-    
-    if (normalizedRole && validRoles.includes(normalizedRole)) {
-      setUserRole(normalizedRole);
-      console.log("Dashboard set userRole to:", normalizedRole);
+    // First try to get role from session
+    if (sessionUserRole) {
+      console.log("📋 Using role from session:", sessionUserRole);
+      determinedRole = sessionUserRole.toUpperCase();
     } else {
-      console.error("Invalid role:", role, "Valid roles are:", validRoles);
-      console.error("Available role mappings:", Object.keys(roleMapping));
-      setUserRole("POLICE"); // Default to police
+      // Fallback to URL parameters
+      const urlSegments = params[""] as string[];
+      console.log("Dashboard URL segments:", urlSegments);
+      
+      if (urlSegments && urlSegments.length > 0) {
+        const urlRole = urlSegments[0];
+        console.log("📋 Using role from URL:", urlRole);
+        
+        // Validate role and map common variations
+        const roleMapping: Record<string, string> = {
+          "police": "POLICE",
+          "fire": "FIRE", 
+          "medical": "MEDICAL",
+          "firefighter": "FIRE",
+          "medic": "MEDICAL",
+          "officer": "POLICE"
+        };
+        
+        const validRoles = ["POLICE", "FIRE", "MEDICAL"];
+        const normalizedRole = roleMapping[urlRole.toLowerCase()] || urlRole.toUpperCase();
+        
+        if (validRoles.includes(normalizedRole)) {
+          determinedRole = normalizedRole;
+        } else {
+          console.error("Invalid role from URL:", urlRole, "Valid roles are:", validRoles);
+          determinedRole = "POLICE"; // Default fallback
+        }
+      } else {
+        console.log("📋 No role found in session or URL, using default");
+        determinedRole = "POLICE"; // Default fallback
+      }
     }
+    
+    // Validate the determined role
+    const validRoles = ["POLICE", "FIRE", "MEDICAL"];
+    if (determinedRole && validRoles.includes(determinedRole)) {
+      setUserRole(determinedRole);
+      console.log("✅ Dashboard set userRole to:", determinedRole);
+    } else {
+      console.error("❌ Invalid determined role:", determinedRole, "Valid roles are:", validRoles);
+      setUserRole("POLICE"); // Final fallback
+    }
+    
   }, [session, params]);
   
   console.log("Current userId:", userId);
-  console.log("Current userRole:", userRole);
+  console.log("Current userRole:",userRole);
   
-  const { sendEmergencyUpdate, receivedAlerts, setReceivedAlerts, sendCancelAlert } = useDashboardSocket(userId || "anonymous-user", userRole);
+  const { sendEmergencyUpdate, receivedAlerts, setReceivedAlerts, sendCancelAlert } = useDashboardSocket(userId || "anonymous-user", userRole || "POLICE");
   console.log(receivedAlerts);
   
   // Memoize handlers to prevent unnecessary re-renders
@@ -127,6 +151,15 @@ export default function () {
           };
           sendEmergencyUpdate(updatePayload);
           
+          // Update local state immediately for better UX
+          setReceivedAlerts(prev => 
+            prev.map(alert => 
+              alert.id === alertId 
+                ? { ...alert, status: newStatus }
+                : alert
+            )
+          );
+          
           // Reset states
           setTimeout(() => {
             setIsUpdatingAlert(false);
@@ -136,6 +169,7 @@ export default function () {
         }
       }, 20);
     };
+    
     animateSlider();
     console.log(`Alert ${alertId} updated to ${newStatus}`);
   }, [sendEmergencyUpdate]);
@@ -236,7 +270,7 @@ export default function () {
     }
   };
 
-  const roleConfig = getRoleConfig(userRole);
+  
 
   // Calculate remaining time for auto-disappear alerts
   const getRemainingTime = (alert: any) => {
@@ -308,7 +342,7 @@ export default function () {
           initial={{ opacity: 0, x: -50, y: -20 }}
           animate={{ opacity: 1, x: 0, y: 0 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className={`absolute top-[100px] left-5 z-40 ${
+          className={`absolute top-[100px] left-5 z-40 max-w-[420px] w-full ${
             userRole === 'POLICE' ? 'bg-gradient-to-r from-blue-500 to-blue-600' :
             userRole === 'FIRE' ? 'bg-gradient-to-r from-red-500 to-red-600' :
             'bg-gradient-to-r from-emerald-500 to-emerald-600'
@@ -347,6 +381,11 @@ export default function () {
                  userRole === 'FIRE' ? 'Monitoring Fire Emergencies' :
                  'Monitoring Medical Emergencies'}
               </motion.div>
+              <div className="mt-2 text-xs opacity-60">
+                <span className="bg-white/20 px-2 py-1 rounded-full">
+                  Role: {userRole} | ID: {userId?.substring(0, 8)}...
+                </span>
+              </div>
             </div>
           </div>
         </motion.div>
@@ -384,11 +423,12 @@ export default function () {
           initial={{ opacity: 0, x: 50, scale: 0.9 }}
           animate={{ opacity: 1, x: 0, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="absolute top-[220px] left-5 w-[420px] bg-white/95 backdrop-blur-md text-zinc-900 shadow-2xl rounded-2xl border border-white/30 overflow-hidden z-40"
+          className="absolute top-[250px] left-5 w-[420px] bg-white/95 backdrop-blur-md text-zinc-900 shadow-2xl rounded-2xl border border-white/30 overflow-hidden z-40"
         >
           {/* Panel Header */}
           <div className="bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b border-gray-200">
-            <div className="flex flex-col items-center">
+            <AlertHeaderCard lat={lat} lng={lng}/>
+            <div className="flex flex-col items-center pt-2">
               <div className="flex items-center space-x-3">
                 <motion.div
                   animate={{ scale: [1, 1.2, 1] }}
@@ -490,9 +530,7 @@ export default function () {
                           {/* Countdown Timer for auto-disappear alerts */}
                           {alert.autoDisappearAt && alert.status === 'REPORTED' && (
                             <div className="mt-2">
-                              {showTimer && (
-                                <CountdownTimer alert={alert} />
-                              )}
+                              <CountdownTimer alert={alert} />
                             </div>
                           )}
                           
@@ -533,8 +571,8 @@ export default function () {
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
                               onClick={() => {
-                                setShowTimer(false),
-                                handleUpdateAlertStatus(alert.id, 'IN_PROCESS')
+                                setShowTimer(false);
+                                handleUpdateAlertStatus(alert.id, 'IN_PROCESS');
                               }}
                               className="px-3 py-1 text-xs bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                             >
@@ -558,7 +596,7 @@ export default function () {
                               onClick={() => handleCancelAlert(alert.id)}
                               className="px-3 py-1 text-xs bg-red-500 text-white rounded-lg"
                             >
-                              Cancel
+                              Cancel 
                             </motion.button>
                           )}
                         </div>
@@ -731,7 +769,7 @@ export default function () {
         
         {/* Enhanced Bottom Navigation Bar */}
         {/* Bottom Navigation Bar */}
-        <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 w-[400px] bg-white/20 backdrop-blur-md text-zinc-900 shadow-lg border border-gray-200 rounded-full z-40">
+        <div className="absolute bottom-5 left-1/2 transform -translate-x-1/2 w-[300px] bg-white/20 backdrop-blur-md text-zinc-900 shadow-lg border border-gray-200 rounded-full z-40">
           {showAlertModel && (
             <div className="px-6 py-1">
               <div className="flex justify-between items-center">

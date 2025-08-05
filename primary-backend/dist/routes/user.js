@@ -115,7 +115,7 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
                 .status(400)
                 .json({ message: "Invalid Input", error: parsedBody.error.errors });
         }
-        const { email, password, role } = parsedBody.data;
+        const { email, password, role, name } = parsedBody.data;
         const generateUsername = String(role + Math.floor(Math.random() * 1000000)).padStart(6, "7");
         const existingUser = yield db_1.prismaClient.user.findFirst({
             where: {
@@ -132,11 +132,18 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
                 email: email,
                 password: HashedPassword,
                 role: role,
+                name: name || generateUsername,
             },
         });
         res.json({
             message: "User Created Sucessfully",
-            user: user,
+            user: {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+            },
         });
     }
     catch (error) {

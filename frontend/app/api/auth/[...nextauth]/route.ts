@@ -44,7 +44,7 @@ const handler = NextAuth({
             name: user.name || user.username,
             username: user.username,
             role: user.role,
-            image: null, // Add image field for consistency
+            image: user.image || null,
           };
 
           console.log("User for NextAuth:", userForNextAuth);
@@ -78,18 +78,25 @@ const handler = NextAuth({
             `http://localhost:5000/api/v1/user/check-email?email=${user.email}`
           );
 
-          if (existingUserResponse.data.exists) {
-            // User exists - allow sign in
-            console.log("Existing user signing in:", user.email);
+          const { exists } = existingUserResponse.data;
+
+          if (exists) {
+            // User exists, get their data
+            const userResponse = await axios.get(
+              `http://localhost:5000/api/v1/user/by-email?email=${user.email}`
+            );
+
+            const existingUser = userResponse.data.user;
+            
+            // Update user object with existing user data
+            user.id = existingUser.id;
+            user.username = existingUser.username;
+            user.role = existingUser.role;
+            
             return true;
           } else {
-            // New user - redirect to role selection
-            console.log("New user needs role selection:", user.email);
-            return `/login/role-selection?email=${encodeURIComponent(
-              user.email
-            )}&name=${encodeURIComponent(
-              user.name || ""
-            )}&image=${encodeURIComponent(user.image || "")}`;
+            // User doesn't exist, redirect to role selection
+            return "/signup/google-callback";
           }
         } catch (error) {
           console.error("Error checking user existence:", error);
@@ -100,39 +107,13 @@ const handler = NextAuth({
     },
 
     async jwt({ token, user, account }) {
-      if (account?.provider === "google" && user) {
-        try {
-          // Get user data from our database
-          const userResponse = await axios.get(
-            `http://localhost:5000/api/v1/user/by-email?email=${user.email}`
-          );
-
-          if (userResponse.data.user) {
-            const dbUser = userResponse.data.user;
-            token.id = dbUser.id;
-            token.email = dbUser.email;
-            token.name = dbUser.username || user.name;
-            token.username = dbUser.username;
-            token.role = dbUser.role;
-            token.picture = user.image;
-          } else {
-            // For new users who haven't selected role yet
-            token.id = user.id;
-            token.email = user.email;
-            token.name = user.name;
-            token.picture = user.image;
-            token.role = null;
-          }
-        } catch (error) {
-          console.error("Error fetching user data:", error);
-        }
-      } else if (user) {
-        // Credentials login
+      if (user) {
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
         token.username = user.username;
         token.role = user.role;
+        token.image = user.image;
       }
       return token;
     },
@@ -144,29 +125,14 @@ const handler = NextAuth({
         session.user.name = token.name as string;
         session.user.username = token.username as string;
         session.user.role = token.role as string;
-        session.user.image = token.picture as string;
+        session.user.image = token.image as string;
       }
       return session;
     },
+  },
 
-    async redirect({ url, baseUrl }) {
-      // Handle role selection redirect
-      if (url.startsWith("/login/role-selection")) {
-        return url;
-      }
-
-      // Handle dashboard redirects based on role
-      if (url.startsWith("/dashboard")) {
-        return url;
-      }
-
-      // Default redirect
-      if (url.startsWith(baseUrl)) {
-        return url;
-      }
-
-      return baseUrl;
-    },
+  pages: {
+    signIn: "/login",
   },
 });
 

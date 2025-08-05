@@ -11,7 +11,7 @@ interface Alert {
   priority: string | number;
   location: Array<{ lat: number; long: number }>;
   receivedAt?: number;
-  autoDisappearAt?: number;
+  autoDisappearAt?: number | null;
 }
 
 export const useEmergencySocket = (userId: string, userRole: string) => {
@@ -334,11 +334,18 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
   const handleAlertUpdate = useCallback((payload: Alert) => {
     setReceivedAlerts(prev => {
       const updated = prev.map(alert => 
-        alert.id === payload.id ? { ...payload, receivedAt: alert.receivedAt, autoDisappearAt: alert.autoDisappearAt } : alert
+        alert.id === payload.id 
+          ? { 
+              ...payload, 
+              receivedAt: alert.receivedAt, 
+              autoDisappearAt: payload.status === 'IN_PROCESS' ? null : alert.autoDisappearAt 
+            } 
+          : alert
       );
       
       // Save to localStorage
       localStorage.setItem(`dashboard-alerts-${userRole}`, JSON.stringify(updated));
+      console.log(`🔄 Updated alert ${payload.id} status to ${payload.status}`);
       return updated;
     });
   }, [userRole]);
@@ -367,6 +374,17 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
         localStorage.removeItem(`dashboard-alerts-${userRole}`);
       }
     }
+  }, [userRole]);
+
+  // Clear alerts from other roles when role changes
+  useEffect(() => {
+    const roles = ["POLICE", "FIRE", "MEDICAL"];
+    roles.forEach(role => {
+      if (role !== userRole) {
+        localStorage.removeItem(`dashboard-alerts-${role}`);
+        console.log(`🗑️ Cleared alerts for role: ${role}`);
+      }
+    });
   }, [userRole]);
 
   // Auto-disappear timer for new alerts

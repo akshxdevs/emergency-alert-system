@@ -5,6 +5,7 @@ export const SigninSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6),
   role: z.enum(Object.values(UserRole) as [string, ...string[]]),
+  name: z.string().optional(),
 });
 
 export const LoginSchema = z.object({
