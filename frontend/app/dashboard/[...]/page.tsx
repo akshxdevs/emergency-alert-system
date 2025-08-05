@@ -42,6 +42,7 @@ export default function () {
   const [isUpdatingAlert, setIsUpdatingAlert] = useState(false);
   const [updatingAlertId, setUpdatingAlertId] = useState<string | null>(null);
   const params = useParams();
+  const [showTimer,setShowTimer] = useState(true);
 
   useEffect(() => {
     const sessionUserId = session?.user?.id;
@@ -135,7 +136,6 @@ export default function () {
         }
       }, 20);
     };
-    
     animateSlider();
     console.log(`Alert ${alertId} updated to ${newStatus}`);
   }, [sendEmergencyUpdate]);
@@ -490,7 +490,9 @@ export default function () {
                           {/* Countdown Timer for auto-disappear alerts */}
                           {alert.autoDisappearAt && alert.status === 'REPORTED' && (
                             <div className="mt-2">
-                              <CountdownTimer alert={alert} />
+                              {showTimer && (
+                                <CountdownTimer alert={alert} />
+                              )}
                             </div>
                           )}
                           
@@ -530,7 +532,10 @@ export default function () {
                             <motion.button
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
-                              onClick={() => handleUpdateAlertStatus(alert.id, 'IN_PROCESS')}
+                              onClick={() => {
+                                setShowTimer(false),
+                                handleUpdateAlertStatus(alert.id, 'IN_PROCESS')
+                              }}
                               className="px-3 py-1 text-xs bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                             >
                               Start Response
