@@ -1,7 +1,7 @@
 export const ServiceDetailsCard = () => {
     return (
         <div className="font-martianmono absolute top-[900px] left-1/2 transform -translate-x-1/2 w-full max-w-full">
-            <div className="flex flex-col justify-center items-center text-center gap-2">
+            <div className="flex flex-col justify-center items-center text-center gap-2 text-zinc-950">
                 <h1 className="text-2xl font-semibold pt-10 pb-5">
                     Why Fire, Medical, and Police Alerts in One System?
                 </h1>
@@ -39,10 +39,10 @@ export const ServiceDetailsCard = () => {
                                 alt={card.title}
                                 className="object-cover rounded-full mb-2"
                             />
-                            <h1 className="text-lg font-semibold mb-1 text-center">
+                            <h1 className="text-md font-semibold mb-1 text-center">
                                 {card.title}
                             </h1>
-                            <p className="text-sm text-center line-clamp-[7]">
+                            <p className="text-xs text-center line-clamp-[7]">
                                 {card.desc}
                             </p>
                         </div>

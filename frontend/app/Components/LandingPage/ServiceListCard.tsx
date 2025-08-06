@@ -1,7 +1,7 @@
 export const ServiceListCard = () => {
     return (
         <div className="font-martianmono absolute top-[480px] left-1/2 transform -translate-x-1/2 w-full max-w-full">
-            <div className="flex flex-col justify-center items-center text-center gap-2">
+            <div className="flex flex-col justify-center items-center text-center gap-2 text-zinc-950">
                 <h1 className="text-2xl font-semibold pt-10 pb-5">Services</h1>
                 <div className="flex justify-between gap-10 pb-10">
                     <div className="flex flex-col gap-10 ">
@@ -24,7 +24,7 @@ export const ServiceListCard = () => {
                                 className="flex justify-start items-center gap-3 border border-red-500 rounded-lg px-4 w-[700px] h-[70px] bg-white"
                             >
                                 <img width="30" height="30" src={item.icon} alt="icon" />
-                                <h1 className="text-sm text-left leading-snug">
+                                <h1 className="text-xs text-left leading-snug">
                                     {item.text}
                                 </h1>
                             </div>
