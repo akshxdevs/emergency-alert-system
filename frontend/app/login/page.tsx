@@ -131,13 +131,13 @@ export default function LoginLandingPage() {
       </div>
 
       <div className="relative z-10 flex items-center justify-center min-h-screen px-4">
-        <motion.div
+      <motion.div
           initial={{ opacity: 0, y: 30, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl w-full max-w-sm p-6"
-        >
-          {/* Header */}
+      >
+        {/* Header */}
           <div className="text-center mb-6">
             <motion.div
               className="mb-4"
@@ -167,7 +167,7 @@ export default function LoginLandingPage() {
             >
               Access your dashboard
             </motion.p>
-          </div>
+        </div>
 
           {/* Login Form */}
           <form onSubmit={handleEmailSignIn} className="space-y-4">
@@ -264,9 +264,9 @@ export default function LoginLandingPage() {
             </AnimatePresence>
 
             {/* Sign In Button */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={isLoading}
               className="w-full bg-gradient-to-r from-red-600 to-red-500 text-white py-2.5 rounded-lg font-medium transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden group text-sm"
@@ -307,13 +307,13 @@ export default function LoginLandingPage() {
               </div>
               <div className="relative flex justify-center text-xs">
                 <span className="px-3 bg-transparent text-gray-400 font-medium">Or continue with</span>
-              </div>
+            </div>
             </motion.div>
 
             {/* Google Sign In Button */}
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
               type="button"
               onClick={handleGoogleSignIn}
               disabled={isLoading}
@@ -326,7 +326,7 @@ export default function LoginLandingPage() {
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
               <span>Sign in with Google</span>
-            </motion.button>
+          </motion.button>
 
             {/* Signup Link */}
             <motion.div 
@@ -351,7 +351,7 @@ export default function LoginLandingPage() {
             </motion.div>
           </form>
         </motion.div>
-      </div>
+        </div>
     </div>
   );
 } 

@@ -1,29 +1,29 @@
-import { WebSocket, WebSocketServer } from "ws";
-import { Server as httpServer } from "http";
-import { producer } from "./kafka/producer";
-import { consumer } from "./kafka/consumer";
-import { redisClient } from "./redis/init";
-import { prismaClient } from "../db/db";
-import { StatusReport } from "@prisma/client";
+  import { WebSocket, WebSocketServer } from "ws";
+  import { Server as httpServer } from "http";
+  import { producer } from "./kafka/producer";
+  import { consumer } from "./kafka/consumer";
+  import { redisClient } from "./redis/init";
+  import { prismaClient } from "../db/db";
+  import { StatusReport } from "@prisma/client";
 
-const clients = new Map<string, WebSocket>();
-const roleClients = new Map<string, Set<WebSocket>>();
+  const clients = new Map<string, WebSocket>();
+  const roleClients = new Map<string, Set<WebSocket>>();
 
-export const setUpSocketServer = (server: httpServer) => {
-  const wss = new WebSocketServer({ noServer: true });
+  export const setUpSocketServer = (server: httpServer) => {
+    const wss = new WebSocketServer({ noServer: true });
 
-  server.on("upgrade", (req, socket, head) => {
-    const userId = req.url?.split("/")[1] as string;
-    const userRole = req.url?.split("/?")[1] as string;
-    if (!userId || !userRole) {
-      socket.destroy();
-      return;
-    }
+    server.on("upgrade", (req, socket, head) => {
+      const userId = req.url?.split("/")[1] as string;
+      const userRole = req.url?.split("/?")[1] as string;
+      if (!userId || !userRole) {
+        socket.destroy();
+        return;
+      }
 
-    wss.handleUpgrade(req, socket, head, (ws) => {
-      wss.emit("connection", ws, userId, userRole);
+      wss.handleUpgrade(req, socket, head, (ws) => {
+        wss.emit("connection", ws, userId, userRole);
+      });
     });
-  });
 
   wss.on(
     "connection",
@@ -166,17 +166,17 @@ export const setUpSocketServer = (server: httpServer) => {
       });
     }
   );
-  function broadcast(data: any) {
-    const payload = JSON.stringify(data);
-    wss.clients.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(payload);
-      }
-    });
-  }
-  function roleBroadcast(role: string, data: any) {
-    const payload = JSON.stringify(data);
-    const sockets = roleClients.get(role);
+    function broadcast(data: any) {
+      const payload = JSON.stringify(data);
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(payload);
+        }
+      });
+    }
+    function roleBroadcast(role: string, data: any) {
+      const payload = JSON.stringify(data);
+      const sockets = roleClients.get(role);
 
     console.log(`🔍 RoleBroadcast called for role: ${role}`);
     console.log(`🔍 Available roles: ${Array.from(roleClients.keys())}`);
@@ -188,34 +188,34 @@ export const setUpSocketServer = (server: httpServer) => {
     }
 
     let sentCount = 0;
-    sockets.forEach((client) => {
-      if (client.readyState === WebSocket.OPEN) {
-        client.send(payload);
+      sockets.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(payload);
         sentCount++;
         console.log(`✅ Sent alert to ${role} client`);
       } else {
         console.log(`❌ Client not ready, state: ${client.readyState}`);
-      }
-    });
+        }
+      });
 
     console.log(`📊 Sent alert to ${sentCount} ${role} clients`);
-  }
+    }
   const updateAlertStatus = async (
     alertId: string,
     newStatus: StatusReport
   ) => {
-    try {
-      const updated = await prismaClient.emergency.update({
-        where: { id: alertId },
-        data: {
-          status: { set: newStatus },
-        },
-      });
-      return updated;
-    } catch (err) {
-      throw err;
-    }
-  };
+      try {
+        const updated = await prismaClient.emergency.update({
+          where: { id: alertId },
+          data: {
+            status: { set: newStatus },
+          },
+        });
+        return updated;
+      } catch (err) {
+        throw err;
+      }
+    };
   const cancelAlert = async (alertId: string) => {
     try {
       const cancelled = await prismaClient.emergency.update({
@@ -271,41 +271,41 @@ export const setUpSocketServer = (server: httpServer) => {
       console.error("Failed to send pending alerts:", err);
     }
   };
-  (async () => {
-    await producer.connect();
-    await consumer.connect();
+    (async () => {
+      await producer.connect();
+      await consumer.connect();
     await consumer.subscribe({
       topic: "emergency-alerts",
       fromBeginning: true,
     });
     await consumer.subscribe({ topic: "alert-updates" });
 
-    await consumer.run({
-      eachMessage: async ({ message, topic }) => {
-        if (!message.value) return;
-        const alert = JSON.parse(message.value.toString());
+      await consumer.run({
+        eachMessage: async ({ message, topic }) => {
+          if (!message.value) return;
+          const alert = JSON.parse(message.value.toString());
 
-        if (topic === "emergency-alerts") {
-          try {
+          if (topic === "emergency-alerts") {
+            try {
             console.log("Processing emergency alert:", alert);
-            await redisClient.set(`alert:${alert.id}`, JSON.stringify(alert));
+              await redisClient.set(`alert:${alert.id}`, JSON.stringify(alert));
 
-            const createAlert = await prismaClient.emergency.create({
-              data: {
-                type: alert.type,
-                reportedBy: alert.reportedBy,
-                status: alert.status,
-                assignedTo: alert.assignedTo,
-                description: alert.description,
-                priority: alert.priority,
-                location: {
-                  create: {
-                    lat: alert.location.lat,
-                    long: alert.location.long,
+              const createAlert = await prismaClient.emergency.create({
+                data: {
+                  type: alert.type,
+                  reportedBy: alert.reportedBy,
+                  status: alert.status,
+                  assignedTo: alert.assignedTo,
+                  description: alert.description,
+                  priority: alert.priority,
+                  location: {
+                    create: {
+                      lat: alert.location.lat,
+                      long: alert.location.long,
+                    },
                   },
                 },
-              },
-            });
+              });
 
             console.log("Alert created in DB:", createAlert);
 
@@ -331,29 +331,29 @@ export const setUpSocketServer = (server: httpServer) => {
                 ],
               },
             });
-          } catch (error) {
-            console.error("Failed to store alert:", error);
+            } catch (error) {
+              console.error("Failed to store alert:", error);
+            }
           }
-        }
 
-        if (topic === "alert-updates") {
-          try {
-            console.log("entered updates");
+            if (topic === "alert-updates") {
+              try {
+                console.log("entered updates");
+                
+                const { id, newStatus } = JSON.parse(message.value.toString());
 
-            const { id, newStatus } = JSON.parse(message.value.toString());
-
-            const updated = await prismaClient.emergency.update({
-              where: { id },
-              data: { status: newStatus },
-            });
-            console.log("Prisma update successful:", updated);
-            await redisClient.set(`alert:${id}`, JSON.stringify(updated));
-            broadcast({ type: "ALERT_UPDATED", payload: updated });
-          } catch (error) {
-            console.error("Prisma update failed:", error);
-          }
-        }
-      },
-    });
-  })();
-};
+                const updated = await prismaClient.emergency.update({
+                  where: { id },
+                  data: { status: newStatus },
+                });
+                console.log("Prisma update successful:", updated);
+                await redisClient.set(`alert:${id}`, JSON.stringify(updated));
+                broadcast({ type: "ALERT_UPDATED", payload: updated });
+              } catch (error) {
+                console.error("Prisma update failed:", error);
+              }
+            }
+          },
+      });
+    })();
+  };

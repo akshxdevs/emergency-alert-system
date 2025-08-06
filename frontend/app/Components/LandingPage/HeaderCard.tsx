@@ -1,10 +1,14 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 
 export const HeaderCard = () => {
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isButtonHovered, setIsButtonHovered] = useState(false);
   const router = useRouter();
+  
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
@@ -14,6 +18,7 @@ export const HeaderCard = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+  
   useEffect(() => {
     const script = document.createElement('script');
     script.src = '/libs/lib.js';
@@ -44,22 +49,192 @@ export const HeaderCard = () => {
 
     document.body.appendChild(script);
   }, []);
-    return <div
-        className="finisher-header relative w-full h-[500px]"
-        id="finisher-header"
+
+  return (
+    <motion.div
+      className="finisher-header relative w-full min-h-[500px] md:h-[600px] lg:h-[700px]"
+      id="finisher-header"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="absolute inset-0 flex items-center justify-center">
+        <motion.div 
+          className="flex flex-col justify-center items-center text-center gap-4 md:gap-6 px-4 md:px-8 max-w-4xl mx-auto"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.3 }}
         >
-        <div className="absolute top-[0px] left-1/2 transform -translate-x-1/2 w-full max-w-full">
-            <div className="flex flex-col justify-center items-center text-center gap-2 text-slate-50 pt-44">
-                <img width="62" height="62" src="https://img.icons8.com/color-pixels/32/siren.png" alt="siren"/>
-                <h1 className="font-gilroyBold text-6xl font-semibold">Stay Safe and Informed With Real-Time Emergency Alerts, Always Reliable</h1>
-                <p className="font-gilroyLight">Built to protect. Designed to alert. Trusted in every crisis.</p>
-                <button onClick={()=>router.push("/login")} className="flex font-mono gap-2 mt-8 text-slate-100  bg-red-500 px-32 py-3 rounded-full">
-                    Begin Setup
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="size-6">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
-                    </svg>
-                </button>
-            </div>
-        </div>
-    </div>
+          {/* Animated Icon */}
+          <motion.div
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ duration: 0.8, delay: 0.5, type: "spring", bounce: 0.4 }}
+            whileHover={{ 
+              scale: 1.05, 
+              rotate: [0, -5, 5, 0],
+              transition: { duration: 0.6 }
+            }}
+            className="relative"
+          >
+            <motion.img 
+              width="48" 
+              height="48" 
+              className="w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 drop-shadow-sm"
+              src="https://img.icons8.com/color-pixels/32/siren.png" 
+              alt="siren"
+            />
+            {/* Subtle Glow Effect */}
+            <motion.div
+              className="absolute inset-0 bg-emerald-400/20 rounded-full blur-lg opacity-0"
+              animate={{ opacity: isHovered ? 0.2 : 0 }}
+              transition={{ duration: 0.3 }}
+            />
+          </motion.div>
+
+          {/* Animated Title */}
+          <motion.h1 
+            className="font-gilroyBold text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold leading-tight text-slate-800"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.7 }}
+            whileHover={{ scale: 1.01 }}
+          >
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.8 }}
+            >
+              Stay Safe and Informed
+            </motion.span>
+            <br />
+            <motion.span
+              className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 1.0 }}
+            >
+              With Real-Time Emergency Alerts
+            </motion.span>
+            <br />
+            <motion.span
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 1.2 }}
+            >
+              Always Reliable
+            </motion.span>
+          </motion.h1>
+
+          {/* Animated Subtitle */}
+          <motion.p 
+            className="font-gilroyLight text-base md:text-lg lg:text-xl text-slate-600 max-w-2xl"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1.4 }}
+          >
+            Built to protect. Designed to alert. Trusted in every crisis.
+          </motion.p>
+
+          {/* Enhanced Button */}
+          <motion.button 
+            onClick={() => router.push("/login")} 
+            className="flex font-mono gap-2 mt-6 md:mt-8 text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 px-8 md:px-12 lg:px-16 py-3 md:py-4 rounded-full shadow-lg relative overflow-hidden group transition-all duration-300"
+            initial={{ opacity: 0, y: 20, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.8, delay: 1.6 }}
+            whileHover={{ 
+              scale: 1.02,
+              boxShadow: "0 10px 25px rgba(16, 185, 129, 0.3)"
+            }}
+            whileTap={{ scale: 0.98 }}
+            onMouseEnter={() => setIsButtonHovered(true)}
+            onMouseLeave={() => setIsButtonHovered(false)}
+          >
+            {/* Animated Background */}
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            />
+            
+            {/* Button Content */}
+            <motion.span 
+              className="relative z-10 flex items-center gap-2 text-sm md:text-base"
+              animate={{ x: isButtonHovered ? 3 : 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              Begin Setup
+              <motion.svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                fill="none" 
+                viewBox="0 0 24 24" 
+                strokeWidth="1.5" 
+                stroke="currentColor" 
+                className="w-4 h-4 md:w-5 md:h-5 lg:w-6 lg:h-6"
+                animate={{ x: isButtonHovered ? 4 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.25 8.25 21 12m0 0-3.75 3.75M21 12H3" />
+              </motion.svg>
+            </motion.span>
+
+            {/* Subtle Ripple Effect */}
+            <AnimatePresence>
+              {isButtonHovered && (
+                <motion.div
+                  className="absolute inset-0 bg-white/10 rounded-full"
+                  initial={{ scale: 0, opacity: 0.5 }}
+                  animate={{ scale: 1.5, opacity: 0 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  transition={{ duration: 0.5 }}
+                />
+              )}
+            </AnimatePresence>
+          </motion.button>
+
+          {/* Subtle Floating Elements */}
+          <motion.div
+            className="absolute top-10 left-10 text-2xl md:text-3xl opacity-10"
+            animate={{ 
+              y: [0, -8, 0],
+              rotate: [0, 3, 0]
+            }}
+            transition={{ 
+              duration: 4, 
+              repeat: Infinity, 
+              ease: "easeInOut" 
+            }}
+          >
+            🚨
+          </motion.div>
+          <motion.div
+            className="absolute top-20 right-10 text-xl md:text-2xl opacity-10"
+            animate={{ 
+              x: [0, 8, 0],
+              scale: [1, 1.05, 1]
+            }}
+            transition={{ 
+              duration: 6, 
+              repeat: Infinity, 
+              ease: "easeInOut" 
+            }}
+          >
+            🚔
+          </motion.div>
+          <motion.div
+            className="absolute bottom-20 left-10 text-xl md:text-2xl opacity-10"
+            animate={{ 
+              scale: [1, 1.1, 1],
+              rotate: [0, -3, 0]
+            }}
+            transition={{ 
+              duration: 5, 
+              repeat: Infinity, 
+              ease: "easeInOut" 
+            }}
+          >
+            🚑
+          </motion.div>
+        </motion.div>
+      </div>
+    </motion.div>
+  );
 }
