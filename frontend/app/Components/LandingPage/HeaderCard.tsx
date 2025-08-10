@@ -52,7 +52,7 @@ export const HeaderCard = () => {
 
   return (
     <motion.div
-      className="finisher-header relative w-full min-h-[500px] md:h-[600px] lg:h-[700px]"
+      className="finisher-header relative w-full min-h-[100px] md:h-[600px] lg:h-[550px]"
       id="finisher-header"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

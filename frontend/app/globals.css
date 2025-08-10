@@ -243,33 +243,30 @@ body::before {
   }
 }
 
-.animate-pulse-red {
-  animation: pulse-red 2s infinite;
-}
-
 @keyframes marquee {
   0% {
     transform: translateX(0);
   }
   100% {
-    transform: translateX(calc(-100% - var(--gap)));
+    transform: translateX(-100%);
   }
 }
 
-@keyframes marquee-vertical {
+@keyframes marquee-reverse {
   0% {
-    transform: translateY(0);
+    transform: translateX(-100%);
   }
   100% {
-    transform: translateY(calc(-100% - var(--gap)));
+    transform: translateX(0);
   }
 }
 
 .animate-marquee {
-  animation: marquee var(--duration) linear infinite;
+  animation: marquee var(--duration, 40s) linear infinite;
 }
 
-.animate-marquee-vertical {
-  animation: marquee-vertical var(--duration) linear infinite;
+.animate-marquee-reverse {
+  animation: marquee-reverse var(--duration, 40s) linear infinite;
 }
+
 

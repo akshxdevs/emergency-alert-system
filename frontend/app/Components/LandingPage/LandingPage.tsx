@@ -27,14 +27,15 @@ export const LandingPage = () => {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.8, delay: 0.4 }}
                 >
-                    <ServiceListCard/>
+                    <ReportsDisplayBanner/>
+
                 </motion.div>
                 <motion.div
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.8, delay: 0.6 }}
                 >
-                    <ReportsDisplayBanner/>
+                    <ServiceListCard/>
                 </motion.div>
                 <motion.div
                     initial={{ y: 50, opacity: 0 }}
