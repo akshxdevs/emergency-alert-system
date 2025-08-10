@@ -17,7 +17,8 @@ const config: Config = {
         gilroy: ["var(--font-gilroy)"],
         gilroyBold: ["var(--font-gilroyBold)"],
         gilroyLight: ["var(--font-gilroyLight)"],
-        martianmono: ["var(--font-martianmono)"], // 👈 define your font
+        martianmono: ["var(--font-martianmono)"],
+        BricolageGrotesque:["var(--font-BricolageGrotesque)"], // 👈 define your font
       },
       animation: {
         "spin-conic": "spin-conic 3s linear infinite",

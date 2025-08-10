@@ -30,7 +30,7 @@ export const ServiceListCard = () => {
             <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
                 <div className="flex flex-col justify-center items-center text-center gap-8 md:gap-12">
                     <motion.h1 
-                        className="text-2xl md:text-3xl lg:text-4xl font-semibold text-slate-800"
+                        className="text-2xl md:text-3xl lg:text-4xl font-semibold text-slate-900"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.4 }}
@@ -49,7 +49,7 @@ export const ServiceListCard = () => {
                                     transition={{ duration: 0.6, delay: 0.6 + idx * 0.1 }}
                                     whileHover={{ 
                                         scale: 1.01,
-                                        boxShadow: "0 8px 25px rgba(16, 185, 129, 0.15)",
+                                        boxShadow: "0 8px 25px rgba(254, 215, 170, 0.25)",
                                         y: -2
                                     }}
                                     onMouseEnter={() => setHoveredIndex(idx)}
@@ -57,24 +57,12 @@ export const ServiceListCard = () => {
                                 >
                                     {/* Subtle Background */}
                                     <motion.div
-                                        className="absolute inset-0 bg-gradient-to-r from-emerald-50 to-teal-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                        className="absolute inset-0 bg-orange-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                     />
                                     
                                     {/* Subtle Border */}
                                     <motion.div
-                                        className="absolute inset-0 rounded-lg"
-                                        style={{
-                                            background: `linear-gradient(45deg, #10b981, #14b8a6, #10b981)`,
-                                            backgroundSize: "400% 400%",
-                                        }}
-                                        animate={{
-                                            backgroundPosition: hoveredIndex === idx ? ["0% 0%", "100% 100%", "0% 0%"] : ["0% 0%"],
-                                        }}
-                                        transition={{
-                                            duration: hoveredIndex === idx ? 2 : 0,
-                                            repeat: hoveredIndex === idx ? Infinity : 0,
-                                            ease: "linear",
-                                        }}
+                                        className="absolute inset-0 rounded-lg bg-orange-200"
                                     />
                                     
                                     <div className="flex items-center gap-4 relative z-10">
@@ -94,7 +82,7 @@ export const ServiceListCard = () => {
                                             />
                                         </motion.div>
                                         <motion.h1 
-                                            className="text-sm md:text-base text-left leading-relaxed font-medium text-slate-700"
+                                            className="text-sm md:text-base text-left leading-relaxed font-medium text-slate-900"
                                             animate={{ x: hoveredIndex === idx ? 3 : 0 }}
                                             transition={{ duration: 0.3 }}
                                         >
@@ -108,7 +96,7 @@ export const ServiceListCard = () => {
                                             {[...Array(3)].map((_, i) => (
                                                 <motion.div
                                                     key={i}
-                                                    className="absolute w-1 h-1 bg-emerald-400 rounded-full"
+                                                    className="absolute w-1 h-1 bg-orange-200 rounded-full"
                                                     initial={{ 
                                                         x: "50%", 
                                                         y: "50%", 

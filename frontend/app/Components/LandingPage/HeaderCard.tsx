@@ -85,49 +85,51 @@ export const HeaderCard = () => {
             />
             {/* Subtle Glow Effect */}
             <motion.div
-              className="absolute inset-0 bg-emerald-400/20 rounded-full blur-lg opacity-0"
+              className="absolute inset-0 bg-orange-200/20 rounded-full blur-lg opacity-0"
               animate={{ opacity: isHovered ? 0.2 : 0 }}
               transition={{ duration: 0.3 }}
             />
           </motion.div>
 
           {/* Animated Title */}
-          <motion.h1 
-            className="font-gilroyBold text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold leading-tight text-slate-800"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.7 }}
-            whileHover={{ scale: 1.01 }}
-          >
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.8 }}
+                      <motion.h1 
+                className="font-BricolageGrotesque text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold leading-tight text-slate-900"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.7 }}
+                whileHover={{ scale: 1.01 }}
             >
-              Stay Safe and Informed
-            </motion.span>
-            <br />
-            <motion.span
-              className="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 1.0 }}
-            >
-              With Real-Time Emergency Alerts
-            </motion.span>
-            <br />
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 1.2 }}
-            >
-              Always Reliable
-            </motion.span>
-          </motion.h1>
+                <motion.span
+                    className="bg-gradient-to-r from-orange-300 to-amber-900 bg-clip-text text-transparent font-bold"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.8 }}
+                >
+                    Stay Safe and Informed
+                </motion.span>
+                <br />
+                <motion.span
+                    className="bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 bg-clip-text text-transparent font-bold"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 1.0 }}
+                >
+                    With Real-Time Emergency Alerts
+                </motion.span>
+                <br />
+                <motion.span
+                    className="bg-gradient-to-r from-orange-300 to-amber-900 bg-clip-text text-transparent font-bold"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 1.2 }}
+                >
+                    Always Reliable
+                </motion.span>
+            </motion.h1>
 
           {/* Animated Subtitle */}
           <motion.p 
-            className="font-gilroyLight text-base md:text-lg lg:text-xl text-slate-600 max-w-2xl"
+            className="font-gilroyLight md:text-lg lg:text-xl text-slate-200 max-w-2xl font-lightSD"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.4 }}
@@ -138,13 +140,13 @@ export const HeaderCard = () => {
           {/* Enhanced Button */}
           <motion.button 
             onClick={() => router.push("/login")} 
-            className="flex font-mono gap-2 mt-6 md:mt-8 text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 px-8 md:px-12 lg:px-16 py-3 md:py-4 rounded-full shadow-lg relative overflow-hidden group transition-all duration-300"
+            className="flex font-BricolageGrotesque gap-2 mt-6 md:mt-8 text-white bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 px-8 md:px-12 lg:px-16 py-3 md:py-4 rounded-full shadow-lg relative overflow-hidden group transition-all duration-300"
             initial={{ opacity: 0, y: 20, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 0.8, delay: 1.6 }}
             whileHover={{ 
               scale: 1.02,
-              boxShadow: "0 10px 25px rgba(16, 185, 129, 0.3)"
+              boxShadow: "0 10px 25px rgba(249, 115, 22, 0.3)"
             }}
             whileTap={{ scale: 0.98 }}
             onMouseEnter={() => setIsButtonHovered(true)}
@@ -152,7 +154,7 @@ export const HeaderCard = () => {
           >
             {/* Animated Background */}
             <motion.div
-              className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-teal-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+              className="absolute inset-0 bg-gradient-to-r from-orange-600 to-amber-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
             />
             
             {/* Button Content */}

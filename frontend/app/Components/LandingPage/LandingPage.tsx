@@ -1,10 +1,10 @@
 "use client";
 import { motion } from "framer-motion";
 import { AkshxFooter } from "../Reusables/AkshxFooter"
-import { AppBar } from "../Reusables/AppBar"
 import { HeaderCard } from "./HeaderCard"
 import { ServiceDetailsCard } from "./ServiceDetailsCard"
 import { ServiceListCard } from "./ServiceListCard"
+import ReportsDisplayBanner from "./ReportsDisplayBanner";
 
 export const LandingPage = () => {
     return (
@@ -14,7 +14,6 @@ export const LandingPage = () => {
             transition={{ duration: 1, ease: "easeOut" }}
             className="relative min-h-screen"
         >
-            <AppBar/>
             <div className="relative">
                 <motion.div
                     initial={{ y: 50, opacity: 0 }}
@@ -35,12 +34,19 @@ export const LandingPage = () => {
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.8, delay: 0.6 }}
                 >
-                    <ServiceDetailsCard/>
+                    <ReportsDisplayBanner/>
                 </motion.div>
                 <motion.div
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.8, delay: 0.8 }}
+                >
+                    <ServiceDetailsCard/>
+                </motion.div>
+                <motion.div
+                    initial={{ y: 50, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 1 }}
                 >
                     <AkshxFooter/>
                 </motion.div>

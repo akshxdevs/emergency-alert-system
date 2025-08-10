@@ -35,6 +35,11 @@ const myfont3 = localFont({
   display: 'swap',
   variable: '--font-martianmono',
 });
+const myfont4 = localFont({
+  src: './fonts/BricolageGrotesque-VariableFont_opsz.ttf',
+  display: 'swap',
+  variable: '--font-BricolageGrotesque',
+});
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -43,7 +48,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${myFont.variable} ${myFont1.variable} ${myFont2.variable} ${myfont3.variable}`}
+        className={`${myFont.variable} ${myFont1.variable} ${myFont2.variable} ${myfont3.variable} ${myfont4.variable}`}
       >
       <SessionProvider>
         {children}

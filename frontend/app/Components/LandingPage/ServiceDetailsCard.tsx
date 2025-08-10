@@ -38,7 +38,7 @@ export const ServiceDetailsCard = () => {
             <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
                 <div className="flex flex-col justify-center items-center text-center gap-8 md:gap-12">
                     <motion.h1 
-                        className="text-2xl md:text-3xl lg:text-4xl font-semibold text-slate-800"
+                        className="text-2xl md:text-3xl lg:text-4xl font-semibold text-slate-900"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.4 }}
@@ -57,31 +57,19 @@ export const ServiceDetailsCard = () => {
                                 whileHover={{ 
                                     scale: 1.02,
                                     y: -5,
-                                    boxShadow: "0 10px 30px rgba(16, 185, 129, 0.15)"
+                                    boxShadow: "0 10px 30px rgba(254, 215, 170, 0.25)"
                                 }}
                                 onMouseEnter={() => setHoveredCard(idx)}
                                 onMouseLeave={() => setHoveredCard(null)}
                             >
                                 {/* Subtle Background */}
                                 <motion.div
-                                    className="absolute inset-0 bg-gradient-to-br from-emerald-50 to-teal-50 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                    className="absolute inset-0 bg-orange-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                                 />
                                 
                                 {/* Subtle Border */}
                                 <motion.div
-                                    className="absolute inset-0 rounded-lg"
-                                    style={{
-                                        background: `linear-gradient(45deg, #10b981, #14b8a6, #10b981)`,
-                                        backgroundSize: "400% 400%",
-                                    }}
-                                    animate={{
-                                        backgroundPosition: hoveredCard === idx ? ["0% 0%", "100% 100%", "0% 0%"] : ["0% 0%"],
-                                    }}
-                                    transition={{
-                                        duration: hoveredCard === idx ? 2 : 0,
-                                        repeat: hoveredCard === idx ? Infinity : 0,
-                                        ease: "linear",
-                                    }}
+                                    className="absolute inset-0 rounded-lg bg-orange-200"
                                 />
                                 
                                 <div className="flex flex-col justify-start items-center relative z-10 h-full">
@@ -104,7 +92,7 @@ export const ServiceDetailsCard = () => {
                                     </motion.div>
                                     
                                     <motion.h1 
-                                        className="text-lg font-semibold mb-3 text-center text-slate-800"
+                                        className="text-lg font-semibold mb-3 text-center text-slate-900"
                                         animate={{ y: hoveredCard === idx ? -2 : 0 }}
                                         transition={{ duration: 0.3 }}
                                     >
@@ -129,7 +117,7 @@ export const ServiceDetailsCard = () => {
                                         {[...Array(4)].map((_, i) => (
                                             <motion.div
                                                 key={i}
-                                                className="absolute w-1 h-1 bg-emerald-400 rounded-full"
+                                                className="absolute w-1 h-1 bg-orange-200 rounded-full"
                                                 initial={{ 
                                                     x: "50%", 
                                                     y: "50%", 
@@ -155,7 +143,7 @@ export const ServiceDetailsCard = () => {
                                 
                                 {/* Subtle Glow Effect */}
                                 <motion.div
-                                    className="absolute inset-0 bg-gradient-to-r from-emerald-400/10 to-teal-400/10 rounded-lg blur-lg opacity-0"
+                                    className="absolute inset-0 bg-orange-200/20 rounded-lg blur-lg opacity-0"
                                     animate={{ opacity: hoveredCard === idx ? 0.1 : 0 }}
                                     transition={{ duration: 0.3 }}
                                 />
