@@ -63,17 +63,54 @@ export const ServiceListCard = () => {
         return () => clearInterval(interval);
     }, []);
 
+    // Container animation variants for stacking effect
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.3, // Delay between each service
+                delayChildren: 0.5,   // Initial delay before first service
+            }
+        }
+    };
+
+    // Individual service animation variants
+    const serviceVariants = {
+        hidden: { 
+            opacity: 0, 
+            x: -100, 
+            y: 50,
+            scale: 0.8,
+            rotateY: -15
+        },
+        visible: { 
+            opacity: 1, 
+            x: 0, 
+            y: 0,
+            scale: 1,
+            rotateY: 0,
+            transition: {
+                duration: 0.8,
+                ease: "easeOut" as const,
+                type: "spring" as const,
+                stiffness: 100,
+                damping: 15
+            }
+        }
+    };
+
     return (
         <motion.div 
-            className="font-martianmono relative w-full py-16 md:py-20 lg:py-8"
+            className="font-martianmono relative w-full py-12 sm:py-16 md:py-20 lg:py-24 bg-white"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
         >
-            <div className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8">
-                <div className="flex flex-col justify-center items-center text-center gap-8 md:gap-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
+                <div className="flex flex-col justify-center items-center text-center gap-6 sm:gap-8 md:gap-12">
                     <motion.h1 
-                        className="text-2xl md:text-3xl lg:text-4xl font-semibold text-slate-900"
+                        className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold text-slate-900"
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.4 }}
@@ -81,19 +118,23 @@ export const ServiceListCard = () => {
                     >
                         Services
                     </motion.h1>
-                    <div className="flex flex-col lg:flex-row justify-between items-center gap-8 lg:gap-12 w-full">
-                        <div className="flex flex-col gap-6 md:gap-8 w-full lg:w-1/2">
+                    <div className="flex flex-col lg:flex-row justify-between items-center gap-8 sm:gap-10 lg:gap-12 w-full">
+                        <motion.div 
+                            className="flex flex-col gap-4 sm:gap-6 md:gap-8 w-full lg:w-1/2"
+                            variants={containerVariants}
+                            initial="hidden"
+                            animate="visible"
+                        >
                             {services.map((item, idx) => (
                                 <motion.div
                                     key={idx}
-                                    className="flex justify-start items-center gap-4 border border-slate-200 rounded-lg px-6 py-4 w-full bg-white shadow-sm hover:shadow-md relative overflow-hidden group cursor-pointer transition-all duration-300"
-                                    initial={{ opacity: 0, x: -50 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ duration: 0.6, delay: 0.6 + idx * 0.1 }}
+                                    className="flex justify-start items-center gap-3 sm:gap-4 border border-slate-200 rounded-lg px-4 sm:px-6 py-3 sm:py-4 w-full bg-white shadow-sm hover:shadow-md relative overflow-hidden group cursor-pointer transition-all duration-300"
+                                    variants={serviceVariants}
                                     whileHover={{ 
-                                        scale: 1.01,
+                                        scale: 1.02,
+                                        y: -5,
                                         boxShadow: "0 8px 25px rgba(254, 215, 170, 0.25)",
-                                        y: -2
+                                        transition: { duration: 0.3 }
                                     }}
                                     onMouseEnter={() => setHoveredIndex(idx)}
                                     onMouseLeave={() => setHoveredIndex(null)}
@@ -108,7 +149,7 @@ export const ServiceListCard = () => {
                                         className="absolute inset-0 rounded-lg bg-orange-200"
                                     />
                                     
-                                    <div className="flex items-center gap-4 relative z-10">
+                                    <div className="flex items-center gap-3 sm:gap-4 relative z-10">
                                         <motion.div
                                             animate={hoveredIndex === idx ? {
                                                 scale: [1, 1.1, 1],
@@ -121,11 +162,11 @@ export const ServiceListCard = () => {
                                                 height="24" 
                                                 src={item.icon} 
                                                 alt="icon" 
-                                                className="drop-shadow-sm"
+                                                className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 drop-shadow-sm"
                                             />
                                         </motion.div>
                                         <motion.h1 
-                                            className="text-sm md:text-base text-left leading-relaxed font-medium text-slate-900"
+                                            className="text-xs sm:text-sm md:text-base lg:text-lg text-left leading-relaxed font-medium text-slate-900"
                                             animate={{ x: hoveredIndex === idx ? 3 : 0 }}
                                             transition={{ duration: 0.3 }}
                                         >
@@ -133,9 +174,9 @@ export const ServiceListCard = () => {
                                         </motion.h1>
                                     </div>
                                     
-                                    {/* Subtle Particle Effect on Hover */}
+                                    {/* Subtle Particle Effect on Hover - Hidden on mobile for performance */}
                                     {hoveredIndex === idx && (
-                                        <div className="absolute inset-0 pointer-events-none">
+                                        <div className="absolute inset-0 pointer-events-none hidden sm:block">
                                             {[...Array(3)].map((_, i) => (
                                                 <motion.div
                                                     key={i}
@@ -164,16 +205,23 @@ export const ServiceListCard = () => {
                                     )}
                                 </motion.div>
                             ))}
-                        </div>
+                        </motion.div>
                         <motion.div
-                            className="w-full lg:w-1/2 flex justify-center relative"
-                            initial={{ opacity: 0, scale: 0.8 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            transition={{ duration: 0.8, delay: 0.8 }}
+                            className="w-full lg:w-1/2 flex justify-center"
+                            initial={{ opacity: 0, scale: 0.8, x: 100 }}
+                            animate={{ opacity: 1, scale: 1, x: 0 }}
+                            transition={{ 
+                                duration: 1.2, 
+                                delay: 1.5, // Delay to start after services stack
+                                ease: "easeOut",
+                                type: "spring",
+                                stiffness: 80,
+                                damping: 20
+                            }}
                             whileHover={{ scale: 1.02 }}
                         >
                             {/* Image Slider Container */}
-                            <div className="relative h-64 md:h-80 lg:h-96 w-full max-w-md overflow-hidden rounded-lg shadow-lg">
+                            <div className="relative h-48 sm:h-56 md:h-64 lg:h-80 xl:h-96 w-full max-w-sm sm:max-w-md overflow-hidden rounded-lg shadow-lg">
                                 {/* Image Slides */}
                                 {emergencyImages.map((image, index) => (
                                     <motion.div
@@ -198,11 +246,11 @@ export const ServiceListCard = () => {
                                 ))}
                                 
                                 {/* Navigation Dots */}
-                                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+                                <div className="absolute bottom-3 sm:bottom-4 left-1/2 transform -translate-x-1/2 flex gap-1.5 sm:gap-2">
                                     {emergencyImages.map((_, index) => (
                                         <motion.button
                                             key={index}
-                                            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                                            className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full transition-all duration-300 ${
                                                 currentImageIndex === index 
                                                     ? 'bg-white scale-125' 
                                                     : 'bg-white/50 hover:bg-white/80'
@@ -214,9 +262,9 @@ export const ServiceListCard = () => {
                                     ))}
                                 </div>
                                 
-                                {/* Progress Bar - Moved to bottom */}
+                                {/* Progress Bar */}
                                 <motion.div
-                                    className="absolute bottom-0 left-0 h-1 bg-white/80"
+                                    className="absolute bottom-0 left-0 h-0.5 bg-white/80"
                                     initial={{ width: "0%" }}
                                     animate={{ width: "100%" }}
                                     transition={{ 

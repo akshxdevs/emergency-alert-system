@@ -28,14 +28,15 @@ export const LandingPage = () => {
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.8, delay: 0.4 }}
+                    className="py-8 sm:py-12 md:py-16"
                 >
                     <ReportsDisplayBanner/>
-
                 </motion.div>
                 <motion.div
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.8, delay: 0.6 }}
+                    className="py-8 sm:py-12 md:py-16"
                 >
                     <ServiceListCard/>
                 </motion.div>
@@ -43,6 +44,7 @@ export const LandingPage = () => {
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.8, delay: 0.8 }}
+                    className="py-8 sm:py-12 md:py-16"
                 >
                     <ServiceDetailsCard/>
                 </motion.div>
@@ -50,6 +52,7 @@ export const LandingPage = () => {
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.8, delay: 1 }}
+                    className="pt-8 sm:pt-12 md:pt-16"
                 >
                     <AkshxFooter/>
                 </motion.div>
