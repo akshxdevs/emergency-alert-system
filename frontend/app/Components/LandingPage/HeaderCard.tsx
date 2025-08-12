@@ -76,13 +76,6 @@ export const HeaderCard = () => {
             }}
             className="relative"
           >
-            <motion.img 
-              width="48" 
-              height="48" 
-              className="w-12 h-12 md:w-16 md:h-16 lg:w-20 lg:h-20 drop-shadow-sm"
-              src="https://img.icons8.com/color-pixels/32/siren.png" 
-              alt="siren"
-            />
             {/* Subtle Glow Effect */}
             <motion.div
               className="absolute inset-0 bg-orange-200/20 rounded-full blur-lg opacity-0"
@@ -92,7 +85,7 @@ export const HeaderCard = () => {
           </motion.div>
 
           {/* Animated Title */}
-                      <motion.h1 
+            <motion.h1 
                 className="font-BricolageGrotesque text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold leading-tight text-slate-900"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}

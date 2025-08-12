@@ -5,6 +5,7 @@ import { HeaderCard } from "./HeaderCard"
 import { ServiceDetailsCard } from "./ServiceDetailsCard"
 import { ServiceListCard } from "./ServiceListCard"
 import ReportsDisplayBanner from "./ReportsDisplayBanner";
+import { AppBarLP } from "./AppBarLP";
 
 export const LandingPage = () => {
     return (
@@ -14,6 +15,7 @@ export const LandingPage = () => {
             transition={{ duration: 1, ease: "easeOut" }}
             className="relative min-h-screen"
         >
+            <AppBarLP/>
             <div className="relative">
                 <motion.div
                     initial={{ y: 50, opacity: 0 }}

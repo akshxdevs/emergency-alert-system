@@ -1,9 +1,10 @@
 "use client";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export const ServiceListCard = () => {
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
     const services = [
         {
@@ -19,6 +20,48 @@ export const ServiceListCard = () => {
             text: "Get instant notifications about nearby fire hazards and outbreaks."
         }
     ];
+
+    const emergencyImages = [
+        {
+            src: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbwHUpZhMHkZMp2rrx8VScgYlqMkjh3jEEXw&s",
+            alt: "Emergency Services",
+            title: "Emergency Response Team"
+        },
+        {
+            src: "https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=500&h=400&fit=crop",
+            alt: "Medical Emergency",
+            title: "Medical Response"
+        },
+        {
+            src: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=500&h=400&fit=crop",
+            alt: "Fire Department",
+            title: "Fire Safety"
+        },
+        {
+            src: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=500&h=400&fit=crop",
+            alt: "Police Department",
+            title: "Law Enforcement"
+        },
+        {
+            src: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=500&h=400&fit=crop",
+            alt: "Ambulance Service",
+            title: "Emergency Transport"
+        },
+        {
+            src: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=500&h=400&fit=crop",
+            alt: "Emergency Communication",
+            title: "Alert System"
+        }
+    ];
+
+    // Auto-rotate images every 4 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentImageIndex((prev) => (prev + 1) % emergencyImages.length);
+        }, 4000);
+
+        return () => clearInterval(interval);
+    }, []);
 
     return (
         <motion.div 
@@ -123,22 +166,66 @@ export const ServiceListCard = () => {
                             ))}
                         </div>
                         <motion.div
-                            className="w-full lg:w-1/2 flex justify-center"
+                            className="w-full lg:w-1/2 flex justify-center relative"
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ duration: 0.8, delay: 0.8 }}
                             whileHover={{ scale: 1.02 }}
                         >
-                            <motion.img
-                                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbwHUpZhMHkZMp2rrx8VScgYlqMkjh3jEEXw&s"
-                                alt="service"
-                                className="h-64 md:h-80 lg:h-96 w-full max-w-md object-cover rounded-lg shadow-lg"
-                                whileHover={{ 
-                                    boxShadow: "0 15px 35px rgba(0, 0, 0, 0.2)",
-                                    filter: "brightness(1.05)"
-                                }}
-                                transition={{ duration: 0.3 }}
-                            />
+                            {/* Image Slider Container */}
+                            <div className="relative h-64 md:h-80 lg:h-96 w-full max-w-md overflow-hidden rounded-lg shadow-lg">
+                                {/* Image Slides */}
+                                {emergencyImages.map((image, index) => (
+                                    <motion.div
+                                        key={index}
+                                        className="absolute inset-0 w-full h-full"
+                                        initial={{ opacity: 0, scale: 1.1 }}
+                                        animate={{ 
+                                            opacity: currentImageIndex === index ? 1 : 0,
+                                            scale: currentImageIndex === index ? 1 : 1.1
+                                        }}
+                                        transition={{ 
+                                            duration: 0.8,
+                                            ease: "easeInOut"
+                                        }}
+                                    >
+                                        <img
+                                            src={image.src}
+                                            alt={image.alt}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </motion.div>
+                                ))}
+                                
+                                {/* Navigation Dots */}
+                                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex gap-2">
+                                    {emergencyImages.map((_, index) => (
+                                        <motion.button
+                                            key={index}
+                                            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                                                currentImageIndex === index 
+                                                    ? 'bg-white scale-125' 
+                                                    : 'bg-white/50 hover:bg-white/80'
+                                            }`}
+                                            onClick={() => setCurrentImageIndex(index)}
+                                            whileHover={{ scale: 1.2 }}
+                                            whileTap={{ scale: 0.9 }}
+                                        />
+                                    ))}
+                                </div>
+                                
+                                {/* Progress Bar - Moved to bottom */}
+                                <motion.div
+                                    className="absolute bottom-0 left-0 h-1 bg-white/80"
+                                    initial={{ width: "0%" }}
+                                    animate={{ width: "100%" }}
+                                    transition={{ 
+                                        duration: 4,
+                                        ease: "linear",
+                                        repeat: Infinity
+                                    }}
+                                />
+                            </div>
                         </motion.div>
                     </div>
                 </div>
