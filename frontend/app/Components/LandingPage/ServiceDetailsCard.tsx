@@ -25,7 +25,6 @@ export const ServiceDetailsCard = () => {
             }, 100); // Speed of typing
             return () => clearTimeout(timeout);
         } else {
-            // Stop the cursor animation when typewriter effect is complete
             setAnimation(false);
         }
     }, [currentIndex, fullText]);
