@@ -1,10 +1,20 @@
 "use client";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import { useTheme } from "@/app/contexts/ThemeContext";
 
 export const ServiceListCard = () => {
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const { theme } = useTheme();
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    // Use a safe theme value that won't cause hydration issues
+    const safeTheme = mounted ? theme : 'light';
 
     const services = [
         {
@@ -102,7 +112,9 @@ export const ServiceListCard = () => {
 
     return (
         <motion.div 
-            className="font-martianmono relative w-full  bg-white"
+            className={`font-martianmono relative w-full transition-colors duration-300 ${
+                safeTheme === 'dark' ? 'bg-black' : 'bg-white'
+            }`}
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -110,7 +122,9 @@ export const ServiceListCard = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
                 <div className="flex flex-col justify-center items-center text-center gap-6 sm:gap-8 md:gap-12">
                     <motion.h1 
-                        className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold text-slate-900"
+                        className={`text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-semibold transition-colors duration-300 ${
+                            safeTheme === 'dark' ? 'text-white' : 'text-slate-900'
+                        }`}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.4 }}
@@ -128,7 +142,11 @@ export const ServiceListCard = () => {
                             {services.map((item, idx) => (
                                 <motion.div
                                     key={idx}
-                                    className="flex justify-start items-center gap-3 sm:gap-4 border border-slate-200 rounded-lg px-4 sm:px-6 py-3 sm:py-4 w-full bg-white shadow-sm hover:shadow-md relative overflow-hidden group cursor-pointer transition-all duration-300"
+                                    className={`flex justify-start items-center gap-3 sm:gap-4 border rounded-lg px-4 sm:px-6 py-3 sm:py-4 w-full shadow-sm hover:shadow-md relative overflow-hidden group cursor-pointer transition-all duration-300 ${
+                                        safeTheme === 'dark' 
+                                            ? 'bg-gray-800 border-gray-600' 
+                                            : 'bg-white border-slate-200'
+                                    }`}
                                     variants={serviceVariants}
                                     whileHover={{ 
                                         scale: 1.02,
@@ -141,12 +159,20 @@ export const ServiceListCard = () => {
                                 >
                                     {/* Subtle Background */}
                                     <motion.div
-                                        className="absolute inset-0 bg-orange-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                                        className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+                                            safeTheme === 'dark' 
+                                                ? 'bg-orange-100'
+                                                : 'bg-orange-100'
+                                        }`}
                                     />
                                     
                                     {/* Subtle Border */}
                                     <motion.div
-                                        className="absolute inset-0 rounded-lg bg-orange-200"
+                                        className={`absolute inset-0 rounded-lg ${
+                                            safeTheme === 'dark' 
+                                                ? 'bg-orange-200' 
+                                                : 'bg-orange-200'
+                                        }`}
                                     />
                                     
                                     <div className="flex items-center gap-3 sm:gap-4 relative z-10">
@@ -166,7 +192,9 @@ export const ServiceListCard = () => {
                                             />
                                         </motion.div>
                                         <motion.h1 
-                                            className="text-xs sm:text-sm md:text-base lg:text-lg text-left leading-relaxed font-medium text-slate-900"
+                                            className={`text-xs sm:text-sm md:text-base lg:text-lg text-left leading-relaxed font-medium transition-colors duration-300 ${
+                                                safeTheme === 'dark' ? 'text-gray-800' : 'text-slate-900'
+                                            }`}
                                             animate={{ x: hoveredIndex === idx ? 3 : 0 }}
                                             transition={{ duration: 0.3 }}
                                         >
@@ -180,7 +208,11 @@ export const ServiceListCard = () => {
                                             {[...Array(3)].map((_, i) => (
                                                 <motion.div
                                                     key={i}
-                                                    className="absolute w-1 h-1 bg-orange-200 rounded-full"
+                                                    className={`absolute w-1 h-1 rounded-full ${
+                                                        safeTheme === 'dark' 
+                                                            ? 'bg-orange-600' 
+                                                            : 'bg-orange-200'
+                                                    }`}
                                                     initial={{ 
                                                         x: "50%", 
                                                         y: "50%", 

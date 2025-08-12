@@ -2,6 +2,7 @@
 import localFont from "next/font/local";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
+import { ThemeProvider } from "./contexts/ThemeContext";
 
 const myFont = localFont({
   src: './fonts/Gilroy-Medium.ttf',
@@ -39,7 +40,9 @@ export default function RootLayout({
         className={`${myFont.variable} ${myFont1.variable} ${myFont2.variable} ${myfont3.variable} ${myfont4.variable}`}
       >
       <SessionProvider>
-        {children}
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </SessionProvider>
       </body>
     </html>

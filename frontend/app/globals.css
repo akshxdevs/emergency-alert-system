@@ -1,6 +1,54 @@
 @import url('https://fonts.googleapis.com/css2?family=Ultra&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Martian+Mono:wght@100;200;300;400;500;600;700;800&display=swap');
 
+/* Theme CSS Variables */
+:root {
+  /* Light Theme Colors */
+  --background: #ffffff;
+  --foreground: #171717;
+  --card: #ffffff;
+  --card-foreground: #171717;
+  --popover: #ffffff;
+  --popover-foreground: #171717;
+  --primary: #f97316;
+  --primary-foreground: #ffffff;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #f1f5f9;
+  --accent-foreground: #0f172a;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #f97316;
+  --radius: 0.5rem;
+}
+
+.dark {
+  /* Dark Theme Colors */
+  --background: #000000;
+  --foreground: #f8fafc;
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
+  --popover: #1e293b;
+  --popover-foreground: #f8fafc;
+  --primary: #f97316;
+  --primary-foreground: #ffffff;
+  --secondary: #334155;
+  --secondary-foreground: #f8fafc;
+  --muted: #334155;
+  --muted-foreground: #94a3b8;
+  --accent: #334155;
+  --accent-foreground: #f8fafc;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+  --border: #475569;
+  --input: #475569;
+  --ring: #f97316;
+}
+
 body {
   font-family: 'Ultra', serif;
 }
@@ -9,39 +57,17 @@ body {
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #fff;
-    --foreground: #ededed;
-  }
-}
 
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+  transition: color 0.3s ease, background-color 0.3s ease;
 }
 
 /* MartianMono font utility */
 .font-martianmono {
   font-family: 'Martian Mono', monospace;
-}
-
-body::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background-image: none;
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  filter: blur(5px);
-  z-index: -1;
 }
 
 @layer utilities {
