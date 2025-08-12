@@ -39,7 +39,7 @@ export default function () {
   const [updatingAlertId, setUpdatingAlertId] = useState<string | null>(null);
   const params = useParams();
   const [showTimer,setShowTimer] = useState(true);
-
+  const [isThreat,setIstreat] = useState(true);
   useEffect(() => {
     const sessionUserId = session?.user?.id;
     const sessionUserRole = session?.user?.role;
@@ -443,7 +443,7 @@ export default function () {
                   {receivedAlerts.length} Active
                 </span>
               </div>
-              <AlertIndicator threat={receivedAlerts.length > 0} />
+              <AlertIndicator threat={receivedAlerts.some(alert => alert.status !== 'RESOLVED')} />
             </div>
           </div>
 
@@ -583,7 +583,10 @@ export default function () {
                             <motion.button
                               whileHover={{ scale: 1.05 }}
                               whileTap={{ scale: 0.95 }}
-                              onClick={() => handleUpdateAlertStatus(alert.id, 'RESOLVED')}
+                              onClick={() => {
+                                setIstreat(false);
+                                handleUpdateAlertStatus(alert.id, 'RESOLVED')
+                              }}
                               className="px-3 py-1 text-xs bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
                             >
                               Resolve
