@@ -42,11 +42,11 @@ export const AkshxFooter = () => {
             <span>Designed and developed by 
             <a 
               href="" 
-              className="ml-1 underline decoration-2 underline-offset-4 text-orange-500 hover:text-orange-600 font-semibold transition-colors duration-300"
+              className="ml-1 text-orange-500 hover:text-orange-600 font-semibold transition-colors duration-300"
             >
               akshxdevs
             </a></span>
-            <div className="border-t border-slate-200/40 mt-2 pt-2">
+            <div className="border-t border-slate-200/40 pt-1">
               <p className="text-center text-xs text-slate-400 font-medium">
                 © 2024 Emergency Alert System. All rights reserved.
               </p>
@@ -61,7 +61,7 @@ export const AkshxFooter = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <motion.a 
-              href=""
+              href="https://github.com/akshxdevs/emergency-alert-system"
               className="p-2 rounded-lg bg-white/80 border border-slate-200/60 shadow-sm hover:shadow-md hover:scale-110 transition-all duration-300 backdrop-blur-sm"
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.95 }}
@@ -69,7 +69,7 @@ export const AkshxFooter = () => {
               <img src="./github-logo.png" alt="GitHub" className="h-6 w-6 md:h-7 md:w-7" />
             </motion.a>
             <motion.a 
-              href=""
+              href="https://x.com/akshxdevs"
               className="p-2 rounded-lg bg-white/80 border border-slate-200/60 shadow-sm hover:shadow-md hover:scale-110 transition-all duration-300 backdrop-blur-sm"
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.95 }}

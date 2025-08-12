@@ -102,7 +102,7 @@ export const ServiceListCard = () => {
 
     return (
         <motion.div 
-            className="font-martianmono relative w-full py-12 sm:py-16 md:py-20 lg:py-24 bg-white"
+            className="font-martianmono relative w-full  bg-white"
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -120,7 +120,7 @@ export const ServiceListCard = () => {
                     </motion.h1>
                     <div className="flex flex-col lg:flex-row justify-between items-center gap-8 sm:gap-10 lg:gap-12 w-full">
                         <motion.div 
-                            className="flex flex-col gap-4 sm:gap-6 md:gap-8 w-full lg:w-1/2"
+                            className="flex flex-col gap-4 sm:gap-6 md:gap-8 w-full lg:w-fit"
                             variants={containerVariants}
                             initial="hidden"
                             animate="visible"

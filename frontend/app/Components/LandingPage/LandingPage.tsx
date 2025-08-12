@@ -28,7 +28,7 @@ export const LandingPage = () => {
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.8, delay: 0.4 }}
-                    className="py-8 sm:py-12 md:py-16"
+                    className="py-8 sm:py-12 md:py-1"
                 >
                     <ReportsDisplayBanner/>
                 </motion.div>
@@ -36,7 +36,7 @@ export const LandingPage = () => {
                     initial={{ y: 50, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
                     transition={{ duration: 0.8, delay: 0.6 }}
-                    className="py-8 sm:py-12 md:py-16"
+                    className="py-8 sm:py-10 md:py-12"
                 >
                     <ServiceListCard/>
                 </motion.div>

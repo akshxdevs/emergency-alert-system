@@ -64,11 +64,11 @@ export const AppBarLP = () => {
             {/* Begin Setup Button */}
             <motion.button
               onClick={() => router.push("/login")}
-              className="px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 md:py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-200 text-sm sm:text-base md:text-lg whitespace-nowrap"
+              className="font-BricolageGrotesque px-4 sm:px-6 md:px-6 py-2 sm:py-2.5 md:py-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-200 text-sm sm:text-base md:text-lg whitespace-nowrap"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              Begin Setup
+              Login
             </motion.button>
           </div>
         </div>

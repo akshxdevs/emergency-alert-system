@@ -4,36 +4,37 @@ import Marquee from "../ui/marquee";
 
 const reviews = [
   {
-    name: "Anonymous",
-    username: "@fardeen14693425",
-    body: "What's one thing you wish people understood about you but rarely do?",
+    name: "City Safety Dept",
+    username: "@civic_alerts",
+    body: "Severe weather warning issued in your area. Please stay indoors and avoid unnecessary travel.",
   },
   {
-    name: "Anonymous",
-    username: "@anonymous_user1",
-    body: "If you could change one decision you made in the past year, what would it be and why?",
+    name: "Anonymous Citizen",
+    username: "@anon_report1",
+    body: "Saw heavy smoke near Elm Street and 5th Avenue. Might be a fire, please check.",
   },
   {
-    name: "Anonymous",
-    username: "@anon_quest2",
-    body: "What's something you're passionate about but haven't had the chance to pursue yet?",
+    name: "Neighborhood Watch",
+    username: "@neighborhood_watch",
+    body: "Suspicious vehicle parked outside for hours near Maple Apartments. License plate: XYZ-1234.",
   },
   {
-    name: "Anonymous",
-    username: "@hidden_wanderer",
-    body: "What advice would you give to someone going through a rough time, based on your own experiences?",
+    name: "Disaster Response Unit",
+    username: "@emergency_ops",
+    body: "Flash flood risk increased for Riverside District. Evacuate to the nearest shelter immediately.",
   },
   {
-    name: "Anonymous",
-    username: "@mystery_mind",
-    body: "If you could instantly master any skill, what would it be and how would you use it?",
+    name: "Anonymous Witness",
+    username: "@anon_report2",
+    body: "Heard loud explosion near the old factory site. Possible gas leak or structural collapse.",
   },
   {
-    name: "Anonymous",
-    username: "@secret_inquirer",
-    body: "What's one thing you wish people understood about you but rarely do?",
+    name: "Local Volunteer Group",
+    username: "@helping_hands",
+    body: "Urgent: Blood donors needed at Central Hospital after bus accident. Type O- preferred.",
   },
 ];
+
 
 const firstRow = reviews.slice(0, reviews.length / 2);
 const secondRow = reviews.slice(reviews.length / 2);
@@ -56,7 +57,7 @@ const ReviewCard = ({
       )}
     >
       {/* Subtle top accent */}
-      <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-600 to-indigo-600" />
+      <div className="absolute top-0 left-0 right-0 h-0.5 " />
       
       {/* Content container */}
       <div className="space-y-2 sm:space-y-3">
