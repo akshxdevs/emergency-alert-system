@@ -98,132 +98,6 @@ body::before {
   }
 }
 
-.fire-glow::before,
-.fire-glow::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  height: 100%;
-  width: 100%;
-  padding: 3px;
-  border-radius: 10px;
-  background-image: conic-gradient(
-    from var(--angle),
-    #ffd147,
-    #f63925,
-    #323433
-  );
-  z-index: -1;
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Animate only on hover */
-.group:hover .fire-glow::before,
-.group:hover .fire-glow::after {
-  animation: spin-conic 0.2s linear infinite;
-  opacity: 10;
-  filter: blur(0.8rem);
-
-}
-
-/* Keyframes */
-@keyframes spin-conic {
-  0% {
-    --angle: 0deg;
-  }
-  100% {
-    --angle: 360deg;
-  }
-}
-
-.citizen-glow::before,
-.citizen-glow::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  height: 100%;
-  width: 100%;
-  padding: 3px;
-  border-radius: 10px;
-  background-image: conic-gradient(
-    from var(--angle),
-    #2563eb,
-    #10b981,
-    #ffff
-  );
-  z-index: -1;
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Animate only on hover */
-.group:hover .citizen-glow::before,
-.group:hover .citizen-glow::after {
-  animation: spin-conic 0.3s linear infinite;
-  opacity: 10;
-  filter: blur(0.7rem);
-
-}
-
-/* Keyframes */
-@keyframes spin-conic {
-  0% {
-    --angle: 0deg;
-  }
-  100% {
-    --angle: 360deg;
-  }
-}
-
-.medical-glow::before,
-.mdeical-glow::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  height: 100%;
-  width: 100%;
-  padding: 3px;
-  border-radius: 10px;
-  background-image: conic-gradient(
-    from var(--angle),
-    #dc2626,
-    #3b82f6,
-    #14b8a6
-  );
-  z-index: -1;
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* Animate only on hover */
-.group:hover .medical-glow::before,
-.group:hover .medical-glow::after {
-  animation: spin-conic 0.3s linear infinite;
-  opacity: 10;
-  filter: blur(0.8rem);
-
-}
-
-/* Keyframes */
-@keyframes spin-conic {
-  0% {
-    --angle: 0deg;
-  }
-  100% {
-    --angle: 360deg;
-  }
-}
-
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
@@ -262,11 +136,11 @@ body::before {
 }
 
 .animate-marquee {
-  animation: marquee var(--duration, 40s) linear infinite;
+  animation: marquee var(--duration) linear infinite;
 }
 
 .animate-marquee-reverse {
-  animation: marquee-reverse var(--duration, 40s) linear infinite;
+  animation: marquee-reverse var(--duration) linear infinite;
 }
 
 
