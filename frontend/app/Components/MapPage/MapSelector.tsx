@@ -21,12 +21,10 @@ const MapSelector = memo(({
   const [loadingLocation, setLoadingLocation] = useState<boolean>(true);
   const [isDragging, setIsDragging] = useState<boolean>(false);
 
-  // Memoize the default center to prevent unnecessary re-renders
   const defaultCenter = useMemo(() => {
     return userLocation || { lat: 28.6139, lng: 77.2090 };
   }, [userLocation]);
 
-  // Memoize the map center to prevent unnecessary re-renders
   const mapCenter = useMemo(() => {
     return [defaultCenter.lat, defaultCenter.lng] as [number, number];
   }, [defaultCenter]);

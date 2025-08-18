@@ -47,11 +47,8 @@ export default function () {
     setUserRole(role);
   }, [session, userRole]);
   
-  // Current userId loaded
-  
   const { sendEmergency } = useEmergencySocket(userId || "anonymous-user", userRole);
 
-  // Memoize handlers to prevent unnecessary re-renders
   const handleLocationSelect = useCallback((lat: number, lng: number) => {
     setLat(lat);
     setLng(lng);
@@ -102,7 +99,6 @@ export default function () {
     sendEmergency(alertPayload);
   }, [hazardType, priority, description, lat, lng, roleAssignedTo, sendEmergency]);
 
-  // Memoize the location button handler
   const handleLocationButtonClick = useCallback(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -127,21 +123,16 @@ export default function () {
     }
   }, []);
 
-  // Memoize the clear marker handler
   const handleClearMarker = useCallback(() => {
     setClearMarker(true);
     setLat(null);
     setLng(null);
-    // Reset clearMarker after a short delay
     setTimeout(() => setClearMarker(false), 100);
   }, []);
 
-  // Memoize the toggle alert model handler
   const handleToggleAlertModel = useCallback(() => {
     setShowAlertModel(!showAlertModel);
   }, [showAlertModel]);
-
-  // Memoize the map props to prevent unnecessary re-renders
   const mapProps = useMemo(() => ({
     onLocationSelect: handleLocationSelect,
     externalLat: lat,

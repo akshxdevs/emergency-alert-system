@@ -21,9 +21,7 @@ export const useEmergencySocket = (userId: string, userRole: string) => {
 
   useEffect(() => {
     const ws = new WebSocket(`${WS_URL}/${userId}/?${userRole}`);
-    ws.onopen = () => {
-      // WebSocket connected
-    };
+    ws.onopen = () => {};
 
     ws.onmessage = (message) => {
       const data = JSON.parse(message.data);
@@ -36,9 +34,7 @@ export const useEmergencySocket = (userId: string, userRole: string) => {
         alert(`Success: ${data.message}`);
       }
 
-      if (data.type === "welcome") {
-        // Welcome message received
-      }
+      if (data.type === "welcome") {}
 
       // Handle role-specific alerts
       if (data.type === "CRIME" && userRole === "POLICE") {
@@ -70,9 +66,7 @@ export const useEmergencySocket = (userId: string, userRole: string) => {
       console.error("WebSocket error:", err);
     };
 
-    ws.onclose = () => {
-      // WebSocket closed
-    };
+    ws.onclose = () => {};
 
     setSocket(ws);
 
@@ -81,17 +75,13 @@ export const useEmergencySocket = (userId: string, userRole: string) => {
     };
   }, [userId, userRole]);
 
-  // Function to handle incoming alerts
   const handleIncomingAlert = useCallback((payload: Alert, title: string, message: string) => {
-    // Add to received alerts, but prevent duplicates
     setReceivedAlerts(prev => {
-      // Check if alert already exists
       const existingAlert = prev.find(alert => alert.id === payload.id);
       if (existingAlert) {
         return prev;
       }
       
-      // Remove alerts older than 24 hours
       const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
       const filteredAlerts = prev.filter(alert => {
         const alertTime = new Date(alert.timeStamp);
@@ -100,7 +90,6 @@ export const useEmergencySocket = (userId: string, userRole: string) => {
       
       const newAlerts = [payload, ...filteredAlerts];
       
-      // Keep only the last 50 alerts to prevent memory issues
       if (newAlerts.length > 50) {
         newAlerts.splice(50);
       }
@@ -108,11 +97,9 @@ export const useEmergencySocket = (userId: string, userRole: string) => {
       return newAlerts;
     });
     
-    // Show notification
     showAlertNotification(title, message, payload);
   }, []);
 
-  // Function to handle alert updates
   const handleAlertUpdate = useCallback((payload: Alert) => {
     setReceivedAlerts(prev => 
       prev.map(alert => 
@@ -123,9 +110,7 @@ export const useEmergencySocket = (userId: string, userRole: string) => {
     showAlertNotification("📝 Status Update", "Alert status updated", payload);
   }, []);
 
-  // Function to show alert notifications
   const showAlertNotification = (title: string, message: string, payload: Alert) => {
-    // Create a custom notification
     const notification = document.createElement('div');
     notification.className = 'fixed top-4 right-4 bg-red-500 text-white p-4 rounded-lg shadow-lg z-50 max-w-sm';
     notification.innerHTML = `
@@ -143,14 +128,12 @@ export const useEmergencySocket = (userId: string, userRole: string) => {
     
     document.body.appendChild(notification);
     
-    // Remove notification after 10 seconds
     setTimeout(() => {
       if (notification.parentNode) {
         notification.parentNode.removeChild(notification);
       }
     }, 10000);
     
-    // Also show browser notification if available
     if ('Notification' in window && Notification.permission === 'granted') {
       new Notification(title, {
         body: message,
@@ -194,31 +177,24 @@ export const useEmergencySocket = (userId: string, userRole: string) => {
   };
 };
 
-// Dedicated hook for dashboard role-specific alerts
 export const useDashboardSocket = (userId: string, userRole: string) => {
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [receivedAlerts, setReceivedAlerts] = useState<Alert[]>([]);
 
   useEffect(() => {
-    // Only create socket if we have a valid userRole
     if (!userRole || !userId) {
       return;
     }
 
-    // Create a unique userId for dashboard to avoid conflicts
     const dashboardUserId = `dashboard-${userRole}-${Date.now()}`;
     const ws = new WebSocket(`${WS_URL}/${dashboardUserId}/?${userRole}`);
     
-    ws.onopen = () => {
-      // Dashboard WebSocket connected
-    };
+    ws.onopen = () => {};
 
     ws.onmessage = (message) => {
       const data = JSON.parse(message.data);
 
-      if (data.type === "welcome") {
-        // Dashboard welcome message received
-      }
+      if (data.type === "welcome") {}
 
       // Handle role-specific alerts for dashboard
       if (data.type === "CRIME" && userRole === "POLICE") {
@@ -255,9 +231,7 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
       console.error("Dashboard userId:", userId, "userRole:", userRole);
     };
 
-    ws.onclose = (event) => {
-      // Dashboard WebSocket closed
-    };
+    ws.onclose = (event) => {};
 
     setSocket(ws);
 
@@ -266,11 +240,8 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
     };
   }, [userId, userRole]);
 
-  // Function to handle incoming alerts for dashboard
   const handleIncomingAlert = useCallback((payload: Alert) => {
-    // Add to received alerts, but prevent duplicates
     setReceivedAlerts(prev => {
-      // Check if alert already exists
       const existingAlert = prev.find(alert => alert.id === payload.id);
       if (existingAlert) {
         return prev;

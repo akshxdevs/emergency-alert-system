@@ -5,9 +5,7 @@ export const UseAlertListener = (userId:string,userRole:string,onMessage:(data:a
     useEffect(()=>{
         if (!userId || !userRole) return;
         const ws = new WebSocket(`${WS_URL}/${userId}/?${userRole}`);
-        ws.onopen = () => {
-            // WebSocket Connected
-        };
+        ws.onopen = () => {};
         ws.onmessage = (message) => {
             try {
                 const data = JSON.parse(message.data);

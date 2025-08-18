@@ -44,8 +44,6 @@ export default function () {
     const sessionUserId = session?.user?.id;
     const sessionUserRole = session?.user?.role;
     
-    // Session data loaded
-    
     // Set userId from session
     if (sessionUserId) {
       setUserId(sessionUserId);
@@ -53,14 +51,12 @@ export default function () {
       setUserId("anonymous-user");
     }
     
-    // Determine user role with proper fallbacks
     let determinedRole = null;
     
     // First try to get role from session
     if (sessionUserRole) {
       determinedRole = sessionUserRole.toUpperCase();
     } else {
-      // Fallback to URL parameters
       const urlSegments = params[""] as string[];
       
       if (urlSegments && urlSegments.length > 0) {
@@ -86,7 +82,7 @@ export default function () {
           determinedRole = "POLICE"; // Default fallback
         }
       } else {
-        determinedRole = "POLICE"; // Default fallback
+        determinedRole = "POLICE";
       }
     }
     
@@ -96,14 +92,13 @@ export default function () {
       setUserRole(determinedRole);
     } else {
       console.error("❌ Invalid determined role:", determinedRole, "Valid roles are:", validRoles);
-      setUserRole("POLICE"); // Final fallback
+      setUserRole("POLICE");
     }
     
   }, [session, params]);
   
   const { sendEmergencyUpdate, receivedAlerts, setReceivedAlerts, sendCancelAlert } = useDashboardSocket(userId || "anonymous-user", userRole || "POLICE");
   
-  // Memoize handlers to prevent unnecessary re-renders
   const handleLocationSelect = useCallback((lat: number, lng: number) => {
     setLat(lat);
     setLng(lng);
