@@ -146,9 +146,7 @@ export default function HomePage() {
     setTimeout(() => setClearMarker(false), 100);
   }, []);
 
-  const handleToggleAlertModel = useCallback(() => {
-    setShowAlertModel(!showAlertModel);
-  }, [showAlertModel]);
+
   const mapProps = useMemo(() => ({
     onLocationSelect: handleLocationSelect,
     externalLat: lat,

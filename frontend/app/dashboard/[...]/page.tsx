@@ -227,10 +227,7 @@ export default function DashboardPage() {
     setTimeout(() => setClearMarker(false), 100);
   }, []);
 
-  // Memoize the toggle alert model handler
-  const handleToggleAlertModel = useCallback(() => {
-    setShowAlertModel(!showAlertModel);
-  }, [showAlertModel]);
+
 
   // Memoize the map props to prevent unnecessary re-renders
   const mapProps = useMemo(() => ({
@@ -241,24 +238,12 @@ export default function DashboardPage() {
     onDragChange: handleDragChange,
   }), [handleLocationSelect, lat, lng, clearMarker, handleDragChange]);
 
-  // Get role-specific color and icon
-  const getRoleConfig = (role: string) => {
-    switch (role) {
-      case 'POLICE':
-        return { color: 'blue', icon: '🚔', title: 'Police Dashboard' };
-      case 'FIRE':
-        return { color: 'red', icon: '🚒', title: 'Fire Department Dashboard' };
-      case 'MEDICAL':
-        return { color: 'emerald', icon: '🚑', title: 'Medical Emergency Dashboard' };
-      default:
-        return { color: 'gray', icon: '👤', title: 'Dashboard' };
-    }
-  };
+
 
   
 
   // Calculate remaining time for auto-disappear alerts
-  const getRemainingTime = (alert: any) => {
+  const getRemainingTime = (alert: Alert) => {
     if (!alert.autoDisappearAt) return null;
     const remaining = alert.autoDisappearAt - Date.now();
     if (remaining <= 0) return null;
@@ -273,7 +258,7 @@ export default function DashboardPage() {
   };
 
   // Countdown timer component
-  const CountdownTimer = ({ alert }: { alert: any }) => {
+  const CountdownTimer = ({ alert }: { alert: Alert }) => {
     const [timeLeft, setTimeLeft] = useState(getRemainingTime(alert));
 
     useEffect(() => {
