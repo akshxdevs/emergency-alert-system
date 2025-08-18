@@ -32,14 +32,14 @@ export default function DashboardPage() {
 
   const [clearMarker, setClearMarker] = useState(false);
   const [isMapDragging, setIsMapDragging] = useState(false);
-  const [selectedAlert, setSelectedAlert] = useState<Alert | null>(null);
+  const [selectedAlert] = useState<Alert | null>(null);
   const [showAlertDetails, setShowAlertDetails] = useState(false);
   const [sliderValue, setSliderValue] = useState(0);
   const [isUpdatingAlert, setIsUpdatingAlert] = useState(false);
   const [updatingAlertId, setUpdatingAlertId] = useState<string | null>(null);
   const params = useParams();
-  const [showTimer,setShowTimer] = useState(true);
-  const [isThreat,setIstreat] = useState(true);
+  const [,setShowTimer] = useState(true);
+  const [,setIstreat] = useState(true);
 
   useEffect(() => {
     const sessionUserId = session?.user?.id;
