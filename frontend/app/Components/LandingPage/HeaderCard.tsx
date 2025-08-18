@@ -14,8 +14,8 @@ export const HeaderCard = () => {
     script.async = true;
 
     script.onload = () => {
-      if (typeof window !== 'undefined' && (window as any).FinisherHeader) {
-        new (window as any).FinisherHeader({
+      if (typeof window !== 'undefined' && (window as unknown as { FinisherHeader?: new (config: unknown) => void }).FinisherHeader) {
+        new ((window as unknown as { FinisherHeader: new (config: unknown) => void }).FinisherHeader)({
           count: 100,
           size: { min: 2, max: 8, pulse: 0 },
           speed: {
