@@ -3,6 +3,8 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
+import Image from "next/image";
+import { BACKEND_URL } from "../../../config";
 
 const roles = [
   {
@@ -60,7 +62,7 @@ export default function RoleSelectionPage() {
     setError(null);
 
     try {
-      const response = await axios.post("http://localhost:5000/api/v1/user/google-signup", {
+      const response = await axios.post(`${BACKEND_URL}/user/google-signup`, {
         email,
         name,
         image,
@@ -106,9 +108,11 @@ export default function RoleSelectionPage() {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
             {image && (
-              <img
+              <Image
                 src={image}
                 alt="Profile"
+                width={64}
+                height={64}
                 className="w-16 h-16 rounded-full mr-4"
               />
             )}

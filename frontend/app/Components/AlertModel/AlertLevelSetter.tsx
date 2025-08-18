@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 
 type ThreatLevel = "high" | "medium" | "low";
 
@@ -55,7 +56,6 @@ export const AlertLevelSetter:React.FC<AlertLevelSelectorProps> = ({onLevelChang
     setTimeout(() => {
       setLevelSelected(nextLevel);
       setIsAnimating(false);
-      console.log(levelSelected);      
     }, 200);
   };
 
@@ -80,9 +80,9 @@ export const AlertLevelSetter:React.FC<AlertLevelSelectorProps> = ({onLevelChang
           `}
         >
           <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-            <img 
-              width="24" 
-              height="24" 
+            <Image 
+              width={24} 
+              height={24} 
               src="https://img.icons8.com/color/48/siren.png" 
               alt={`${levelSelected} threat level`}
               className={`transition-all duration-500 filter brightness-0 invert ${

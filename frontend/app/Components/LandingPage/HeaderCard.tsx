@@ -43,7 +43,7 @@ export const HeaderCard = () => {
           shapes: ['c', 's'],
         });
       } else {
-        console.error('FinisherHeader not found');
+        // FinisherHeader not found
       }
     };
 

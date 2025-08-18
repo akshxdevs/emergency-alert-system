@@ -3,6 +3,8 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { signIn, getSession } from "next-auth/react";
+import Image from "next/image";
+import { BACKEND_URL } from "../../config";
 
 interface RoleOption {
   id: string;
@@ -107,7 +109,7 @@ export default function SignupPage() {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/api/v1/user/signup", {
+      const response = await fetch(`${BACKEND_URL}/user/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -182,12 +184,13 @@ export default function SignupPage() {
           className="text-center mb-6"
         >
           <div className="w-12 h-12 mx-auto flex items-center justify-center shadow-lg">
-            <img
-              width="32"
-              height="32"
+            <Image
+              width={32}
+              height={32}
               className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12"
               src="https://img.icons8.com/color-pixels/32/siren.png"
               alt="siren"
+              priority
             />
           </div>
           <h1 className="text-2xl font-bold text-white mb-1 tracking-tight">

@@ -2,6 +2,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 export const AppBar = () => {
     const router = useRouter()
@@ -25,9 +26,9 @@ export const AppBar = () => {
                 <div className="px-5 flex justify-between items-center">
                     <div className="flex items-center gap-2">
                         <div className="flex items-center gap-1  p-1.5 rounded-lg shadow-lg">
-                            <img 
-                                width="30" 
-                                height="30" 
+                            <Image 
+                                width={30} 
+                                height={30} 
                                 src="https://img.icons8.com/color-pixels/32/siren.png" 
                                 alt="siren"
                                 className="animate-pulse"
@@ -93,7 +94,7 @@ export const AppBar = () => {
             ) : (
                 <div className="pl-5 flex gap-2">
                 <div className="flex justify-center items-center gap-1 text-[#979797] text-sm">
-                        <img width="32" height="32" src="https://img.icons8.com/color-pixels/32/siren.png" alt="siren"/>
+                        <Image width={32} height={32} src="https://img.icons8.com/color-pixels/32/siren.png" alt="siren"/>
                         <p className="p-2 text-zinc-600 rounded-lg transition-colors duration-500 ease-in-out hover:bg-gray-600 hover:text-white hover:[transition-delay:200ms]">Search</p>
                         <p className="p-2 text-zinc-600  rounded-lg transition-colors duration-500 ease-in-out hover:bg-gray-600 hover:text-white hover:[transition-delay:200ms]">Service</p>
                         <p className="p-2 text-zinc-600  rounded-lg transition-colors duration-500 ease-in-out hover:bg-gray-600 hover:text-white hover:[transition-delay:200ms]">Explore</p>

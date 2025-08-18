@@ -47,13 +47,12 @@ export default function () {
     setUserRole(role);
   }, [session, userRole]);
   
-  console.log("Current userId:", userId);
+  // Current userId loaded
   
   const { sendEmergency } = useEmergencySocket(userId || "anonymous-user", userRole);
 
   // Memoize handlers to prevent unnecessary re-renders
   const handleLocationSelect = useCallback((lat: number, lng: number) => {
-    console.log("Selected Location:", lat, lng);
     setLat(lat);
     setLng(lng);
     setShowAlertModel(true);
@@ -62,7 +61,6 @@ export default function () {
   const handleCategoryChange = useCallback((category: string | null) => {
     if (category) {
       setHazardType(category.toUpperCase());
-      console.log("Hazard type set to:", category.toUpperCase());
     } else {
       setHazardType("");
     }
@@ -71,7 +69,6 @@ export default function () {
   const handleLevelChange = useCallback((level:string | null) => {
     if (level) {
       setPriority(level.toUpperCase());
-      console.log("Priority Level set to: ",level.toUpperCase());
     }else{
       setHazardType("");
     }
@@ -80,7 +77,6 @@ export default function () {
   const handleMoreDetails = useCallback((moreDetails:string | null) => {
     if (moreDetails) {
       setDescription(moreDetails.toUpperCase());
-      console.log("Description Details: ",moreDetails.toUpperCase());
     }else{
       setDescription("");
     }
@@ -88,12 +84,10 @@ export default function () {
 
   const handleDragChange = useCallback((isDragging: boolean) => {
     setIsMapDragging(isDragging);
-    console.log('Home page received drag state:', isDragging);
   }, []);
 
   const handleConfirm = useCallback(async () => {
     const assignedTo = roleAssignedTo[hazardType] || "OTHER";
-    console.log(priority);
     const alertPayload = {
       type: hazardType,
       priority: priority,
@@ -106,7 +100,6 @@ export default function () {
       },
     };
     sendEmergency(alertPayload);
-    console.log("Emergency Confirmed!");
   }, [hazardType, priority, description, lat, lng, roleAssignedTo, sendEmergency]);
 
   // Memoize the location button handler

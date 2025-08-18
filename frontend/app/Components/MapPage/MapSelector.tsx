@@ -40,12 +40,10 @@ const MapSelector = memo(({
           setLoadingLocation(false); 
         },
         (error) => {
-          console.error('Error getting location:', error);
           setLoadingLocation(false); 
         }
       );
     } else {
-      console.error('Geolocation is not supported by this browser.');
       setLoadingLocation(false);  
     }
   }, []);

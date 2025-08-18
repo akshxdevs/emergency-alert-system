@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { useTheme } from "@/app/contexts/ThemeContext";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export const AkshxFooter = () => {
   const { theme } = useTheme();
@@ -34,9 +35,9 @@ export const AkshxFooter = () => {
             transition={{ duration: 0.2 }}
           >
             <div className="relative">
-              <img
-                width="18"
-                height="18"
+              <Image
+                width={18}
+                height={18}
                 className="w-12 h-12 md:w-14 md:h-14 lg:w-12 lg:h-12 drop-shadow-lg"
                 src="https://img.icons8.com/color-pixels/32/siren.png"
                 alt="siren"
@@ -92,9 +93,11 @@ export const AkshxFooter = () => {
               whileHover={{ y: -3 }}
               whileTap={{ scale: 0.95 }}
             >
-              <img 
-                src="./github-logo.png" 
+              <Image 
+                src="/github-logo.png" 
                 alt="GitHub" 
+                width={16}
+                height={16}
                 className={`h-4 w-4 md:h-4 md:w-4 transition-all duration-300 ${
                   safeTheme === 'dark' ? 'brightness-0 invert' : ''
                 }`}
@@ -110,9 +113,11 @@ export const AkshxFooter = () => {
               whileHover={{ y: -2 }}
               whileTap={{ scale: 0.95 }}
             >
-              <img 
-                src="./twitter.png" 
+              <Image 
+                src="/twitter.png" 
                 alt="Twitter" 
+                width={16}
+                height={16}
                 className={`h-4 w-4 md:h-4 md:w-4 transition-all duration-300 ${
                   safeTheme === 'dark' ? 'brightness-0 invert' : ''
                 }`}

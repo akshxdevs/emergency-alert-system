@@ -1,23 +1,23 @@
 import { useEffect } from "react"
+import { WS_URL } from "../../../config";
 
 export const UseAlertListener = (userId:string,userRole:string,onMessage:(data:any)=>void) => {
     useEffect(()=>{
         if (!userId || !userRole) return;
-        const ws = new WebSocket(`ws://localhost:5000/${userId}/?${userRole}`);
+        const ws = new WebSocket(`${WS_URL}/${userId}/?${userRole}`);
         ws.onopen = () => {
-            console.log("Websocket Connected");
+            // WebSocket Connected
         };
         ws.onmessage = (message) => {
             try {
                 const data = JSON.parse(message.data);
-                console.log(data);
                 onMessage(data);
             } catch (error) {
                 console.error(error);
             }
         }
         ws.onerror = (err) => {
-            console.log(err);
+            console.error("WebSocket error:", err);
         }
         return () => {
             ws.close();

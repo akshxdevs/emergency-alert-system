@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 
 type Location =  {
     lat: number | null,
@@ -9,8 +10,6 @@ type Location =  {
 
 export const AlertHeaderCard = ({lat,lng}:Location) => {
     const {data:session} = useSession(); 
-    console.log("Full session:", session);
-    console.log("User data:", session?.user);
     const username = session?.user?.username || 
                    session?.user?.name || 
                    session?.user?.email?.split('@')[0] || 
@@ -34,7 +33,7 @@ export const AlertHeaderCard = ({lat,lng}:Location) => {
             <div className="flex items-center">
                 {session ? (
                     userProfilePic ? (
-                        <img src={userProfilePic} alt="Profile" className="w-8 h-8 rounded-full" />
+                        <Image src={userProfilePic} alt="Profile" width={32} height={32} className="w-8 h-8 rounded-full" />
                     ) : (
                         <div className="flex items-center">
                             <button className="p-1">

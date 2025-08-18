@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useTheme } from "@/app/contexts/ThemeContext";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 
 export const AppBarLP = () => {
   const router = useRouter();
@@ -37,9 +38,9 @@ export const AppBarLP = () => {
             transition={{ duration: 0.2 }}
           >
             <div className="relative">
-              <img
-                width="32"
-                height="32"
+              <Image
+                width={32}
+                height={32}
                 className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12"
                 src="https://img.icons8.com/color-pixels/32/siren.png"
                 alt="siren"

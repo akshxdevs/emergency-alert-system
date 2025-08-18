@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import Image from "next/image";
+import { BACKEND_URL } from "../../../config";
 
 interface RoleOption {
   id: string;
@@ -82,7 +84,7 @@ export default function GoogleCallbackPage() {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:5000/api/v1/user/google-signup", {
+      const response = await fetch(`${BACKEND_URL}/user/google-signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -147,9 +149,11 @@ export default function GoogleCallbackPage() {
         <div className="text-center mb-8">
           <div className="mb-4">
             {session.user?.image && (
-              <img
+              <Image
                 src={session.user.image}
                 alt="Profile"
+                width={64}
+                height={64}
                 className="w-16 h-16 rounded-full mx-auto border-4 border-blue-200"
               />
             )}

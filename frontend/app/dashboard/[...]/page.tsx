@@ -44,11 +44,7 @@ export default function () {
     const sessionUserId = session?.user?.id;
     const sessionUserRole = session?.user?.role;
     
-    console.log("🔍 Session data:", {
-      userId: sessionUserId,
-      userRole: sessionUserRole,
-      fullSession: session
-    });
+    // Session data loaded
     
     // Set userId from session
     if (sessionUserId) {
@@ -62,16 +58,13 @@ export default function () {
     
     // First try to get role from session
     if (sessionUserRole) {
-      console.log("📋 Using role from session:", sessionUserRole);
       determinedRole = sessionUserRole.toUpperCase();
     } else {
       // Fallback to URL parameters
       const urlSegments = params[""] as string[];
-      console.log("Dashboard URL segments:", urlSegments);
       
       if (urlSegments && urlSegments.length > 0) {
         const urlRole = urlSegments[0];
-        console.log("📋 Using role from URL:", urlRole);
         
         // Validate role and map common variations
         const roleMapping: Record<string, string> = {
@@ -93,7 +86,6 @@ export default function () {
           determinedRole = "POLICE"; // Default fallback
         }
       } else {
-        console.log("📋 No role found in session or URL, using default");
         determinedRole = "POLICE"; // Default fallback
       }
     }
@@ -102,7 +94,6 @@ export default function () {
     const validRoles = ["POLICE", "FIRE", "MEDICAL"];
     if (determinedRole && validRoles.includes(determinedRole)) {
       setUserRole(determinedRole);
-      console.log("✅ Dashboard set userRole to:", determinedRole);
     } else {
       console.error("❌ Invalid determined role:", determinedRole, "Valid roles are:", validRoles);
       setUserRole("POLICE"); // Final fallback
@@ -110,15 +101,10 @@ export default function () {
     
   }, [session, params]);
   
-  console.log("Current userId:", userId);
-  console.log("Current userRole:",userRole);
-  
   const { sendEmergencyUpdate, receivedAlerts, setReceivedAlerts, sendCancelAlert } = useDashboardSocket(userId || "anonymous-user", userRole || "POLICE");
-  console.log(receivedAlerts);
   
   // Memoize handlers to prevent unnecessary re-renders
   const handleLocationSelect = useCallback((lat: number, lng: number) => {
-    console.log("Selected Location:", lat, lng);
     setLat(lat);
     setLng(lng);
     setShowAlertModel(true);
@@ -126,7 +112,6 @@ export default function () {
 
   const handleDragChange = useCallback((isDragging: boolean) => {
     setIsMapDragging(isDragging);
-    console.log('Dashboard received drag state:', isDragging);
   }, []);
 
   // Update alert status with slider interaction

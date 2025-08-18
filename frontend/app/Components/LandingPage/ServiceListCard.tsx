@@ -2,6 +2,7 @@
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useTheme } from "@/app/contexts/ThemeContext";
+import Image from "next/image";
 
 export const ServiceListCard = () => {
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -183,9 +184,9 @@ export const ServiceListCard = () => {
                                             } : {}}
                                             transition={{ duration: 0.6, repeat: hoveredIndex === idx ? Infinity : 0 }}
                                         >
-                                            <img 
-                                                width="24" 
-                                                height="24" 
+                                            <Image 
+                                                width={24} 
+                                                height={24} 
                                                 src={item.icon} 
                                                 alt="icon" 
                                                 className="w-5 h-5 sm:w-6 sm:h-6 md:w-8 md:h-8 drop-shadow-sm"
@@ -269,9 +270,11 @@ export const ServiceListCard = () => {
                                             ease: "easeInOut"
                                         }}
                                     >
-                                        <img
+                                        <Image
                                             src={image.src}
                                             alt={image.alt}
+                                            width={500}
+                                            height={400}
                                             className="w-full h-full object-cover"
                                         />
                                     </motion.div>

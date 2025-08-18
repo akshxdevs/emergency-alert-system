@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { BACKEND_URL, WS_URL } from "../../../config";
 
 interface Alert {
   id: string;
@@ -19,16 +20,13 @@ export const useEmergencySocket = (userId: string, userRole: string) => {
   const [receivedAlerts, setReceivedAlerts] = useState<Alert[]>([]);
 
   useEffect(() => {
-    const ws = new WebSocket(`ws://localhost:5000/${userId}/?${userRole}`);
-    console.log(`Connecting as ${userRole} with userId: ${userId}`);
-    
+    const ws = new WebSocket(`${WS_URL}/${userId}/?${userRole}`);
     ws.onopen = () => {
-      console.log("WebSocket connected");
+      // WebSocket connected
     };
 
     ws.onmessage = (message) => {
       const data = JSON.parse(message.data);
-      console.log("Message from server:", data);
 
       if (data.type === "error") {
         alert(`Error: ${data.message}`);
@@ -39,37 +37,31 @@ export const useEmergencySocket = (userId: string, userRole: string) => {
       }
 
       if (data.type === "welcome") {
-        console.log("Welcome message:", data.message);
+        // Welcome message received
       }
 
       // Handle role-specific alerts
       if (data.type === "CRIME" && userRole === "POLICE") {
-        console.log("Police received CRIME alert:", data.payload);
         handleIncomingAlert(data.payload, "🚔 Police Alert", "New crime incident reported");
       }
       
       if (data.type === "FIRE" && userRole === "FIRE") {
-        console.log("Fire received FIRE alert:", data.payload);
         handleIncomingAlert(data.payload, "🚒 Fire Alert", "New fire emergency reported");
       }
       
       if (data.type === "MEDICAL" && userRole === "MEDICAL") {
-        console.log("Medical received MEDICAL alert:", data.payload);
         handleIncomingAlert(data.payload, "🚑 Medical Alert", "New medical emergency reported");
       }
       
       if (data.type === "ACCIDENT" && userRole === "POLICE") {
-        console.log("Police received ACCIDENT alert:", data.payload);
         handleIncomingAlert(data.payload, "🚨 Accident Alert", "New accident reported");
       }
 
       if (data.type === "HIGH_PRIORITY_ALERT") {
-        console.log("Received HIGH_PRIORITY_ALERT:", data.payload);
         handleIncomingAlert(data.payload, "🚨 HIGH PRIORITY ALERT", "Critical emergency reported");
       }
       
       if (data.type === "UPDATE_ALERT_STATUS") {
-        console.log("Received UPDATE_ALERT_STATUS:", data.payload);
         handleAlertUpdate(data.payload);
       }
     };
@@ -79,7 +71,7 @@ export const useEmergencySocket = (userId: string, userRole: string) => {
     };
 
     ws.onclose = () => {
-      console.log("WebSocket closed");
+      // WebSocket closed
     };
 
     setSocket(ws);
@@ -91,14 +83,11 @@ export const useEmergencySocket = (userId: string, userRole: string) => {
 
   // Function to handle incoming alerts
   const handleIncomingAlert = useCallback((payload: Alert, title: string, message: string) => {
-    console.log("Processing incoming alert:", payload);
-    
     // Add to received alerts, but prevent duplicates
     setReceivedAlerts(prev => {
       // Check if alert already exists
       const existingAlert = prev.find(alert => alert.id === payload.id);
       if (existingAlert) {
-        console.log("Alert already exists, skipping duplicate:", payload.id);
         return prev;
       }
       
@@ -116,7 +105,6 @@ export const useEmergencySocket = (userId: string, userRole: string) => {
         newAlerts.splice(50);
       }
       
-      console.log("Updated receivedAlerts:", newAlerts);
       return newAlerts;
     });
     
@@ -214,71 +202,61 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
   useEffect(() => {
     // Only create socket if we have a valid userRole
     if (!userRole || !userId) {
-      console.log("Dashboard: Skipping socket creation - missing userRole or userId");
       return;
     }
 
     // Create a unique userId for dashboard to avoid conflicts
     const dashboardUserId = `dashboard-${userRole}-${Date.now()}`;
-    const ws = new WebSocket(`ws://localhost:5000/${dashboardUserId}/?${userRole}`);
-    console.log(`Dashboard connecting as ${userRole} with userId: ${dashboardUserId}`);
+    const ws = new WebSocket(`${WS_URL}/${dashboardUserId}/?${userRole}`);
     
     ws.onopen = () => {
-      console.log("Dashboard WebSocket connected");
+      // Dashboard WebSocket connected
     };
 
     ws.onmessage = (message) => {
       const data = JSON.parse(message.data);
-      console.log("Dashboard received message:", data);
 
       if (data.type === "welcome") {
-        console.log("Dashboard welcome message:", data.message);
+        // Dashboard welcome message received
       }
 
       // Handle role-specific alerts for dashboard
       if (data.type === "CRIME" && userRole === "POLICE") {
-        console.log("Dashboard Police received CRIME alert:", data.payload);
         handleIncomingAlert(data.payload);
       }
       
       if (data.type === "FIRE" && userRole === "FIRE") {
-        console.log("Dashboard Fire received FIRE alert:", data.payload);
         handleIncomingAlert(data.payload);
       }
       
       if (data.type === "MEDICAL" && userRole === "MEDICAL") {
-        console.log("Dashboard Medical received MEDICAL alert:", data.payload);
         handleIncomingAlert(data.payload);
       }
       
       if (data.type === "ACCIDENT" && userRole === "POLICE") {
-        console.log("Dashboard Police received ACCIDENT alert:", data.payload);
         handleIncomingAlert(data.payload);
       }
 
       if (data.type === "HIGH_PRIORITY_ALERT") {
-        console.log("Dashboard received HIGH_PRIORITY_ALERT:", data.payload);
         handleIncomingAlert(data.payload);
       }
       
       if (data.type === "UPDATE_ALERT_STATUS") {
-        console.log("Dashboard received UPDATE_ALERT_STATUS:", data.payload);
         handleAlertUpdate(data.payload);
       }
       if (data.type === "ALERT_CANCELLED") {
-        console.log("Dashboard received ALERT_CANCELLED:", data.payload);
         handleAlertCancellation(data.payload);
       }
     };
 
     ws.onerror = (err) => {
       console.error("Dashboard WebSocket error:", err);
-      console.error("Dashboard WebSocket URL was:", `ws://localhost:5000/${dashboardUserId}/?${userRole}`);
+              console.error("Dashboard WebSocket URL was:", `${WS_URL}/${dashboardUserId}/?${userRole}`);
       console.error("Dashboard userId:", userId, "userRole:", userRole);
     };
 
     ws.onclose = (event) => {
-      console.log("Dashboard WebSocket closed:", event.code, event.reason);
+      // Dashboard WebSocket closed
     };
 
     setSocket(ws);
@@ -290,14 +268,11 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
 
   // Function to handle incoming alerts for dashboard
   const handleIncomingAlert = useCallback((payload: Alert) => {
-    console.log("Dashboard processing incoming alert:", payload);
-    
     // Add to received alerts, but prevent duplicates
     setReceivedAlerts(prev => {
       // Check if alert already exists
       const existingAlert = prev.find(alert => alert.id === payload.id);
       if (existingAlert) {
-        console.log("Dashboard: Alert already exists, skipping duplicate:", payload.id);
         return prev;
       }
       
@@ -345,7 +320,6 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
       
       // Save to localStorage
       localStorage.setItem(`dashboard-alerts-${userRole}`, JSON.stringify(updated));
-      console.log(`🔄 Updated alert ${payload.id} status to ${payload.status}`);
       return updated;
     });
   }, [userRole]);
@@ -367,7 +341,6 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
     if (savedAlerts) {
       try {
         const parsedAlerts = JSON.parse(savedAlerts);
-        console.log(`📋 Loading ${parsedAlerts.length} saved alerts for ${userRole}`);
         setReceivedAlerts(parsedAlerts);
       } catch (error) {
         console.error("Error loading saved alerts:", error);
@@ -382,7 +355,6 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
     roles.forEach(role => {
       if (role !== userRole) {
         localStorage.removeItem(`dashboard-alerts-${role}`);
-        console.log(`🗑️ Cleared alerts for role: ${role}`);
       }
     });
   }, [userRole]);
@@ -400,7 +372,6 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
           
           // Remove alerts that have passed their auto-disappear time
           if (alert.autoDisappearAt && now > alert.autoDisappearAt) {
-            console.log(`⏰ Auto-removing alert: ${alert.id}`);
             return false;
           }
           
@@ -421,7 +392,6 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
       console.error("Dashboard Socket not open");
       return;
     }
-    console.log("Dashboard sending update:", alert);
     socket.send(
       JSON.stringify({
         type: "UPDATE_ALERT_STATUS",
@@ -435,7 +405,6 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
       console.error("Dashboard Socket not open");
       return;
     }
-    console.log("Dashboard sending cancel alert:", alertId);
     socket.send(
       JSON.stringify({
         type: "CANCEL_ALERT",

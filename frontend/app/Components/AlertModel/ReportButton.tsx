@@ -57,7 +57,6 @@ export const ReportButton = ({ onConfirm }: ReportButtonProps) => {
         if (onConfirm) {
           onConfirm();
         }
-        console.log("Emergency reported successfully!");
         // Auto reset after 30 seconds
         resetTimeoutRef.current = setTimeout(() => {
           resetToInitial();
