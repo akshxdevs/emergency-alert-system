@@ -107,7 +107,7 @@ export const AlertLevelSetter:React.FC<AlertLevelSelectorProps> = ({onLevelChang
 
       {/* Level Progress */}
       <div className="flex gap-1 mt-2">
-        {levelOrder.map((level, index) => {
+        {levelOrder.map((level) => {
           const isActive = level === levelSelected;
           const config = threatLevels[level];
           

@@ -12,7 +12,20 @@ import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import { useEffect, useState, useCallback, useMemo } from "react";
 
-export default function () {
+interface Alert {
+  id: string;
+  type: string;
+  reportedBy: string;
+  status: string;
+  assignedTo: string;
+  timeStamp: string;
+  description: string;
+  priority: string | number;
+  location: Array<{ lat: number; long: number }>;
+  autoDisappearAt?: number | null;
+}
+
+export default function HomePage() {
   const {data:session} = useSession();
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
@@ -85,19 +98,22 @@ export default function () {
 
   const handleConfirm = useCallback(async () => {
     const assignedTo = roleAssignedTo[hazardType] || "OTHER";
-    const alertPayload = {
+    const alertPayload: Alert = {
+      id: `alert-${Date.now()}`,
       type: hazardType,
+      reportedBy: userId || "anonymous",
       priority: priority,
       status: "REPORTED",
       description: description,
       assignedTo: assignedTo,
-      location: {
-        lat: lat,
-        long: lng,
-      },
+      timeStamp: new Date().toISOString(),
+      location: [{
+        lat: lat || 0,
+        long: lng || 0,
+      }],
     };
     sendEmergency(alertPayload);
-  }, [hazardType, priority, description, lat, lng, roleAssignedTo, sendEmergency]);
+  }, [hazardType, priority, description, lat, lng, roleAssignedTo, sendEmergency, userId]);
 
   const handleLocationButtonClick = useCallback(() => {
     if (navigator.geolocation) {

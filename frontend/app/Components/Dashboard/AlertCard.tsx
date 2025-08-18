@@ -25,7 +25,7 @@ interface AlertCardProps {
   isUpdatingAlert: boolean;
   updatingAlertId: string | null;
   sliderValue: number;
-  CountdownTimer: React.ComponentType<{ alert: any }>;
+  CountdownTimer: React.ComponentType<{ alert: Alert }>;
 }
 
 const AlertCard = memo(({

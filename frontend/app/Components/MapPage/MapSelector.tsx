@@ -19,7 +19,7 @@ const MapSelector = memo(({
   const [markerPos, setMarkerPos] = useState<{ lat: number; lng: number } | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [loadingLocation, setLoadingLocation] = useState<boolean>(true);
-  const [isDragging, setIsDragging] = useState<boolean>(false);
+
 
   const defaultCenter = useMemo(() => {
     return userLocation || { lat: 28.6139, lng: 77.2090 };
@@ -37,7 +37,7 @@ const MapSelector = memo(({
           setUserLocation({ lat: latitude, lng: longitude });
           setLoadingLocation(false); 
         },
-        (error) => {
+        () => {
           setLoadingLocation(false); 
         }
       );
@@ -58,7 +58,6 @@ const MapSelector = memo(({
   }, [onLocationSelect]);
 
   const handleDragChange = useCallback((dragging: boolean) => {
-    setIsDragging(dragging);
     onDragChange?.(dragging);
   }, [onDragChange]);
 
@@ -75,6 +74,8 @@ const MapSelector = memo(({
 
     return null;
   });
+  
+  MapUpdater.displayName = 'MapUpdater';
 
   const LocationMarker = memo(() => {
     useMapEvents({
@@ -95,6 +96,8 @@ const MapSelector = memo(({
 
     return markerPos ? <Marker position={markerPos} icon={customIcon} /> : null;
   });
+  
+  LocationMarker.displayName = 'LocationMarker';
 
   return (
     <>

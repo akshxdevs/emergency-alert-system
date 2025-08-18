@@ -77,9 +77,9 @@ export default function RoleSelectionPage() {
           router.push(`/dashboard/${response.data.user.id}`);
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Role selection error:", error);
-      setError(error.response?.data?.message || "Something went wrong");
+      setError("Something went wrong");
     } finally {
       setIsLoading(false);
     }

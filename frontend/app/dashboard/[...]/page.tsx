@@ -22,7 +22,7 @@ interface Alert {
   autoDisappearAt?: number | null; // Added for auto-disappear functionality
 }
 
-export default function () {
+export default function DashboardPage() {
   const {data:session} = useSession();
   const [lat, setLat] = useState<number | null>(null);
   const [lng, setLng] = useState<number | null>(null);
@@ -40,6 +40,7 @@ export default function () {
   const params = useParams();
   const [showTimer,setShowTimer] = useState(true);
   const [isThreat,setIstreat] = useState(true);
+
   useEffect(() => {
     const sessionUserId = session?.user?.id;
     const sessionUserRole = session?.user?.role;
@@ -125,11 +126,15 @@ export default function () {
           clearInterval(interval);
           
           // Send the update
-          const updatePayload = {
-            alertId: alertId,
-            newStatus: newStatus
-          };
-          sendEmergencyUpdate(updatePayload);
+          // Find the alert to update
+          const alertToUpdate = receivedAlerts.find(alert => alert.id === alertId);
+          if (alertToUpdate) {
+            const updatePayload = {
+              ...alertToUpdate,
+              status: newStatus
+            };
+            sendEmergencyUpdate(updatePayload);
+          }
           
           // Update local state immediately for better UX
           setReceivedAlerts(prev => 

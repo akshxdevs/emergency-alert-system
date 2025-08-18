@@ -49,12 +49,8 @@ const handler = NextAuth({
 
           console.log("User for NextAuth:", userForNextAuth);
           return userForNextAuth;
-        } catch (err: any) {
-          console.error("Credentials login error details:", {
-            message: err?.message,
-            response: err?.response?.data,
-            status: err?.response?.status,
-          });
+        } catch (err: unknown) {
+          console.error("Credentials login error details:", err);
           return null;
         }
       },
@@ -70,7 +66,7 @@ const handler = NextAuth({
   debug: process.env.NODE_ENV === "development",
 
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account }) {
       if (account?.provider === "google") {
         try {
           // Check if user exists in our database
@@ -106,7 +102,7 @@ const handler = NextAuth({
       return true;
     },
 
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;

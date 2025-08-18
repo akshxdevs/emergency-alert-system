@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useSession, signIn } from "next-auth/react";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -47,7 +47,7 @@ const roleOptions: RoleOption[] = [
 
 export default function GoogleCallbackPage() {
   const { data: session, status } = useSession();
-  const [selectedRole, setSelectedRole] = useState<string>("");
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();

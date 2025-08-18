@@ -8,7 +8,7 @@ export const AppBar = () => {
     const router = useRouter()
     const {data:session} = useSession();
     const [isVisible, setIsVisible] = useState(false);
-    const [isHovered, setIsHovered] = useState(false);
+
 
     useEffect(() => {
         setIsVisible(true);
@@ -19,8 +19,7 @@ export const AppBar = () => {
             className={`font-gilroy fixed top-4 left-1/2 -translate-x-1/2 w-full max-w-xl z-50 shadow-2xl border border-gray-200/20 rounded-full backdrop-blur-xl bg-white/90 dark:bg-gray-900/90 transition-all duration-700 ease-out ${
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'
             }`}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
+
         >
             {session ? (
                 <div className="px-5 flex justify-between items-center">

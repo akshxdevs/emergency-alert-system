@@ -1,9 +1,22 @@
 import React, { memo } from 'react';
 import { motion } from 'framer-motion';
 
+interface Alert {
+  id: string;
+  type: string;
+  reportedBy: string;
+  status: string;
+  assignedTo: string;
+  timeStamp: string;
+  description: string;
+  priority: string | number;
+  location: Array<{ lat: number; long: number }>;
+  autoDisappearAt?: number | null;
+}
+
 interface RoleHeaderProps {
   userRole: string;
-  receivedAlerts: any[];
+  receivedAlerts: Alert[];
 }
 
 const RoleHeader = memo(({ userRole, receivedAlerts }: RoleHeaderProps) => {

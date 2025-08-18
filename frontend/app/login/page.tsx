@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { signIn, getSession } from "next-auth/react";
@@ -366,7 +366,7 @@ export default function LoginLandingPage() {
               transition={{ delay: 0.8 }}
             >
               <p className="text-gray-400 text-xs">
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <motion.a
                   href="/signup"
                   className="text-red-400 hover:text-red-300 font-medium relative group transition-colors"

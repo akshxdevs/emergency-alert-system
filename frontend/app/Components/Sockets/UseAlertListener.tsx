@@ -1,7 +1,7 @@
 import { useEffect } from "react"
 import { WS_URL } from "../../../config";
 
-export const UseAlertListener = (userId:string,userRole:string,onMessage:(data:any)=>void) => {
+export const UseAlertListener = (userId:string,userRole:string,onMessage:(data:unknown)=>void) => {
     useEffect(()=>{
         if (!userId || !userRole) return;
         const ws = new WebSocket(`${WS_URL}/${userId}/?${userRole}`);

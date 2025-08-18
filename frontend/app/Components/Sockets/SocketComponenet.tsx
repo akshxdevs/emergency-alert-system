@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { BACKEND_URL, WS_URL } from "../../../config";
+import { WS_URL } from "../../../config";
 
 interface Alert {
   id: string;
@@ -142,7 +142,7 @@ export const useEmergencySocket = (userId: string, userRole: string) => {
     }
   };
 
-  const sendEmergency = (alert: any) => {
+  const sendEmergency = (alert: Alert) => {
     if (!socket || socket.readyState !== WebSocket.OPEN) {
       console.error("Socket not open");
       return;
@@ -155,7 +155,7 @@ export const useEmergencySocket = (userId: string, userRole: string) => {
     );
   };
   
-  const sendEmergencyUpdate = (alert: any) => {
+  const sendEmergencyUpdate = (alert: Alert) => {
     if (!socket || socket.readyState !== WebSocket.OPEN) {
       console.error("Socket not open");
       return;
@@ -231,7 +231,7 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
       console.error("Dashboard userId:", userId, "userRole:", userRole);
     };
 
-    ws.onclose = (event) => {};
+    ws.onclose = () => {};
 
     setSocket(ws);
 
@@ -358,7 +358,7 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
     return () => clearInterval(interval);
   }, [userRole]);
 
-  const sendEmergencyUpdate = (alert: any) => {
+  const sendEmergencyUpdate = (alert: Alert) => {
     if (!socket || socket.readyState !== WebSocket.OPEN) {
       console.error("Dashboard Socket not open");
       return;
