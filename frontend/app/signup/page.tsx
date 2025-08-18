@@ -82,7 +82,6 @@ export default function SignupPage() {
     setError(null);
 
     try {
-      // Store selected role in localStorage for Google auth callback
       localStorage.setItem("selectedRole", selectedRole);
 
       await signIn("google", {
@@ -128,7 +127,6 @@ export default function SignupPage() {
         return;
       }
 
-      // Auto login after successful signup
       const result = await signIn("credentials", {
         email,
         password,
@@ -248,7 +246,7 @@ export default function SignupPage() {
                   transition={{ 
                     delay: index * 0.1,
                     duration: 0.6,
-                    ease: [0.25, 0.46, 0.45, 0.94] // Custom easing curve
+                    ease: [0.25, 0.46, 0.45, 0.94]
                   }}
                   whileHover={{
                     scale: 1.02,

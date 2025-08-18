@@ -53,17 +53,14 @@ export const ReportButton = ({ onConfirm }: ReportButtonProps) => {
         setShowSuccess(true);
         setShowFullScreenSuccess(true);
         
-        // Trigger the emergency report from parent component
         if (onConfirm) {
           onConfirm();
         }
-        // Auto reset after 30 seconds
         resetTimeoutRef.current = setTimeout(() => {
           resetToInitial();
         }, 5000);
       }, 500);
     } else {
-      // Reset to start
       setSlideProgress(0);
     }
   };
@@ -106,14 +103,12 @@ export const ReportButton = ({ onConfirm }: ReportButtonProps) => {
     }
   };
 
-  // Reset on component mount
   useEffect(() => {
     setSlideProgress(0);
     setIsConfirmed(false);
     setShowSuccess(false);
     setShowFullScreenSuccess(false);
     
-    // Cleanup timeout on unmount
     return () => {
       if (resetTimeoutRef.current) {
         clearTimeout(resetTimeoutRef.current);

@@ -31,8 +31,8 @@ export default function () {
     CRIME: "POLICE",
     FIRE: "FIRE",
     MEDICAL: "MEDICAL",
-    ACCIDENT: "POLICE", // Accidents can also be handled by police
-    OTHER: "POLICE", // Other emergencies default to police
+    ACCIDENT: "POLICE",
+    OTHER: "POLICE",
   };
 
   useEffect(() => {

@@ -46,20 +46,17 @@ const MapSelector = memo(({
     }
   }, []);
 
-  // Clear marker when clearMarker prop is true
   useEffect(() => {
     if (clearMarker) {
       setMarkerPos(null);
     }
   }, [clearMarker]);
 
-  // Memoize the location select callback
   const handleLocationSelect = useCallback((lat: number, lng: number) => {
     setMarkerPos({ lat, lng });
     onLocationSelect(lat, lng);
   }, [onLocationSelect]);
 
-  // Memoize the drag change callback
   const handleDragChange = useCallback((dragging: boolean) => {
     setIsDragging(dragging);
     onDragChange?.(dragging);
@@ -108,7 +105,7 @@ const MapSelector = memo(({
           center={mapCenter}
           zoom={13}
           style={{ height: '100%', width: '100%' }}
-          key={`map-${mapCenter[0]}-${mapCenter[1]}`} // Add key to prevent unnecessary re-renders
+          key={`map-${mapCenter[0]}-${mapCenter[1]}`}
         >
           <TileLayer
             attribution='&copy; OpenStreetMap contributors'

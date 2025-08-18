@@ -12,7 +12,6 @@ export const AkshxFooter = () => {
     setMounted(true);
   }, []);
 
-  // Use a safe theme value that won't cause hydration issues
   const safeTheme = mounted ? theme : 'light';
 
   return (

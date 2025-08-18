@@ -19,7 +19,6 @@ export const OtherOptions:React.FC<AlertAddMoreDetailsProps> = ({onAddingMoreDet
   const handleToggle = () => {
     setIsExpanded(!isExpanded);
     if (!isExpanded) {
-      // Focus the textarea when expanding
       setTimeout(() => {
         const textarea = document.getElementById("emergency-description");
         if (textarea) textarea.focus();
@@ -32,7 +31,7 @@ export const OtherOptions:React.FC<AlertAddMoreDetailsProps> = ({onAddingMoreDet
   };
 
   const characterCount = description.length;
-  const maxCharacters = 300; // Reduced from 500
+  const maxCharacters = 300;
   const isNearLimit = characterCount > maxCharacters * 0.8;
 
   return (
@@ -176,7 +175,6 @@ export const OtherOptions:React.FC<AlertAddMoreDetailsProps> = ({onAddingMoreDet
           </button>
           <button
             onClick={() => {
-              // You can add save functionality here
               setIsExpanded(false);
             }}
             className="px-2 py-1 text-xs bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200"

@@ -14,7 +14,6 @@ export const ServiceListCard = () => {
         setMounted(true);
     }, []);
 
-    // Use a safe theme value that won't cause hydration issues
     const safeTheme = mounted ? theme : 'light';
 
     const services = [
@@ -65,7 +64,6 @@ export const ServiceListCard = () => {
         }
     ];
 
-    // Auto-rotate images every 4 seconds
     useEffect(() => {
         const interval = setInterval(() => {
             setCurrentImageIndex((prev) => (prev + 1) % emergencyImages.length);
@@ -74,19 +72,17 @@ export const ServiceListCard = () => {
         return () => clearInterval(interval);
     }, []);
 
-    // Container animation variants for stacking effect
-    const containerVariants = {
-        hidden: { opacity: 0 },
-        visible: {
-            opacity: 1,
-            transition: {
-                staggerChildren: 0.3, // Delay between each service
-                delayChildren: 0.5,   // Initial delay before first service
-            }
+        const containerVariants = {
+      hidden: { opacity: 0 },
+      visible: {
+        opacity: 1,
+        transition: {
+          staggerChildren: 0.3,
+          delayChildren: 0.5,
         }
+      }
     };
 
-    // Individual service animation variants
     const serviceVariants = {
         hidden: { 
             opacity: 0, 
@@ -245,7 +241,7 @@ export const ServiceListCard = () => {
                             animate={{ opacity: 1, scale: 1, x: 0 }}
                             transition={{ 
                                 duration: 1.2, 
-                                delay: 1.5, // Delay to start after services stack
+                                delay: 1.5,
                                 ease: "easeOut",
                                 type: "spring",
                                 stiffness: 80,
