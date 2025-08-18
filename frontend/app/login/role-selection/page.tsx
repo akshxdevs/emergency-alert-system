@@ -1,6 +1,6 @@
 "use client";
 import { useSearchParams, useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 import Image from "next/image";
@@ -41,7 +41,7 @@ const roles = [
   },
 ];
 
-export default function RoleSelectionPage() {
+function RoleSelectionContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
@@ -203,5 +203,20 @@ export default function RoleSelectionPage() {
         </div>
       </motion.div>
     </div>
+  );
+}
+
+export default function RoleSelectionPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-[#0f1117] px-4">
+        <div className="bg-[#151922] p-8 rounded-3xl shadow-md w-full max-w-md text-white text-center">
+          <h1 className="text-2xl font-bold mb-4">Loading...</h1>
+          <p className="text-gray-400">Please wait while we load the role selection page.</p>
+        </div>
+      </div>
+    }>
+      <RoleSelectionContent />
+    </Suspense>
   );
 } 
