@@ -16,20 +16,18 @@ export const ServiceDetailsCard = () => {
         setMounted(true);
     }, []);
 
-    // Typewriter effect
     useEffect(() => {
         if (currentIndex < fullText.length) {
             const timeout = setTimeout(() => {
                 setTypewriterText(prev => prev + fullText[currentIndex]);
                 setCurrentIndex(prev => prev + 1);
-            }, 100); // Speed of typing
+            }, 100);
             return () => clearTimeout(timeout);
         } else {
             setAnimation(false);
         }
     }, [currentIndex, fullText]);
 
-    // Use a safe theme value that won't cause hydration issues
     const safeTheme = mounted ? theme : 'light';
 
     const cards = [
@@ -102,7 +100,6 @@ export const ServiceDetailsCard = () => {
                                 onMouseEnter={() => setHoveredCard(idx)}
                                 onMouseLeave={() => setHoveredCard(null)}
                             >
-                                {/* Subtle Border */}
                                 <motion.div
                                     className="absolute inset-0 rounded-lg"
                                     style={{
@@ -164,7 +161,6 @@ export const ServiceDetailsCard = () => {
                                     </motion.p>
                                 </div>
                                 
-                                {/* Subtle Particle Effect on Hover */}
                                 {hoveredCard === idx && (
                                     <div className="absolute inset-0 pointer-events-none">
                                         {[...Array(4)].map((_, i) => (
@@ -194,7 +190,6 @@ export const ServiceDetailsCard = () => {
                                     </div>
                                 )}
                                 
-                                {/* Subtle Glow Effect */}
                                 <motion.div
                                     className={`absolute inset-0 rounded-lg blur-lg opacity-0 transition-opacity duration-300 ${
                                         safeTheme === 'dark' 

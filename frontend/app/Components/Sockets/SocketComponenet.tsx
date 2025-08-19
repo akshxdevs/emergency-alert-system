@@ -36,7 +36,6 @@ export const useEmergencySocket = (userId: string, userRole: string) => {
 
       if (data.type === "welcome") {}
 
-      // Handle role-specific alerts
       if (data.type === "CRIME" && userRole === "POLICE") {
         handleIncomingAlert(data.payload, "🚔 Police Alert", "New crime incident reported");
       }
@@ -196,7 +195,6 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
 
       if (data.type === "welcome") {}
 
-      // Handle role-specific alerts for dashboard
       if (data.type === "CRIME" && userRole === "POLICE") {
         handleIncomingAlert(data.payload);
       }
@@ -247,14 +245,12 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
         return prev;
       }
       
-      // Add timestamp for auto-disappear functionality
       const alertWithTimestamp = {
         ...payload,
         receivedAt: Date.now(),
         autoDisappearAt: Date.now() + (2 * 60 * 1000) // 2 minutes from now
       };
       
-      // Remove alerts older than 24 hours
       const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
       const filteredAlerts = prev.filter(alert => {
         const alertTime = new Date(alert.timeStamp);
@@ -263,12 +259,10 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
       
       const newAlerts = [alertWithTimestamp, ...filteredAlerts];
       
-      // Keep only the last 50 alerts to prevent memory issues
       if (newAlerts.length > 50) {
         newAlerts.splice(50);
       }
       
-      // Save to localStorage
       localStorage.setItem(`dashboard-alerts-${userRole}`, JSON.stringify(newAlerts));
       
       console.log("Dashboard updated receivedAlerts:", newAlerts);
@@ -276,7 +270,6 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
     });
   }, [userRole]);
 
-  // Function to handle alert updates for dashboard
   const handleAlertUpdate = useCallback((payload: Alert) => {
     setReceivedAlerts(prev => {
       const updated = prev.map(alert => 
@@ -295,18 +288,15 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
     });
   }, [userRole]);
 
-  // Function to handle alert cancellation for dashboard
   const handleAlertCancellation = useCallback((payload: Alert) => {
     setReceivedAlerts(prev => {
       const filtered = prev.filter(alert => alert.id !== payload.id);
       
-      // Save to localStorage
       localStorage.setItem(`dashboard-alerts-${userRole}`, JSON.stringify(filtered));
       return filtered;
     });
   }, [userRole]);
 
-  // Load alerts from localStorage on mount
   useEffect(() => {
     const savedAlerts = localStorage.getItem(`dashboard-alerts-${userRole}`);
     if (savedAlerts) {
@@ -320,7 +310,6 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
     }
   }, [userRole]);
 
-  // Clear alerts from other roles when role changes
   useEffect(() => {
     const roles = ["POLICE", "FIRE", "MEDICAL"];
     roles.forEach(role => {
@@ -330,18 +319,15 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
     });
   }, [userRole]);
 
-  // Auto-disappear timer for new alerts
   useEffect(() => {
     const interval = setInterval(() => {
       const now = Date.now();
       setReceivedAlerts(prev => {
         const filtered = prev.filter(alert => {
-          // Keep IN_PROCESS alerts until resolved
           if (alert.status === 'IN_PROCESS') {
             return true;
           }
           
-          // Remove alerts that have passed their auto-disappear time
           if (alert.autoDisappearAt && now > alert.autoDisappearAt) {
             return false;
           }
@@ -349,7 +335,6 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
           return true;
         });
         
-        // Save to localStorage
         localStorage.setItem(`dashboard-alerts-${userRole}`, JSON.stringify(filtered));
         return filtered;
       });

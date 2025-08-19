@@ -45,7 +45,6 @@ export default function DashboardPage() {
     const sessionUserId = session?.user?.id;
     const sessionUserRole = session?.user?.role;
     
-    // Set userId from session
     if (sessionUserId) {
       setUserId(sessionUserId);
     } else {
@@ -54,7 +53,6 @@ export default function DashboardPage() {
     
     let determinedRole = null;
     
-    // First try to get role from session
     if (sessionUserRole) {
       determinedRole = sessionUserRole.toUpperCase();
     } else {
@@ -63,7 +61,6 @@ export default function DashboardPage() {
       if (urlSegments && urlSegments.length > 0) {
         const urlRole = urlSegments[0];
         
-        // Validate role and map common variations
         const roleMapping: Record<string, string> = {
           "police": "POLICE",
           "fire": "FIRE", 
@@ -87,7 +84,6 @@ export default function DashboardPage() {
       }
     }
     
-    // Validate the determined role
     const validRoles = ["POLICE", "FIRE", "MEDICAL"];
     if (determinedRole && validRoles.includes(determinedRole)) {
       setUserRole(determinedRole);
@@ -110,7 +106,6 @@ export default function DashboardPage() {
     setIsMapDragging(isDragging);
   }, []);
 
-  // Update alert status with slider interaction
   const handleUpdateAlertStatus = useCallback((alertId: string, newStatus: string) => {
     setIsUpdatingAlert(true);
     setUpdatingAlertId(alertId);
