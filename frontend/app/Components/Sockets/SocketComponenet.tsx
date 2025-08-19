@@ -282,7 +282,6 @@ export const useDashboardSocket = (userId: string, userRole: string) => {
           : alert
       );
       
-      // Save to localStorage
       localStorage.setItem(`dashboard-alerts-${userRole}`, JSON.stringify(updated));
       return updated;
     });

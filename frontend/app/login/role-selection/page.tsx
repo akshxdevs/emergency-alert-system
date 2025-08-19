@@ -70,7 +70,6 @@ function RoleSelectionContent() {
       });
 
       if (response.data.user) {
-        // Redirect based on role
         if (selectedRole === "CIVILIAN") {
           router.push(`/home/${response.data.user.id}`);
         } else {

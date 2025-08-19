@@ -48,7 +48,6 @@ export const AlertLevelSetter:React.FC<AlertLevelSelectorProps> = ({onLevelChang
 
   const handleImageClick = () => {
     setIsAnimating(true);
-    // Find current index and move to next level
     const currentIndex = levelOrder.indexOf(levelSelected);
     const nextIndex = (currentIndex + 1) % levelOrder.length;
     const nextLevel = levelOrder[nextIndex];

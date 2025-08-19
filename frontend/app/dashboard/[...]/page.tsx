@@ -110,7 +110,6 @@ export default function DashboardPage() {
     setIsUpdatingAlert(true);
     setUpdatingAlertId(alertId);
     
-    // Simulate slider animation
     const animateSlider = () => {
       let progress = 0;
       const interval = setInterval(() => {
@@ -120,8 +119,6 @@ export default function DashboardPage() {
         if (progress >= 100) {
           clearInterval(interval);
           
-          // Send the update
-          // Find the alert to update
           const alertToUpdate = receivedAlerts.find(alert => alert.id === alertId);
           if (alertToUpdate) {
             const updatePayload = {
@@ -131,7 +128,7 @@ export default function DashboardPage() {
             sendEmergencyUpdate(updatePayload);
           }
           
-          // Update local state immediately for better UX
+
           setReceivedAlerts(prev => 
             prev.map(alert => 
               alert.id === alertId 
@@ -140,7 +137,6 @@ export default function DashboardPage() {
             )
           );
           
-          // Reset states
           setTimeout(() => {
             setIsUpdatingAlert(false);
             setUpdatingAlertId(null);
@@ -154,13 +150,11 @@ export default function DashboardPage() {
     console.log(`Alert ${alertId} updated to ${newStatus}`);
   }, [sendEmergencyUpdate]);
 
-  // Cancel alert function
   const handleCancelAlert = useCallback((alertId: string) => {
     if (confirm("Are you sure you want to cancel this emergency alert? This action cannot be undone.")) {
       setIsUpdatingAlert(true);
       setUpdatingAlertId(alertId);
       
-      // Simulate slider animation for cancellation
       const animateSlider = () => {
         let progress = 0;
         const interval = setInterval(() => {
@@ -170,10 +164,8 @@ export default function DashboardPage() {
           if (progress >= 100) {
             clearInterval(interval);
             
-            // Send the cancel request
             sendCancelAlert(alertId);
             
-            // Reset states
             setTimeout(() => {
               setIsUpdatingAlert(false);
               setUpdatingAlertId(null);
@@ -188,7 +180,6 @@ export default function DashboardPage() {
     }
   }, [sendCancelAlert]);
 
-  // Memoize the location button handler
   const handleLocationButtonClick = useCallback(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -213,18 +204,15 @@ export default function DashboardPage() {
     }
   }, []);
 
-  // Memoize the clear marker handler
   const handleClearMarker = useCallback(() => {
     setClearMarker(true);
     setLat(null);
     setLng(null);
-    // Reset clearMarker after a short delay
     setTimeout(() => setClearMarker(false), 100);
   }, []);
 
 
 
-  // Memoize the map props to prevent unnecessary re-renders
   const mapProps = useMemo(() => ({
     onLocationSelect: handleLocationSelect,
     externalLat: lat,
@@ -237,7 +225,6 @@ export default function DashboardPage() {
 
   
 
-  // Calculate remaining time for auto-disappear alerts
   const getRemainingTime = (alert: Alert) => {
     if (!alert.autoDisappearAt) return null;
     const remaining = alert.autoDisappearAt - Date.now();
@@ -245,14 +232,12 @@ export default function DashboardPage() {
     return Math.ceil(remaining / 1000); // Return seconds
   };
 
-  // Format time for display
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Countdown timer component
   const CountdownTimer = ({ alert }: { alert: Alert }) => {
     const [timeLeft, setTimeLeft] = useState(getRemainingTime(alert));
 

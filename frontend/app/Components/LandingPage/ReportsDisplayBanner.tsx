@@ -52,7 +52,6 @@ const ReviewCard = ({
     <figure
       className={cn(
         "relative w-48 sm:w-56 md:w-60 lg:w-64 cursor-pointer overflow-hidden rounded-xl border p-3 sm:p-4 md:p-5 transition-all duration-300",
-        // Clean, minimal design with site-matching colors
         "bg-white/90 border-slate-200/60 shadow-md hover:shadow-xl hover:-translate-y-1 backdrop-blur-sm"
       )}
     >

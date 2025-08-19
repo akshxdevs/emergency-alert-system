@@ -50,7 +50,6 @@
         })
       );
 
-      // Send pending alerts from database to dashboard users
       if (userId.includes('dashboard')) {
         sendPendingAlerts(socket, userRole);
       }
@@ -82,7 +81,6 @@
               ],
             });
 
-            // Send success response to client
             socket.send(
               JSON.stringify({
                 type: "success",
@@ -231,7 +229,6 @@
   };
   const sendPendingAlerts = async (socket: WebSocket, userRole: string) => {
     try {
-      // Fetch alerts that are IN_PROCESS (pending) for the specific role
       const pendingAlerts = await prismaClient.emergency.findMany({
         where: {
           status: StatusReport.IN_PROCESS,
@@ -245,7 +242,6 @@
       if (pendingAlerts.length > 0) {
         console.log(`📋 Sending ${pendingAlerts.length} pending alerts to ${userRole} dashboard`);
         
-        // Send each pending alert individually
         pendingAlerts.forEach((alert) => {
           const alertWithLocation = {
             ...alert,
@@ -309,13 +305,11 @@
 
             console.log("Alert created in DB:", createAlert);
 
-            // Send high priority broadcast to all clients
             if (alert.priority === "HIGH") {
               console.log("Broadcasting HIGH_PRIORITY_ALERT to all clients");
               broadcast({ type: "HIGH_PRIORITY_ALERT", payload: createAlert });
             }
 
-            // Send role-specific alert
             console.log(
               `Broadcasting ${alert.type} alert to ${alert.assignedTo} role`
             );

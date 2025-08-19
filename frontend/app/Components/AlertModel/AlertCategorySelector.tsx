@@ -58,7 +58,6 @@ export const AlertCategorySelector: React.FC<AlertCategorySelectorProps> = ({ on
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
 
-  // Call onCategoryChange when selectedCategory changes
   useEffect(() => {
     if (onCategoryChange) {
       onCategoryChange(selectedCategory);

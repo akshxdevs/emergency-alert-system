@@ -60,7 +60,6 @@ export default function GoogleCallbackPage() {
       return;
     }
 
-    // Check if user already has a role
     if (session.user?.role) {
       const userId = session.user.id;
       const userRole = session.user.role;
@@ -104,7 +103,6 @@ export default function GoogleCallbackPage() {
         return;
       }
 
-      // Redirect based on role
       const userId = data.user.id;
       const userRole = data.user.role;
       

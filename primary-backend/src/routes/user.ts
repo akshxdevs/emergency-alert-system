@@ -11,7 +11,6 @@ const redis = new Redis();
 const OTP_LIMIT = 3;
 const OTP_EXPIRY = 100;
 
-// Check if user exists by email (for Google auth)
 router.get("/check-email", async (req, res) => {
   try {
     const { email } = req.query;
@@ -31,7 +30,6 @@ router.get("/check-email", async (req, res) => {
   }
 });
 
-// Get user by email (for Google auth)
 router.get("/by-email", async (req, res) => {
   try {
     const { email } = req.query;
@@ -55,7 +53,6 @@ router.get("/by-email", async (req, res) => {
   }
 });
 
-// Google signup with role selection
 router.post("/google-signup", async (req, res) => {
   try {
     const parsedBody = GoogleSignupSchema.safeParse(req.body);
@@ -68,7 +65,6 @@ router.post("/google-signup", async (req, res) => {
 
     const { email, name, image, role } = parsedBody.data;
 
-    // Check if user already exists
     const existingUser = await prismaClient.user.findFirst({
       where: { email: email },
     });
@@ -77,12 +73,10 @@ router.post("/google-signup", async (req, res) => {
       return res.status(409).json({ message: "User already exists" });
     }
 
-    // Generate username based on role
     const generateUsername: string = String(
       role + Math.floor(Math.random() * 1000000)
     ).padStart(6, "7");
 
-    // Create new user
     const user = await prismaClient.user.create({
       data: {
         username: generateUsername,
@@ -92,7 +86,6 @@ router.post("/google-signup", async (req, res) => {
       },
     });
 
-    // Generate JWT token
     const token = jwt.sign(
       { id: user.id },
       JWT_SECRET as string,

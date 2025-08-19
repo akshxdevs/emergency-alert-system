@@ -32,7 +32,6 @@ export const HeaderCard = () => {
           shapes: ['c', 's'],
         });
       } else {
-        // FinisherHeader not found
       }
     };
 

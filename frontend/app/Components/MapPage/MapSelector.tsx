@@ -61,7 +61,6 @@ const MapSelector = memo(({
     onDragChange?.(dragging);
   }, [onDragChange]);
 
-  // Component to update map center when external coordinates change
   const MapUpdater = memo(() => {
     const map = useMap();
     

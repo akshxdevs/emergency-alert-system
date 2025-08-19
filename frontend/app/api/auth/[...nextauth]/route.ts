@@ -37,7 +37,6 @@ const handler = NextAuth({
             return null;
           }
 
-          // Ensure all required fields are present
           const userForNextAuth = {
             id: user.id,
             email: user.email,
@@ -69,7 +68,6 @@ const handler = NextAuth({
     async signIn({ user, account }) {
       if (account?.provider === "google") {
         try {
-          // Check if user exists in our database
           const existingUserResponse = await axios.get(
             `http://localhost:5000/api/v1/user/check-email?email=${user.email}`
           );
@@ -77,21 +75,18 @@ const handler = NextAuth({
           const { exists } = existingUserResponse.data;
 
           if (exists) {
-            // User exists, get their data
             const userResponse = await axios.get(
               `http://localhost:5000/api/v1/user/by-email?email=${user.email}`
             );
 
             const existingUser = userResponse.data.user;
             
-            // Update user object with existing user data
             user.id = existingUser.id;
             user.username = existingUser.username;
             user.role = existingUser.role;
             
             return true;
           } else {
-            // User doesn't exist, redirect to role selection
             return "/signup/google-callback";
           }
         } catch (error) {
