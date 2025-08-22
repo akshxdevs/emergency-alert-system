@@ -47,7 +47,6 @@ const setUpSocketServer = (server) => {
             type: `welcome ${userId}`,
             message: `Connected to Emergency Alert WS`,
         }));
-        // Send pending alerts from database to dashboard users
         if (userId.includes('dashboard')) {
             sendPendingAlerts(socket, userRole);
         }
@@ -74,7 +73,6 @@ const setUpSocketServer = (server) => {
                             },
                         ],
                     });
-                    // Send success response to client
                     socket.send(JSON.stringify({
                         type: "success",
                         message: "Emergency alert sent successfully",
@@ -201,7 +199,6 @@ const setUpSocketServer = (server) => {
     });
     const sendPendingAlerts = (socket, userRole) => __awaiter(void 0, void 0, void 0, function* () {
         try {
-            // Fetch alerts that are IN_PROCESS (pending) for the specific role
             const pendingAlerts = yield db_1.prismaClient.emergency.findMany({
                 where: {
                     status: client_1.StatusReport.IN_PROCESS,
@@ -213,7 +210,6 @@ const setUpSocketServer = (server) => {
             });
             if (pendingAlerts.length > 0) {
                 console.log(`📋 Sending ${pendingAlerts.length} pending alerts to ${userRole} dashboard`);
-                // Send each pending alert individually
                 pendingAlerts.forEach((alert) => {
                     const alertWithLocation = Object.assign(Object.assign({}, alert), { location: alert.location.map(loc => ({
                             lat: loc.lat,
@@ -267,12 +263,10 @@ const setUpSocketServer = (server) => {
                             },
                         });
                         console.log("Alert created in DB:", createAlert);
-                        // Send high priority broadcast to all clients
                         if (alert.priority === "HIGH") {
                             console.log("Broadcasting HIGH_PRIORITY_ALERT to all clients");
                             broadcast({ type: "HIGH_PRIORITY_ALERT", payload: createAlert });
                         }
-                        // Send role-specific alert
                         console.log(`Broadcasting ${alert.type} alert to ${alert.assignedTo} role`);
                         roleBroadcast(alert.assignedTo, {
                             type: alert.type,

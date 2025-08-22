@@ -1,75 +1,68 @@
-  // This is your Prisma schema file,
-  // learn more about it in the docs: https://pris.ly/d/prisma-schema
+generator client {
+  provider = "prisma-client-js"
+}
 
-  // Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-  // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
-  generator client {
-    provider = "prisma-client-js"
-  }
+model User{
+  id String @id @default(uuid())
+  username String @unique
+  email String @unique
+  password String
+  phoneNo String?
+  role UserRole?
+  name String?
+  image String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model Location {
+  id String @id @default(uuid())
+  lat Float
+  long Float
+  emergencyId String
+  alert Emergency @relation(fields: [emergencyId],references: [id])
+}
 
-  datasource db {
-    provider = "postgresql"
-    url      = env("DATABASE_URL")
-  }
+model Emergency{
+  id String @id @default(uuid())
+  type HazardType
+  reportedBy String
+  status StatusReport
+  assignedTo UserRole
+  timeStamp DateTime @default(now())
+  statusUpdatedAt DateTime? @updatedAt
+  description String?
+  priority PriorityLevel
+  location Location[]
+}
 
-  model User{
-    id String @id @default(uuid())
-    username String @unique
-    email String @unique
-    password String
-    phoneNo String?
-    role UserRole?
-    name String? // For Google auth users
-    image String? // For Google auth users
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-  }
-  model Location {
-    id String @id @default(uuid())
-    lat Float
-    long Float
-    emergencyId String
-    alert Emergency @relation(fields: [emergencyId],references: [id])
-  }
+enum UserRole {
+  CIVILIAN
+  POLICE
+  FIRE
+  MEDICAL
+}
 
-  model Emergency{
-    id String @id @default(uuid())
-    type HazardType
-    reportedBy String
-    status StatusReport
-    assignedTo UserRole
-    timeStamp DateTime @default(now())
-    statusUpdatedAt DateTime? @updatedAt
-    description String?
-    priority PriorityLevel
-    location Location[]
-  }
+enum HazardType {
+  FIRE
+  CRIME
+  ACCIDENT
+  MEDICAL
+  OTHER
+}
 
+enum StatusReport {
+  REPORTED
+  IN_PROCESS
+  RESOLVED
+}
 
-  enum UserRole {
-    CIVILIAN
-    POLICE
-    FIRE
-    MEDICAL
-  }
-
-  enum HazardType {
-    FIRE
-    CRIME
-    ACCIDENT
-    MEDICAL
-    OTHER
-  }
-
-  enum StatusReport {
-    REPORTED
-    IN_PROCESS
-    RESOLVED
-  }
-
-  enum PriorityLevel {
-  LOW
-  MEDIUM
-  HIGH
+enum PriorityLevel {
+LOW
+MEDIUM
+HIGH
 }

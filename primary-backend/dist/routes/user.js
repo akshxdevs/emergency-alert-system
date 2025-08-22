@@ -24,7 +24,6 @@ const router = (0, express_1.Router)();
 const redis = new ioredis_1.default();
 const OTP_LIMIT = 3;
 const OTP_EXPIRY = 100;
-// Check if user exists by email (for Google auth)
 router.get("/check-email", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email } = req.query;
@@ -41,7 +40,6 @@ router.get("/check-email", (req, res) => __awaiter(void 0, void 0, void 0, funct
         res.status(500).json({ message: "Something went wrong!" });
     }
 }));
-// Get user by email (for Google auth)
 router.get("/by-email", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email } = req.query;
@@ -61,7 +59,6 @@ router.get("/by-email", (req, res) => __awaiter(void 0, void 0, void 0, function
         res.status(500).json({ message: "Something went wrong!" });
     }
 }));
-// Google signup with role selection
 router.post("/google-signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const parsedBody = types_1.GoogleSignupSchema.safeParse(req.body);
@@ -71,16 +68,13 @@ router.post("/google-signup", (req, res) => __awaiter(void 0, void 0, void 0, fu
                 .json({ message: "Invalid Input", error: parsedBody.error.errors });
         }
         const { email, name, image, role } = parsedBody.data;
-        // Check if user already exists
         const existingUser = yield db_1.prismaClient.user.findFirst({
             where: { email: email },
         });
         if (existingUser) {
             return res.status(409).json({ message: "User already exists" });
         }
-        // Generate username based on role
         const generateUsername = String(role + Math.floor(Math.random() * 1000000)).padStart(6, "7");
-        // Create new user
         const user = yield db_1.prismaClient.user.create({
             data: {
                 username: generateUsername,
@@ -89,7 +83,6 @@ router.post("/google-signup", (req, res) => __awaiter(void 0, void 0, void 0, fu
                 role: role,
             },
         });
-        // Generate JWT token
         const token = jsonwebtoken_1.default.sign({ id: user.id }, config_1.JWT_SECRET, { expiresIn: "7d" });
         res.json({
             message: "User created successfully",
