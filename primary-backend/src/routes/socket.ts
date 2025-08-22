@@ -71,15 +71,20 @@
               return;
             }
             const fullAlert = { ...alert, reportedBy: userId };
-            await producer.send({
-              topic: "emergency-alerts",
-              messages: [
-                {
-                  key: "alert",
-                  value: JSON.stringify(fullAlert),
-                },
-              ],
-            });
+            try {
+              await producer.send({
+                topic: "emergency-alerts",
+                messages: [
+                  {
+                    key: "alert",
+                    value: JSON.stringify(fullAlert),
+                  },
+                ],
+              });
+            } catch (error) {
+              console.log('⚠️ Kafka not available, storing alert directly');
+              await redisClient.set(`alert:${fullAlert.id}`, JSON.stringify(fullAlert));
+            }
 
             socket.send(
               JSON.stringify({
@@ -268,8 +273,9 @@
     }
   };
     (async () => {
-      await producer.connect();
-      await consumer.connect();
+      try {
+        await producer.connect();
+        await consumer.connect();
     await consumer.subscribe({
       topic: "emergency-alerts",
       fromBeginning: true,
@@ -349,5 +355,8 @@
             }
           },
       });
+      } catch (error) {
+        console.log('⚠️ Kafka not available, continuing without Kafka');
+      }
     })();
   };

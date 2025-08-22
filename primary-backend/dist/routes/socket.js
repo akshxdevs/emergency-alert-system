@@ -64,15 +64,21 @@ const setUpSocketServer = (server) => {
                         return;
                     }
                     const fullAlert = Object.assign(Object.assign({}, alert), { reportedBy: userId });
-                    yield producer_1.producer.send({
-                        topic: "emergency-alerts",
-                        messages: [
-                            {
-                                key: "alert",
-                                value: JSON.stringify(fullAlert),
-                            },
-                        ],
-                    });
+                    try {
+                        yield producer_1.producer.send({
+                            topic: "emergency-alerts",
+                            messages: [
+                                {
+                                    key: "alert",
+                                    value: JSON.stringify(fullAlert),
+                                },
+                            ],
+                        });
+                    }
+                    catch (error) {
+                        console.log('⚠️ Kafka not available, storing alert directly');
+                        yield init_1.redisClient.set(`alert:${fullAlert.id}`, JSON.stringify(fullAlert));
+                    }
                     socket.send(JSON.stringify({
                         type: "success",
                         message: "Emergency alert sent successfully",
@@ -230,76 +236,81 @@ const setUpSocketServer = (server) => {
         }
     });
     (() => __awaiter(void 0, void 0, void 0, function* () {
-        yield producer_1.producer.connect();
-        yield consumer_1.consumer.connect();
-        yield consumer_1.consumer.subscribe({
-            topic: "emergency-alerts",
-            fromBeginning: true,
-        });
-        yield consumer_1.consumer.subscribe({ topic: "alert-updates" });
-        yield consumer_1.consumer.run({
-            eachMessage: (_a) => __awaiter(void 0, [_a], void 0, function* ({ message, topic }) {
-                if (!message.value)
-                    return;
-                const alert = JSON.parse(message.value.toString());
-                if (topic === "emergency-alerts") {
-                    try {
-                        console.log("Processing emergency alert:", alert);
-                        yield init_1.redisClient.set(`alert:${alert.id}`, JSON.stringify(alert));
-                        const createAlert = yield db_1.prismaClient.emergency.create({
-                            data: {
-                                type: alert.type,
-                                reportedBy: alert.reportedBy,
-                                status: alert.status,
-                                assignedTo: alert.assignedTo,
-                                description: alert.description,
-                                priority: alert.priority,
-                                location: {
-                                    create: {
-                                        lat: alert.location.lat,
-                                        long: alert.location.long,
+        try {
+            yield producer_1.producer.connect();
+            yield consumer_1.consumer.connect();
+            yield consumer_1.consumer.subscribe({
+                topic: "emergency-alerts",
+                fromBeginning: true,
+            });
+            yield consumer_1.consumer.subscribe({ topic: "alert-updates" });
+            yield consumer_1.consumer.run({
+                eachMessage: (_a) => __awaiter(void 0, [_a], void 0, function* ({ message, topic }) {
+                    if (!message.value)
+                        return;
+                    const alert = JSON.parse(message.value.toString());
+                    if (topic === "emergency-alerts") {
+                        try {
+                            console.log("Processing emergency alert:", alert);
+                            yield init_1.redisClient.set(`alert:${alert.id}`, JSON.stringify(alert));
+                            const createAlert = yield db_1.prismaClient.emergency.create({
+                                data: {
+                                    type: alert.type,
+                                    reportedBy: alert.reportedBy,
+                                    status: alert.status,
+                                    assignedTo: alert.assignedTo,
+                                    description: alert.description,
+                                    priority: alert.priority,
+                                    location: {
+                                        create: {
+                                            lat: alert.location.lat,
+                                            long: alert.location.long,
+                                        },
                                     },
                                 },
-                            },
-                        });
-                        console.log("Alert created in DB:", createAlert);
-                        if (alert.priority === "HIGH") {
-                            console.log("Broadcasting HIGH_PRIORITY_ALERT to all clients");
-                            broadcast({ type: "HIGH_PRIORITY_ALERT", payload: createAlert });
+                            });
+                            console.log("Alert created in DB:", createAlert);
+                            if (alert.priority === "HIGH") {
+                                console.log("Broadcasting HIGH_PRIORITY_ALERT to all clients");
+                                broadcast({ type: "HIGH_PRIORITY_ALERT", payload: createAlert });
+                            }
+                            console.log(`Broadcasting ${alert.type} alert to ${alert.assignedTo} role`);
+                            roleBroadcast(alert.assignedTo, {
+                                type: alert.type,
+                                payload: Object.assign(Object.assign({}, createAlert), { location: [
+                                        {
+                                            lat: alert.location.lat,
+                                            long: alert.location.long,
+                                        },
+                                    ] }),
+                            });
                         }
-                        console.log(`Broadcasting ${alert.type} alert to ${alert.assignedTo} role`);
-                        roleBroadcast(alert.assignedTo, {
-                            type: alert.type,
-                            payload: Object.assign(Object.assign({}, createAlert), { location: [
-                                    {
-                                        lat: alert.location.lat,
-                                        long: alert.location.long,
-                                    },
-                                ] }),
-                        });
+                        catch (error) {
+                            console.error("Failed to store alert:", error);
+                        }
                     }
-                    catch (error) {
-                        console.error("Failed to store alert:", error);
+                    if (topic === "alert-updates") {
+                        try {
+                            console.log("entered updates");
+                            const { id, newStatus } = JSON.parse(message.value.toString());
+                            const updated = yield db_1.prismaClient.emergency.update({
+                                where: { id },
+                                data: { status: newStatus },
+                            });
+                            console.log("Prisma update successful:", updated);
+                            yield init_1.redisClient.set(`alert:${id}`, JSON.stringify(updated));
+                            broadcast({ type: "ALERT_UPDATED", payload: updated });
+                        }
+                        catch (error) {
+                            console.error("Prisma update failed:", error);
+                        }
                     }
-                }
-                if (topic === "alert-updates") {
-                    try {
-                        console.log("entered updates");
-                        const { id, newStatus } = JSON.parse(message.value.toString());
-                        const updated = yield db_1.prismaClient.emergency.update({
-                            where: { id },
-                            data: { status: newStatus },
-                        });
-                        console.log("Prisma update successful:", updated);
-                        yield init_1.redisClient.set(`alert:${id}`, JSON.stringify(updated));
-                        broadcast({ type: "ALERT_UPDATED", payload: updated });
-                    }
-                    catch (error) {
-                        console.error("Prisma update failed:", error);
-                    }
-                }
-            }),
-        });
+                }),
+            });
+        }
+        catch (error) {
+            console.log('⚠️ Kafka not available, continuing without Kafka');
+        }
     }))();
 };
 exports.setUpSocketServer = setUpSocketServer;
