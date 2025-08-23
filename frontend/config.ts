@@ -1,5 +1,5 @@
 export const BACKEND_URL =
-  process.env.BACKEND_URL || "http://localhost:5000/api/v1";
+  process.env.BACKEND_URL || "https://emergency-alert-system-bffp.onrender.com/api/v1";
 
 export const WS_URL =
-  process.env.WS_URL || "ws://localhost:5000";
+  process.env.WS_URL || "wss://emergency-alert-system-bffp.onrender.com";

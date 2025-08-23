@@ -21,7 +21,7 @@ const handler = NextAuth({
           console.log("Attempting credentials login for:", credentials?.email);
           
           const res = await axios.post(
-            "http://localhost:5000/api/v1/user/signin",
+            "https://emergency-alert-system-bffp.onrender.com/api/v1/user/signin",
             {
               email: credentials?.email,
               password: credentials?.password,
@@ -69,14 +69,14 @@ const handler = NextAuth({
       if (account?.provider === "google") {
         try {
           const existingUserResponse = await axios.get(
-            `http://localhost:5000/api/v1/user/check-email?email=${user.email}`
+            `https://emergency-alert-system-bffp.onrender.com/api/v1/user/check-email?email=${user.email}`
           );
 
           const { exists } = existingUserResponse.data;
 
           if (exists) {
             const userResponse = await axios.get(
-              `http://localhost:5000/api/v1/user/by-email?email=${user.email}`
+              `https://emergency-alert-system-bffp.onrender.com/api/v1/user/by-email?email=${user.email}`
             );
 
             const existingUser = userResponse.data.user;
