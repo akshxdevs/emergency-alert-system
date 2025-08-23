@@ -26,6 +26,7 @@ console.log("GOOGLE_CLIENT_SECRET:", process.env.GOOGLE_CLIENT_SECRET ? "Set" : 
 console.log("NEXTAUTH_URL:", NEXTAUTH_URL);
 console.log("NEXTAUTH_SECRET:", process.env.NEXTAUTH_SECRET ? "Set" : "Missing");
 
+// Force redeploy to load environment variables
 const handler = NextAuth({
   providers: [
     GoogleProvider({
