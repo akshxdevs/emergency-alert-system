@@ -12,18 +12,7 @@ import { useSession } from "next-auth/react";
 import { useParams } from "next/navigation";
 import { useEffect, useState, useCallback, useMemo } from "react";
 
-interface Alert {
-  id: string;
-  type: string;
-  reportedBy: string;
-  status: string;
-  assignedTo: string;
-  timeStamp: string;
-  description: string;
-  priority: string | number;
-  location: Array<{ lat: number; long: number }>;
-  autoDisappearAt?: number | null;
-}
+
 
 export default function HomePage() {
   const {data:session} = useSession();
@@ -98,7 +87,7 @@ export default function HomePage() {
 
   const handleConfirm = useCallback(async () => {
     const assignedTo = roleAssignedTo[hazardType] || "OTHER";
-    const alertPayload: Alert = {
+    const alertPayload = {
       id: `alert-${Date.now()}`,
       type: hazardType,
       reportedBy: userId || "anonymous",
@@ -107,10 +96,10 @@ export default function HomePage() {
       description: description,
       assignedTo: assignedTo,
       timeStamp: new Date().toISOString(),
-      location: [{
+      location: {
         lat: lat || 0,
         long: lng || 0,
-      }],
+      },
     };
     sendEmergency(alertPayload as unknown as Record<string, unknown>);
   }, [hazardType, priority, description, lat, lng, roleAssignedTo, sendEmergency, userId]);

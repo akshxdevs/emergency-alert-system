@@ -282,17 +282,60 @@ export function DashboardSocketComponent({
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const useEmergencySocket = (_userId: string, _userRole: string) => {
+export const useEmergencySocket = (userId: string, userRole: string) => {
+  const wsRef = useRef<WebSocket | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+
+  const connectWebSocket = useCallback(() => {
+    try {
+      const ws = new WebSocket(`${WS_URL}/${userId}/?${userRole}`);
+      wsRef.current = ws;
+
+      ws.onopen = () => {
+        setIsConnected(true);
+        console.log('Emergency socket connected');
+      };
+
+      ws.onclose = () => {
+        setIsConnected(false);
+        console.log('Emergency socket disconnected');
+      };
+
+      ws.onerror = (error) => {
+        console.error('Emergency socket error:', error);
+      };
+    } catch (error) {
+      console.error('Failed to connect emergency socket:', error);
+    }
+  }, [userId, userRole]);
+
+  useEffect(() => {
+    if (userId && userRole) {
+      connectWebSocket();
+    }
+
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+    };
+  }, [userId, userRole, connectWebSocket]);
+
   const sendMessage = useCallback((message: Record<string, unknown>) => {
-    console.log('Sending emergency message:', message);
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify(message));
+      console.log('Sent emergency message:', message);
+    } else {
+      console.error('WebSocket not connected. Message not sent:', message);
+    }
   }, []);
 
   const sendEmergency = useCallback((alert: Record<string, unknown>) => {
     sendMessage({
-      type: "REPORT_EMERGENCY",
+      type: "NEW_ALERT",
       payload: alert,
     });
   }, [sendMessage]);
 
-  return { sendEmergency };
+  return { sendEmergency, isConnected };
 };
