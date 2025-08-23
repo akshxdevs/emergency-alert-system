@@ -1,13 +1,4 @@
 "use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -24,13 +15,13 @@ const router = (0, express_1.Router)();
 const redis = new ioredis_1.default();
 const OTP_LIMIT = 3;
 const OTP_EXPIRY = 100;
-router.get("/check-email", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.get("/check-email", async (req, res) => {
     try {
         const { email } = req.query;
         if (!email || typeof email !== 'string') {
             return res.status(400).json({ message: "Email is required" });
         }
-        const existingUser = yield db_1.prismaClient.user.findFirst({
+        const existingUser = await db_1.prismaClient.user.findFirst({
             where: { email: email },
         });
         res.json({ exists: !!existingUser });
@@ -39,14 +30,14 @@ router.get("/check-email", (req, res) => __awaiter(void 0, void 0, void 0, funct
         console.error("Error checking email:", error);
         res.status(500).json({ message: "Something went wrong!" });
     }
-}));
-router.get("/by-email", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.get("/by-email", async (req, res) => {
     try {
         const { email } = req.query;
         if (!email || typeof email !== 'string') {
             return res.status(400).json({ message: "Email is required" });
         }
-        const user = yield db_1.prismaClient.user.findFirst({
+        const user = await db_1.prismaClient.user.findFirst({
             where: { email: email },
         });
         if (!user) {
@@ -58,8 +49,8 @@ router.get("/by-email", (req, res) => __awaiter(void 0, void 0, void 0, function
         console.error("Error fetching user:", error);
         res.status(500).json({ message: "Something went wrong!" });
     }
-}));
-router.post("/google-signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.post("/google-signup", async (req, res) => {
     try {
         const parsedBody = types_1.GoogleSignupSchema.safeParse(req.body);
         if (!parsedBody.success) {
@@ -68,14 +59,14 @@ router.post("/google-signup", (req, res) => __awaiter(void 0, void 0, void 0, fu
                 .json({ message: "Invalid Input", error: parsedBody.error.errors });
         }
         const { email, name, image, role } = parsedBody.data;
-        const existingUser = yield db_1.prismaClient.user.findFirst({
+        const existingUser = await db_1.prismaClient.user.findFirst({
             where: { email: email },
         });
         if (existingUser) {
             return res.status(409).json({ message: "User already exists" });
         }
         const generateUsername = String(role + Math.floor(Math.random() * 1000000)).padStart(6, "7");
-        const user = yield db_1.prismaClient.user.create({
+        const user = await db_1.prismaClient.user.create({
             data: {
                 username: generateUsername,
                 email: email,
@@ -99,8 +90,8 @@ router.post("/google-signup", (req, res) => __awaiter(void 0, void 0, void 0, fu
         console.error("Google signup error:", error);
         res.status(500).json({ message: "Something went wrong!" });
     }
-}));
-router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.post("/signup", async (req, res) => {
     try {
         const parsedBody = types_1.SigninSchema.safeParse(req.body);
         if (!parsedBody.success) {
@@ -110,7 +101,7 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
         }
         const { email, password, role, name } = parsedBody.data;
         const generateUsername = String(role + Math.floor(Math.random() * 1000000)).padStart(6, "7");
-        const existingUser = yield db_1.prismaClient.user.findFirst({
+        const existingUser = await db_1.prismaClient.user.findFirst({
             where: {
                 email: email,
             },
@@ -118,8 +109,8 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
         if (existingUser) {
             return res.status(402).send({ message: "User already exist" });
         }
-        const HashedPassword = yield bcrypt_1.default.hash(password, 10);
-        const user = yield db_1.prismaClient.user.create({
+        const HashedPassword = await bcrypt_1.default.hash(password, 10);
+        const user = await db_1.prismaClient.user.create({
             data: {
                 username: generateUsername,
                 email: email,
@@ -143,8 +134,8 @@ router.post("/signup", (req, res) => __awaiter(void 0, void 0, void 0, function*
         console.error(error);
         res.status(403).send({ message: "Something went wrong!" });
     }
-}));
-router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.post("/signin", async (req, res) => {
     try {
         console.log("Signin request received:", req.body);
         const parsedBody = types_1.LoginSchema.safeParse(req.body);
@@ -156,7 +147,7 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
         }
         const { email, password } = parsedBody.data;
         console.log("Looking for user with email:", email);
-        const user = yield db_1.prismaClient.user.findFirst({
+        const user = await db_1.prismaClient.user.findFirst({
             where: {
                 email,
             },
@@ -165,7 +156,7 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
         if (!user) {
             return res.status(401).send({ message: "Invalid Email Or Password!" });
         }
-        const passwordValidation = yield bcrypt_1.default.compare(password, user.password);
+        const passwordValidation = await bcrypt_1.default.compare(password, user.password);
         console.log("Password validation:", passwordValidation ? "Success" : "Failed");
         if (!passwordValidation) {
             return res.status(401).send({ message: "Password Mismatch!" });
@@ -191,18 +182,18 @@ router.post("/signin", (req, res) => __awaiter(void 0, void 0, void 0, function*
         console.error("Signin error:", error);
         res.status(403).send({ message: "Something went wrong!" });
     }
-}));
-router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.post("/login", async (req, res) => {
     try {
         const { phoneNo } = req.body;
         const generateOtp = String(Math.floor(Math.random() * 1000000)).padStart(6, "7");
         const optKey = `otp:${String(phoneNo)}`;
-        const otpReqCnts = yield redis.get(`otp_counts:${phoneNo}`);
+        const otpReqCnts = await redis.get(`otp_counts:${phoneNo}`);
         if (otpReqCnts && Number(otpReqCnts) >= OTP_LIMIT)
             return res.json({ message: "Too Many request!!" });
-        yield redis.setex(optKey, OTP_EXPIRY, generateOtp);
-        yield redis.incr(`otp_count:${phoneNo}`);
-        yield redis.expire(`opt_count:${phoneNo}`, OTP_EXPIRY);
+        await redis.setex(optKey, OTP_EXPIRY, generateOtp);
+        await redis.incr(`otp_count:${phoneNo}`);
+        await redis.expire(`opt_count:${phoneNo}`, OTP_EXPIRY);
         res.json({
             message: `Otp: ${generateOtp} Generated Sucessfully for ${phoneNo}`,
         });
@@ -210,8 +201,8 @@ router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* 
     catch (error) {
         res.status(411).json({ message: "Something Went Wrong!!" });
     }
-}));
-router.post("/login/customer/verify-otp", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+});
+router.post("/login/customer/verify-otp", async (req, res) => {
     try {
         const { phoneNo, userRole, otp, password, email } = req.body;
         const role = String(userRole).toLocaleLowerCase();
@@ -219,12 +210,12 @@ router.post("/login/customer/verify-otp", (req, res) => __awaiter(void 0, void 0
         if (!phoneNo || !otp) {
             return res.status(403).json({ message: "Invalid inputs!" });
         }
-        const storedOtp = yield redis.get(`otp:${phoneNo}`);
+        const storedOtp = await redis.get(`otp:${phoneNo}`);
         console.log(storedOtp);
         if (!storedOtp || storedOtp !== otp) {
             return res.status(401).json({ message: "Invalid or expired OTP!" });
         }
-        const existingUser = yield db_1.prismaClient.user.findFirst({
+        const existingUser = await db_1.prismaClient.user.findFirst({
             where: {
                 phoneNo: phoneNo,
             },
@@ -232,10 +223,10 @@ router.post("/login/customer/verify-otp", (req, res) => __awaiter(void 0, void 0
         console.log(userRole);
         if (existingUser) {
             const userToken = jsonwebtoken_1.default.sign({
-                id: existingUser === null || existingUser === void 0 ? void 0 : existingUser.id,
+                id: existingUser?.id,
             }, config_1.JWT_SECRET, { expiresIn: "7d" });
-            yield redis.del(`otp:${phoneNo}`);
-            yield redis.del(`otp_count:${phoneNo}`);
+            await redis.del(`otp:${phoneNo}`);
+            await redis.del(`otp_count:${phoneNo}`);
             res.json({
                 message: "User Login Successfully!",
                 token: userToken,
@@ -243,8 +234,8 @@ router.post("/login/customer/verify-otp", (req, res) => __awaiter(void 0, void 0
             });
         }
         if (!existingUser) {
-            const hashedPassword = yield bcrypt_1.default.hash(password, 10);
-            const user = yield db_1.prismaClient.user.create({
+            const hashedPassword = await bcrypt_1.default.hash(password, 10);
+            const user = await db_1.prismaClient.user.create({
                 data: {
                     username: generateUsername,
                     email: email,
@@ -255,8 +246,8 @@ router.post("/login/customer/verify-otp", (req, res) => __awaiter(void 0, void 0
             const token = jsonwebtoken_1.default.sign({
                 id: user.id,
             }, config_1.JWT_SECRET, { expiresIn: "7d" });
-            yield redis.del(`otp:${phoneNo}`);
-            yield redis.del(`otp_count:${phoneNo}`);
+            await redis.del(`otp:${phoneNo}`);
+            await redis.del(`otp_count:${phoneNo}`);
             return res.json({
                 message: "User Login Successfully!",
                 token: token,
@@ -267,5 +258,5 @@ router.post("/login/customer/verify-otp", (req, res) => __awaiter(void 0, void 0
     catch (error) {
         res.status(411).json({ message: "Something Went Wrong!!" });
     }
-}));
+});
 exports.userRouter = router;

@@ -1,4 +1,4 @@
-import { Router } from "express";
+import { Router, Request, Response } from "express";
 import Redis from "ioredis";
 import jwt from "jsonwebtoken";
 import { prismaClient } from "../db/db";
@@ -11,7 +11,7 @@ const redis = new Redis();
 const OTP_LIMIT = 3;
 const OTP_EXPIRY = 100;
 
-router.get("/check-email", async (req, res) => {
+router.get("/check-email", async (req: Request, res: Response) => {
   try {
     const { email } = req.query;
     
@@ -30,7 +30,7 @@ router.get("/check-email", async (req, res) => {
   }
 });
 
-router.get("/by-email", async (req, res) => {
+router.get("/by-email", async (req: Request, res: Response) => {
   try {
     const { email } = req.query;
     
@@ -53,7 +53,7 @@ router.get("/by-email", async (req, res) => {
   }
 });
 
-router.post("/google-signup", async (req, res) => {
+router.post("/google-signup", async (req: Request, res: Response) => {
   try {
     const parsedBody = GoogleSignupSchema.safeParse(req.body);
     
@@ -108,7 +108,7 @@ router.post("/google-signup", async (req, res) => {
   }
 });
 
-router.post("/signup", async (req, res) => {
+router.post("/signup", async (req: Request, res: Response) => {
   try {
     const parsedBody = SigninSchema.safeParse(req.body);
 
@@ -155,7 +155,7 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-router.post("/signin", async (req, res) => {
+router.post("/signin", async (req: Request, res: Response) => {
   try {
     console.log("Signin request received:", req.body);
     
@@ -215,7 +215,7 @@ router.post("/signin", async (req, res) => {
     res.status(403).send({ message: "Something went wrong!" });
   }
 });
-router.post("/login", async (req, res) => {
+router.post("/login", async (req: Request, res: Response) => {
   try {
     const { phoneNo } = req.body;
     const generateOtp: string = String(
@@ -235,7 +235,7 @@ router.post("/login", async (req, res) => {
     res.status(411).json({ message: "Something Went Wrong!!" });
   }
 });
-router.post("/login/customer/verify-otp", async (req, res) => {
+router.post("/login/customer/verify-otp", async (req: Request, res: Response) => {
   try {
     const { phoneNo, userRole, otp, password, email } = req.body;
     const role = String(userRole).toLocaleLowerCase();
