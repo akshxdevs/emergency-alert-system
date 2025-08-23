@@ -1,5 +1,6 @@
   import { WebSocket, WebSocketServer } from "ws";
-  import { Server as httpServer } from "http";
+  import { Server as httpServer, IncomingMessage } from "http";
+  import { Socket } from "net";
   import { producer } from "./kafka/producer";
   import { consumer } from "./kafka/consumer";
   import { redisClient } from "./redis/init";
@@ -12,7 +13,7 @@
   export const setUpSocketServer = (server: httpServer) => {
     const wss = new WebSocketServer({ noServer: true });
 
-    server.on("upgrade", (req, socket, head) => {
+    server.on("upgrade", (req: IncomingMessage, socket: Socket, head: Buffer) => {
       const userId = req.url?.split("/")[1] as string;
       const userRole = req.url?.split("/?")[1] as string;
       if (!userId || !userRole) {
@@ -20,7 +21,7 @@
         return;
       }
 
-      wss.handleUpgrade(req, socket, head, (ws) => {
+      wss.handleUpgrade(req, socket, head, (ws: WebSocket) => {
         wss.emit("connection", ws, userId, userRole);
       });
     });
@@ -54,7 +55,7 @@
         sendPendingAlerts(socket, userRole);
       }
 
-      socket.on("message", async (messages) => {
+      socket.on("message", async (messages: WebSocket.Data) => {
         try {
           const data = JSON.parse(messages.toString());
 
