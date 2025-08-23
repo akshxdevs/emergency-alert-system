@@ -66,12 +66,12 @@ const setUpSocketServer = (server) => {
                             });
                         }
                         catch (error) {
-                            console.log('⚠️ Kafka not available, storing alert directly');
+                            console.log('Kafka not available, storing alert directly');
                             await init_1.redisClient.set(`alert:${fullAlert.id}`, JSON.stringify(fullAlert));
                         }
                     }
                     else {
-                        console.log('⚠️ Kafka producer not available, storing alert directly');
+                        console.log('Kafka producer not available, storing alert directly');
                         await init_1.redisClient.set(`alert:${fullAlert.id}`, JSON.stringify(fullAlert));
                     }
                     socket.send(JSON.stringify({
@@ -239,7 +239,7 @@ const setUpSocketServer = (server) => {
     (async () => {
         try {
             if (!producer_1.producer || !consumer_1.consumer) {
-                console.log('⚠️ Kafka not available - no valid credentials provided');
+                console.log('Kafka not available - no valid credentials provided');
                 return;
             }
             await producer_1.producer.connect();
@@ -253,8 +253,8 @@ const setUpSocketServer = (server) => {
             }
             catch (subscribeError) {
                 if (subscribeError.type === 'TOPIC_AUTHORIZATION_FAILED') {
-                    console.log('⚠️ Topic subscription failed - topics may not exist or insufficient permissions');
-                    console.log('ℹ️ Application will continue without Kafka consumer');
+                    console.log('Topic subscription failed - topics may not exist or insufficient permissions');
+                    console.log('Application will continue without Kafka consumer');
                     return;
                 }
                 throw subscribeError;
@@ -326,10 +326,10 @@ const setUpSocketServer = (server) => {
                 },
             });
             kafkaAvailable = true;
-            console.log('✅ Kafka consumer initialized successfully');
+            console.log('Kafka consumer initialized successfully');
         }
         catch (error) {
-            console.log('⚠️ Kafka not available, continuing without Kafka');
+            console.log('Kafka not available, continuing without Kafka');
             console.error('Kafka error:', error);
         }
     })();

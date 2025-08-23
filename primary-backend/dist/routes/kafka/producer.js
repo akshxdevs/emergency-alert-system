@@ -36,15 +36,15 @@ if (hasValidCredentials) {
 exports.producer = producerInstance;
 const initializeProducer = async () => {
     if (!exports.producer) {
-        console.log('⚠️ Kafka producer not available - no valid credentials provided');
+        console.log('Kafka producer not available - no valid credentials provided');
         return;
     }
     try {
         await exports.producer.connect();
-        console.log('✅ Connected to RedPanda Kafka producer');
+        console.log('Connected to RedPanda Kafka producer');
     }
     catch (error) {
-        console.log('❌ RedPanda Kafka producer not available, continuing without Kafka');
+        console.log('RedPanda Kafka producer not available, continuing without Kafka');
         console.error('Kafka producer error:', error);
     }
 };
