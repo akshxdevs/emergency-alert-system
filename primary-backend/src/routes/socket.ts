@@ -84,12 +84,98 @@
                   ],
                 });
               } catch (error) {
-                console.log('Kafka not available, storing alert directly');
+                console.log('Kafka not available, storing alert directly to database');
                 await redisClient.set(`alert:${fullAlert.id}`, JSON.stringify(fullAlert));
+                
+                // Save directly to database when Kafka fails
+                try {
+                  const createAlert = await prismaClient.emergency.create({
+                    data: {
+                      type: fullAlert.type,
+                      reportedBy: fullAlert.reportedBy,
+                      status: fullAlert.status,
+                      assignedTo: fullAlert.assignedTo,
+                      description: fullAlert.description,
+                      priority: fullAlert.priority,
+                      location: {
+                        create: {
+                          lat: fullAlert.location.lat,
+                          long: fullAlert.location.long,
+                        },
+                      },
+                    },
+                  });
+                  
+                  console.log("Alert created directly in DB (Kafka failed):", createAlert);
+                  
+                  if (fullAlert.priority === "HIGH") {
+                    console.log("Broadcasting HIGH_PRIORITY_ALERT to all clients");
+                    broadcast({ type: "HIGH_PRIORITY_ALERT", payload: createAlert });
+                  }
+                  
+                  console.log(`Broadcasting ${fullAlert.type} alert to ${fullAlert.assignedTo} role`);
+                  roleBroadcast(fullAlert.assignedTo, {
+                    type: fullAlert.type,
+                    payload: {
+                      ...createAlert,
+                      location: [
+                        {
+                          lat: fullAlert.location.lat,
+                          long: fullAlert.location.long,
+                        },
+                      ],
+                    },
+                  });
+                } catch (dbError) {
+                  console.error("Failed to save alert directly to database after Kafka failure:", dbError);
+                }
               }
             } else {
-              console.log('Kafka producer not available, storing alert directly');
+              console.log('Kafka producer not available, storing alert directly to database');
               await redisClient.set(`alert:${fullAlert.id}`, JSON.stringify(fullAlert));
+              
+              // Save directly to database when Kafka is not available
+              try {
+                const createAlert = await prismaClient.emergency.create({
+                  data: {
+                    type: fullAlert.type,
+                    reportedBy: fullAlert.reportedBy,
+                    status: fullAlert.status,
+                    assignedTo: fullAlert.assignedTo,
+                    description: fullAlert.description,
+                    priority: fullAlert.priority,
+                    location: {
+                      create: {
+                        lat: fullAlert.location.lat,
+                        long: fullAlert.location.long,
+                      },
+                    },
+                  },
+                });
+                
+                console.log("Alert created directly in DB:", createAlert);
+                
+                if (fullAlert.priority === "HIGH") {
+                  console.log("Broadcasting HIGH_PRIORITY_ALERT to all clients");
+                  broadcast({ type: "HIGH_PRIORITY_ALERT", payload: createAlert });
+                }
+                
+                console.log(`Broadcasting ${fullAlert.type} alert to ${fullAlert.assignedTo} role`);
+                roleBroadcast(fullAlert.assignedTo, {
+                  type: fullAlert.type,
+                  payload: {
+                    ...createAlert,
+                    location: [
+                      {
+                        lat: fullAlert.location.lat,
+                        long: fullAlert.location.long,
+                      },
+                    ],
+                  },
+                });
+              } catch (dbError) {
+                console.error("Failed to save alert directly to database:", dbError);
+              }
             }
 
             socket.send(
