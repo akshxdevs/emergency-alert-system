@@ -208,7 +208,7 @@ const setUpSocketServer = (server) => {
                 pendingAlerts.forEach((alert) => {
                     const alertWithLocation = {
                         ...alert,
-                        location: alert.location.map(loc => ({
+                        location: alert.location.map((loc) => ({
                             lat: loc.lat,
                             long: loc.long,
                         })),

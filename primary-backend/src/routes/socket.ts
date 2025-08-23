@@ -29,17 +29,17 @@
   wss.on(
     "connection",
     (socket: WebSocket, userId: string, userRole: string) => {
-      console.log(`🔌 New connection: userId=${userId}, userRole=${userRole}`);
+      console.log(`New connection: userId=${userId}, userRole=${userRole}`);
 
       clients.set(userId, socket);
       if (!roleClients.has(userRole)) {
         roleClients.set(userRole, new Set<WebSocket>());
-        console.log(`📝 Created new role group for: ${userRole}`);
+        console.log(`Created new role group for: ${userRole}`);
       }
       roleClients.get(userRole)?.add(socket);
-      console.log(`✅ Added client to role group: ${userRole}`);
+      console.log(`Added client to role group: ${userRole}`);
       console.log(
-        `📊 Total clients for role ${userRole}: ${
+        `Total clients for role ${userRole}: ${
           roleClients.get(userRole)?.size
         }`
       );
@@ -55,7 +55,7 @@
         sendPendingAlerts(socket, userRole);
       }
 
-      socket.on("message", async (messages: WebSocket.Data) => {
+      socket.on("message", async (messages: Buffer) => {
         try {
           const data = JSON.parse(messages.toString());
 
@@ -83,7 +83,7 @@
                 ],
               });
             } catch (error) {
-              console.log('⚠️ Kafka not available, storing alert directly');
+              console.log('Kafka not available, storing alert directly');
               await redisClient.set(`alert:${fullAlert.id}`, JSON.stringify(fullAlert));
             }
 
@@ -172,7 +172,7 @@
   );
     function broadcast(data: any) {
       const payload = JSON.stringify(data);
-      wss.clients.forEach((client) => {
+      wss.clients.forEach((client: WebSocket) => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(payload);
         }
@@ -182,27 +182,27 @@
       const payload = JSON.stringify(data);
       const sockets = roleClients.get(role);
 
-    console.log(`🔍 RoleBroadcast called for role: ${role}`);
-    console.log(`🔍 Available roles: ${Array.from(roleClients.keys())}`);
-    console.log(`🔍 Sockets for role ${role}:`, sockets ? sockets.size : 0);
+    console.log(`RoleBroadcast called for role: ${role}`);
+    console.log(`Available roles: ${Array.from(roleClients.keys())}`);
+    console.log(`Sockets for role ${role}:`, sockets ? sockets.size : 0);
 
     if (!sockets) {
-      console.log(`❌ No sockets found for role: ${role}`);
+      console.log(`No sockets found for role: ${role}`);
       return;
     }
 
     let sentCount = 0;
-      sockets.forEach((client) => {
+      sockets.forEach((client: WebSocket) => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(payload);
         sentCount++;
-        console.log(`✅ Sent alert to ${role} client`);
+        console.log(`Sent alert to ${role} client`);
       } else {
-        console.log(`❌ Client not ready, state: ${client.readyState}`);
+        console.log(`Client not ready, state: ${client.readyState}`);
         }
       });
 
-    console.log(`📊 Sent alert to ${sentCount} ${role} clients`);
+    console.log(`Sent alert to ${sentCount} ${role} clients`);
     }
   const updateAlertStatus = async (
     alertId: string,
@@ -246,12 +246,12 @@
       });
 
       if (pendingAlerts.length > 0) {
-        console.log(`📋 Sending ${pendingAlerts.length} pending alerts to ${userRole} dashboard`);
+        console.log(`Sending ${pendingAlerts.length} pending alerts to ${userRole} dashboard`);
         
         pendingAlerts.forEach((alert) => {
           const alertWithLocation = {
             ...alert,
-            location: alert.location.map(loc => ({
+            location: alert.location.map((loc: any) => ({
               lat: loc.lat,
               long: loc.long,
             })),
@@ -267,7 +267,7 @@
           );
         });
       } else {
-        console.log(`📋 No pending alerts found for ${userRole} dashboard`);
+        console.log(`No pending alerts found for ${userRole} dashboard`);
       }
     } catch (err) {
       console.error("Failed to send pending alerts:", err);
@@ -284,7 +284,7 @@
     await consumer.subscribe({ topic: "alert-updates" });
 
       await consumer.run({
-        eachMessage: async ({ message, topic }) => {
+        eachMessage: async ({ message, topic }: { message: any; topic: string }) => {
           if (!message.value) return;
           const alert = JSON.parse(message.value.toString());
 
@@ -357,7 +357,7 @@
           },
       });
       } catch (error) {
-        console.log('⚠️ Kafka not available, continuing without Kafka');
+        console.log('Kafka not available, continuing without Kafka');
       }
     })();
   };

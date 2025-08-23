@@ -12,8 +12,8 @@ exports.redisClient = new ioredis_1.default(redisUrl, {
     }
 });
 exports.redisClient.on('connect', () => {
-    console.log('✅ Connected to Upstash Redis');
+    console.log('Connected to Upstash Redis');
 });
 exports.redisClient.on('error', (err) => {
-    console.error('❌ Redis connection error:', err);
+    console.error('Redis connection error:', err);
 });
