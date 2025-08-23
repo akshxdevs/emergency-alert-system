@@ -4,14 +4,27 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
 import { NEXTAUTH_URL } from "../../../../config";
 
-// Debug environment variables in development
-if (process.env.NODE_ENV === "development") {
-  console.log("NextAuth Configuration:");
-  console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID ? "Set" : "Missing");
-  console.log("GOOGLE_CLIENT_SECRET:", process.env.GOOGLE_CLIENT_SECRET ? "Set" : "Missing");
-  console.log("NEXTAUTH_URL:", NEXTAUTH_URL);
-  console.log("NEXTAUTH_SECRET:", process.env.NEXTAUTH_SECRET ? "Set" : "Missing");
+// Validate required environment variables
+const requiredEnvVars = {
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+  NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+};
+
+const missingVars = Object.entries(requiredEnvVars)
+  .filter(([key, value]) => !value)
+  .map(([key]) => key);
+
+if (missingVars.length > 0) {
+  console.error('Missing required environment variables:', missingVars);
 }
+
+// Debug environment variables
+console.log("NextAuth Configuration Check:");
+console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID ? "Set" : "Missing");
+console.log("GOOGLE_CLIENT_SECRET:", process.env.GOOGLE_CLIENT_SECRET ? "Set" : "Missing");
+console.log("NEXTAUTH_URL:", NEXTAUTH_URL);
+console.log("NEXTAUTH_SECRET:", process.env.NEXTAUTH_SECRET ? "Set" : "Missing");
 
 const handler = NextAuth({
   providers: [
@@ -65,7 +78,7 @@ const handler = NextAuth({
     strategy: "jwt",
   },
 
-  debug: process.env.NODE_ENV === "development",
+  debug: true,
 
   callbacks: {
     async signIn({ user, account }) {
