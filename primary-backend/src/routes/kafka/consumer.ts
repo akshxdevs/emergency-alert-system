@@ -4,21 +4,25 @@ const kafkaBrokers = process.env.KAFKA_BROKERS?.split(',') || ['d2ka4bpmodb6qsnj
 
 const saslMechanism = process.env.KAFKA_SASL_MECHANISM || 'scram-sha-256';
 
+// Only create Kafka instance if credentials are provided
+const kafkaUsername = process.env.KAFKA_USERNAME;
+const kafkaPassword = process.env.KAFKA_PASSWORD;
+
 const kafka = new Kafka({
     clientId: 'emergency-alert-service',
     brokers: kafkaBrokers,
     ssl: {},
-    sasl: saslMechanism === 'scram-sha-256' 
+    sasl: kafkaUsername && kafkaPassword ? (saslMechanism === 'scram-sha-256' 
         ? {
             mechanism: 'scram-sha-256',
-            username: process.env.KAFKA_USERNAME || '',
-            password: process.env.KAFKA_PASSWORD || ''
+            username: kafkaUsername,
+            password: kafkaPassword
         }
         : {
             mechanism: 'scram-sha-512',
-            username: process.env.KAFKA_USERNAME || '',
-            password: process.env.KAFKA_PASSWORD || ''
-        }
+            username: kafkaUsername,
+            password: kafkaPassword
+        }) : undefined
 });
 
 export const consumer = kafka.consumer({ groupId: 'alert-group' });

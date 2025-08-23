@@ -23,15 +23,15 @@ const setUpSocketServer = (server) => {
         });
     });
     wss.on("connection", (socket, userId, userRole) => {
-        console.log(`🔌 New connection: userId=${userId}, userRole=${userRole}`);
+        console.log(`New connection: userId=${userId}, userRole=${userRole}`);
         clients.set(userId, socket);
         if (!roleClients.has(userRole)) {
             roleClients.set(userRole, new Set());
-            console.log(`📝 Created new role group for: ${userRole}`);
+            console.log(`Created new role group for: ${userRole}`);
         }
         roleClients.get(userRole)?.add(socket);
-        console.log(`✅ Added client to role group: ${userRole}`);
-        console.log(`📊 Total clients for role ${userRole}: ${roleClients.get(userRole)?.size}`);
+        console.log(`Added client to role group: ${userRole}`);
+        console.log(`Total clients for role ${userRole}: ${roleClients.get(userRole)?.size}`);
         socket.send(JSON.stringify({
             type: `welcome ${userId}`,
             message: `Connected to Emergency Alert WS`,
@@ -65,7 +65,7 @@ const setUpSocketServer = (server) => {
                         });
                     }
                     catch (error) {
-                        console.log('⚠️ Kafka not available, storing alert directly');
+                        console.log('Kafka not available, storing alert directly');
                         await init_1.redisClient.set(`alert:${fullAlert.id}`, JSON.stringify(fullAlert));
                     }
                     socket.send(JSON.stringify({
@@ -144,11 +144,11 @@ const setUpSocketServer = (server) => {
     function roleBroadcast(role, data) {
         const payload = JSON.stringify(data);
         const sockets = roleClients.get(role);
-        console.log(`🔍 RoleBroadcast called for role: ${role}`);
-        console.log(`🔍 Available roles: ${Array.from(roleClients.keys())}`);
-        console.log(`🔍 Sockets for role ${role}:`, sockets ? sockets.size : 0);
+        console.log(`RoleBroadcast called for role: ${role}`);
+        console.log(`Available roles: ${Array.from(roleClients.keys())}`);
+        console.log(`Sockets for role ${role}:`, sockets ? sockets.size : 0);
         if (!sockets) {
-            console.log(`❌ No sockets found for role: ${role}`);
+            console.log(`No sockets found for role: ${role}`);
             return;
         }
         let sentCount = 0;
@@ -156,13 +156,13 @@ const setUpSocketServer = (server) => {
             if (client.readyState === ws_1.WebSocket.OPEN) {
                 client.send(payload);
                 sentCount++;
-                console.log(`✅ Sent alert to ${role} client`);
+                console.log(`Sent alert to ${role} client`);
             }
             else {
-                console.log(`❌ Client not ready, state: ${client.readyState}`);
+                console.log(`Client not ready, state: ${client.readyState}`);
             }
         });
-        console.log(`📊 Sent alert to ${sentCount} ${role} clients`);
+        console.log(`Sent alert to ${sentCount} ${role} clients`);
     }
     const updateAlertStatus = async (alertId, newStatus) => {
         try {
@@ -204,7 +204,7 @@ const setUpSocketServer = (server) => {
                 },
             });
             if (pendingAlerts.length > 0) {
-                console.log(`📋 Sending ${pendingAlerts.length} pending alerts to ${userRole} dashboard`);
+                console.log(`Sending ${pendingAlerts.length} pending alerts to ${userRole} dashboard`);
                 pendingAlerts.forEach((alert) => {
                     const alertWithLocation = {
                         ...alert,
@@ -222,13 +222,14 @@ const setUpSocketServer = (server) => {
                 });
             }
             else {
-                console.log(`📋 No pending alerts found for ${userRole} dashboard`);
+                console.log(`No pending alerts found for ${userRole} dashboard`);
             }
         }
         catch (err) {
             console.error("Failed to send pending alerts:", err);
         }
     };
+    let kafkaAvailable = false;
     (async () => {
         try {
             await producer_1.producer.connect();
@@ -304,9 +305,12 @@ const setUpSocketServer = (server) => {
                     }
                 },
             });
+            kafkaAvailable = true;
+            console.log('✅ Kafka consumer initialized successfully');
         }
         catch (error) {
             console.log('⚠️ Kafka not available, continuing without Kafka');
+            console.error('Kafka error:', error);
         }
     })();
 };

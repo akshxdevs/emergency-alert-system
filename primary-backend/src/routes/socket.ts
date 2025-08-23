@@ -273,18 +273,19 @@
       console.error("Failed to send pending alerts:", err);
     }
   };
+    let kafkaAvailable = false;
     (async () => {
       try {
         await producer.connect();
         await consumer.connect();
-    await consumer.subscribe({
-      topic: "emergency-alerts",
-      fromBeginning: true,
-    });
-    await consumer.subscribe({ topic: "alert-updates" });
+        await consumer.subscribe({
+          topic: "emergency-alerts",
+          fromBeginning: true,
+        });
+        await consumer.subscribe({ topic: "alert-updates" });
 
-      await consumer.run({
-        eachMessage: async ({ message, topic }: { message: any; topic: string }) => {
+        await consumer.run({
+          eachMessage: async ({ message, topic }: { message: any; topic: string }) => {
           if (!message.value) return;
           const alert = JSON.parse(message.value.toString());
 
@@ -356,8 +357,11 @@
             }
           },
       });
+        kafkaAvailable = true;
+        console.log('✅ Kafka consumer initialized successfully');
       } catch (error) {
-        console.log('Kafka not available, continuing without Kafka');
+        console.log('⚠️ Kafka not available, continuing without Kafka');
+        console.error('Kafka error:', error);
       }
     })();
   };
