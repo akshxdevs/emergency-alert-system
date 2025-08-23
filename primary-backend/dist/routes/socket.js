@@ -53,19 +53,25 @@ const setUpSocketServer = (server) => {
                         return;
                     }
                     const fullAlert = { ...alert, reportedBy: userId };
-                    try {
-                        await producer_1.producer.send({
-                            topic: "emergency-alerts",
-                            messages: [
-                                {
-                                    key: "alert",
-                                    value: JSON.stringify(fullAlert),
-                                },
-                            ],
-                        });
+                    if (producer_1.producer) {
+                        try {
+                            await producer_1.producer.send({
+                                topic: "emergency-alerts",
+                                messages: [
+                                    {
+                                        key: "alert",
+                                        value: JSON.stringify(fullAlert),
+                                    },
+                                ],
+                            });
+                        }
+                        catch (error) {
+                            console.log('⚠️ Kafka not available, storing alert directly');
+                            await init_1.redisClient.set(`alert:${fullAlert.id}`, JSON.stringify(fullAlert));
+                        }
                     }
-                    catch (error) {
-                        console.log('Kafka not available, storing alert directly');
+                    else {
+                        console.log('⚠️ Kafka producer not available, storing alert directly');
                         await init_1.redisClient.set(`alert:${fullAlert.id}`, JSON.stringify(fullAlert));
                     }
                     socket.send(JSON.stringify({
@@ -232,13 +238,27 @@ const setUpSocketServer = (server) => {
     let kafkaAvailable = false;
     (async () => {
         try {
+            if (!producer_1.producer || !consumer_1.consumer) {
+                console.log('⚠️ Kafka not available - no valid credentials provided');
+                return;
+            }
             await producer_1.producer.connect();
             await consumer_1.consumer.connect();
-            await consumer_1.consumer.subscribe({
-                topic: "emergency-alerts",
-                fromBeginning: true,
-            });
-            await consumer_1.consumer.subscribe({ topic: "alert-updates" });
+            try {
+                await consumer_1.consumer.subscribe({
+                    topic: "emergency-alerts",
+                    fromBeginning: true,
+                });
+                await consumer_1.consumer.subscribe({ topic: "alert-updates" });
+            }
+            catch (subscribeError) {
+                if (subscribeError.type === 'TOPIC_AUTHORIZATION_FAILED') {
+                    console.log('⚠️ Topic subscription failed - topics may not exist or insufficient permissions');
+                    console.log('ℹ️ Application will continue without Kafka consumer');
+                    return;
+                }
+                throw subscribeError;
+            }
             await consumer_1.consumer.run({
                 eachMessage: async ({ message, topic }) => {
                     if (!message.value)

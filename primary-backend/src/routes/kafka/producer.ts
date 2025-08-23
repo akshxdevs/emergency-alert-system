@@ -8,26 +8,43 @@ const saslMechanism = process.env.KAFKA_SASL_MECHANISM || 'scram-sha-256';
 const kafkaUsername = process.env.KAFKA_USERNAME;
 const kafkaPassword = process.env.KAFKA_PASSWORD;
 
-const kafka = new Kafka({
-    clientId: 'emergency-alerts',
-    brokers: kafkaBrokers,
-    ssl: {},
-    sasl: kafkaUsername && kafkaPassword ? (saslMechanism === 'scram-sha-256' 
-        ? {
-            mechanism: 'scram-sha-256',
-            username: kafkaUsername,
-            password: kafkaPassword
-        }
-        : {
-            mechanism: 'scram-sha-512',
-            username: kafkaUsername,
-            password: kafkaPassword
-        }) : undefined
-});
+// Check if credentials are properly set (not placeholder values)
+const hasValidCredentials = kafkaUsername && 
+                           kafkaPassword && 
+                           kafkaUsername !== 'your_username' && 
+                           kafkaPassword !== 'your_password';
 
-export const producer = kafka.producer();
+let kafka: Kafka | null = null;
+let producerInstance: any = null;
+
+if (hasValidCredentials) {
+    kafka = new Kafka({
+        clientId: 'emergency-alerts',
+        brokers: kafkaBrokers,
+        ssl: {},
+        sasl: saslMechanism === 'scram-sha-256' 
+            ? {
+                mechanism: 'scram-sha-256',
+                username: kafkaUsername,
+                password: kafkaPassword
+            }
+            : {
+                mechanism: 'scram-sha-512',
+                username: kafkaUsername,
+                password: kafkaPassword
+            }
+    });
+    producerInstance = kafka.producer();
+}
+
+export const producer = producerInstance;
 
 export const initializeProducer = async () => {
+    if (!producer) {
+        console.log('Kafka producer not available - no valid credentials provided');
+        return;
+    }
+    
     try {
         await producer.connect();
         console.log('Connected to RedPanda Kafka producer');

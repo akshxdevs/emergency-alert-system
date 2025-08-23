@@ -4,9 +4,11 @@ import cors from "cors";
 import { PORT } from "./config";
 import { setUpSocketServer } from "./routes/socket";
 import { userRouter } from "./routes/user";
-import { initializeAdmin } from "./routes/kafka/admin";
 import { initializeProducer } from "./routes/kafka/producer";
 import { initializeConsumer } from "./routes/kafka/consumer";
+
+// Suppress KafkaJS partitioner warning
+process.env.KAFKAJS_NO_PARTITIONER_WARNING = "1";
 
 const app = express();
 
@@ -20,7 +22,6 @@ setUpSocketServer(server);
 
 // Initialize RedPanda Kafka connections
 const initializeKafka = async () => {
-    await initializeAdmin();
     await initializeProducer();
     await initializeConsumer();
 };

@@ -72,18 +72,23 @@
               return;
             }
             const fullAlert = { ...alert, reportedBy: userId };
-            try {
-              await producer.send({
-                topic: "emergency-alerts",
-                messages: [
-                  {
-                    key: "alert",
-                    value: JSON.stringify(fullAlert),
-                  },
-                ],
-              });
-            } catch (error) {
-              console.log('Kafka not available, storing alert directly');
+            if (producer) {
+              try {
+                await producer.send({
+                  topic: "emergency-alerts",
+                  messages: [
+                    {
+                      key: "alert",
+                      value: JSON.stringify(fullAlert),
+                    },
+                  ],
+                });
+              } catch (error) {
+                console.log('⚠️ Kafka not available, storing alert directly');
+                await redisClient.set(`alert:${fullAlert.id}`, JSON.stringify(fullAlert));
+              }
+            } else {
+              console.log('⚠️ Kafka producer not available, storing alert directly');
               await redisClient.set(`alert:${fullAlert.id}`, JSON.stringify(fullAlert));
             }
 
@@ -276,13 +281,27 @@
     let kafkaAvailable = false;
     (async () => {
       try {
+        if (!producer || !consumer) {
+          console.log('⚠️ Kafka not available - no valid credentials provided');
+          return;
+        }
+        
         await producer.connect();
         await consumer.connect();
-        await consumer.subscribe({
-          topic: "emergency-alerts",
-          fromBeginning: true,
-        });
-        await consumer.subscribe({ topic: "alert-updates" });
+        try {
+          await consumer.subscribe({
+            topic: "emergency-alerts",
+            fromBeginning: true,
+          });
+          await consumer.subscribe({ topic: "alert-updates" });
+        } catch (subscribeError: any) {
+          if (subscribeError.type === 'TOPIC_AUTHORIZATION_FAILED') {
+            console.log('⚠️ Topic subscription failed - topics may not exist or insufficient permissions');
+            console.log('ℹ️ Application will continue without Kafka consumer');
+            return;
+          }
+          throw subscribeError;
+        }
 
         await consumer.run({
           eachMessage: async ({ message, topic }: { message: any; topic: string }) => {
