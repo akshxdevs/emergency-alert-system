@@ -2,6 +2,16 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
+import { NEXTAUTH_URL } from "../../../../config";
+
+// Debug environment variables in development
+if (process.env.NODE_ENV === "development") {
+  console.log("NextAuth Configuration:");
+  console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID ? "Set" : "Missing");
+  console.log("GOOGLE_CLIENT_SECRET:", process.env.GOOGLE_CLIENT_SECRET ? "Set" : "Missing");
+  console.log("NEXTAUTH_URL:", NEXTAUTH_URL);
+  console.log("NEXTAUTH_SECRET:", process.env.NEXTAUTH_SECRET ? "Set" : "Missing");
+}
 
 const handler = NextAuth({
   providers: [
@@ -61,6 +71,8 @@ const handler = NextAuth({
     async signIn({ user, account }) {
       if (account?.provider === "google") {
         try {
+          console.log("Google sign-in attempt for:", user.email);
+          
           const existingUserResponse = await axios.get(
             `https://emergency-alert-system-bffp.onrender.com/api/v1/user/check-email?email=${user.email}`
           );
@@ -78,11 +90,14 @@ const handler = NextAuth({
             user.username = existingUser.username;
             user.role = existingUser.role;
             
+            console.log("Existing user found, signing in:", existingUser.id);
             return true;
           } else {
+            console.log("New user, redirecting to signup callback");
             return "/signup/google-callback";
           }
-        } catch {
+        } catch (error) {
+          console.error("Error during Google sign-in:", error);
           return false;
         }
       }
