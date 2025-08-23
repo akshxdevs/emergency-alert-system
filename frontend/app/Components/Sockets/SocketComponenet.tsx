@@ -114,11 +114,12 @@ export default function SocketComponent({
     }
   }, [userId, userRole, reconnectAttempts, maxReconnectAttempts, handleMessage]);
 
-  const sendMessage = useCallback((message: Record<string, unknown>) => {
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify(message));
-    }
-  }, []);
+  // sendMessage function available for future use
+  // const sendMessage = useCallback((message: Record<string, unknown>) => {
+  //   if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+  //     wsRef.current.send(JSON.stringify(message));
+  //   }
+  // }, []);
 
   useEffect(() => {
     if (session?.user?.id && userRole) {
@@ -251,11 +252,12 @@ export function DashboardSocketComponent({
     }
   }, [userId, userRole, reconnectAttempts, maxReconnectAttempts, handleMessage]);
 
-  const sendMessage = useCallback((message: Record<string, unknown>) => {
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify(message));
-    }
-  }, []);
+  // sendMessage function available for future use
+  // const sendMessage = useCallback((message: Record<string, unknown>) => {
+  //   if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+  //     wsRef.current.send(JSON.stringify(message));
+  //   }
+  // }, []);
 
   const loadSavedAlerts = useCallback(async () => {
     try {
@@ -294,7 +296,8 @@ export function DashboardSocketComponent({
   return null;
 }
 
-export const useEmergencySocket = (userId: string, userRole: string) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export const useEmergencySocket = (_userId: string, _userRole: string) => {
   const sendMessage = useCallback((message: Record<string, unknown>) => {
     console.log('Sending emergency message:', message);
   }, []);
