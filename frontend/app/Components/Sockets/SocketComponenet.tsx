@@ -1,377 +1,352 @@
-import { useEffect, useState, useCallback } from "react";
+"use client";
+import { useEffect, useRef, useState } from "react";
+import { useSession } from "next-auth/react";
 import { WS_URL } from "../../../config";
 
 interface Alert {
   id: string;
   type: string;
-  reportedBy: string;
   status: string;
-  assignedTo: string;
-  timeStamp: string;
+  priority: string;
   description: string;
-  priority: string | number;
-  location: Array<{ lat: number; long: number }>;
-  receivedAt?: number;
-  autoDisappearAt?: number | null;
+  reportedBy: string;
+  assignedTo: string;
+  location: {
+    lat: number;
+    long: number;
+  };
+  createdAt: string;
+  updatedAt: string;
 }
 
-export const useEmergencySocket = (userId: string, userRole: string) => {
-  const [socket, setSocket] = useState<WebSocket | null>(null);
-  const [receivedAlerts, setReceivedAlerts] = useState<Alert[]>([]);
+interface SocketComponentProps {
+  userId: string;
+  userRole: string;
+  onAlertReceived?: (alert: Alert) => void;
+  onAlertUpdate?: (alertId: string, newStatus: string) => void;
+  onAlertCancel?: (alertId: string) => void;
+}
 
-  useEffect(() => {
-    const ws = new WebSocket(`${WS_URL}/${userId}/?${userRole}`);
-    ws.onopen = () => {};
+export default function SocketComponent({
+  userId,
+  userRole,
+  onAlertReceived,
+  onAlertUpdate,
+  onAlertCancel,
+}: SocketComponentProps) {
+  const { data: session } = useSession();
+  const wsRef = useRef<WebSocket | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [reconnectAttempts, setReconnectAttempts] = useState(0);
+  const maxReconnectAttempts = 5;
 
-    ws.onmessage = (message) => {
-      const data = JSON.parse(message.data);
+  const handleIncomingAlert = (alert: Alert, title: string, message: string) => {
+    if (onAlertReceived) {
+      onAlertReceived(alert);
+    }
 
-      if (data.type === "error") {
-        alert(`Error: ${data.message}`);
-      }
-
-      if (data.type === "success") {
-        alert(`Success: ${data.message}`);
-      }
-
-      if (data.type === "welcome") {}
-
-      if (data.type === "CRIME" && userRole === "POLICE") {
-        handleIncomingAlert(data.payload, "🚔 Police Alert", "New crime incident reported");
-      }
-      
-      if (data.type === "FIRE" && userRole === "FIRE") {
-        handleIncomingAlert(data.payload, "🚒 Fire Alert", "New fire emergency reported");
-      }
-      
-      if (data.type === "MEDICAL" && userRole === "MEDICAL") {
-        handleIncomingAlert(data.payload, "🚑 Medical Alert", "New medical emergency reported");
-      }
-      
-      if (data.type === "ACCIDENT" && userRole === "POLICE") {
-        handleIncomingAlert(data.payload, "🚨 Accident Alert", "New accident reported");
-      }
-
-      if (data.type === "HIGH_PRIORITY_ALERT") {
-        handleIncomingAlert(data.payload, "🚨 HIGH PRIORITY ALERT", "Critical emergency reported");
-      }
-      
-      if (data.type === "UPDATE_ALERT_STATUS") {
-        handleAlertUpdate(data.payload);
-      }
-    };
-
-    ws.onerror = (err) => {
-      console.error("WebSocket error:", err);
-    };
-
-    ws.onclose = () => {};
-
-    setSocket(ws);
-
-    return () => {
-      ws.close();
-    };
-  }, [userId, userRole]);
-
-  const handleIncomingAlert = useCallback((payload: Alert, title: string, message: string) => {
-    setReceivedAlerts(prev => {
-      const existingAlert = prev.find(alert => alert.id === payload.id);
-      if (existingAlert) {
-        return prev;
-      }
-      
-      const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-      const filteredAlerts = prev.filter(alert => {
-        const alertTime = new Date(alert.timeStamp);
-        return alertTime > twentyFourHoursAgo;
-      });
-      
-      const newAlerts = [payload, ...filteredAlerts];
-      
-      if (newAlerts.length > 50) {
-        newAlerts.splice(50);
-      }
-      
-      return newAlerts;
-    });
-    
-    showAlertNotification(title, message, payload);
-  }, []);
-
-  const handleAlertUpdate = useCallback((payload: Alert) => {
-    setReceivedAlerts(prev => 
-      prev.map(alert => 
-        alert.id === payload.id ? payload : alert
-      )
-    );
-    
-    showAlertNotification("📝 Status Update", "Alert status updated", payload);
-  }, []);
-
-  const showAlertNotification = (title: string, message: string, payload: Alert) => {
-    const notification = document.createElement('div');
-    notification.className = 'fixed top-4 right-4 bg-red-500 text-white p-4 rounded-lg shadow-lg z-50 max-w-sm';
-    notification.innerHTML = `
-      <div class="flex items-center space-x-2">
-        <div class="text-xl">${title}</div>
-      </div>
-      <div class="mt-2 text-sm">${message}</div>
-      <div class="mt-2 text-xs opacity-75">
-        Location: ${payload.location?.[0]?.lat?.toFixed(4)}, ${payload.location?.[0]?.long?.toFixed(4)}
-      </div>
-      <div class="mt-2 text-xs opacity-75">
-        Priority: ${typeof payload.priority === 'string' ? payload.priority : payload.priority === 3 ? 'HIGH' : payload.priority === 2 ? 'MEDIUM' : 'LOW'}
-      </div>
-    `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-      if (notification.parentNode) {
-        notification.parentNode.removeChild(notification);
-      }
-    }, 10000);
-    
-    if ('Notification' in window && Notification.permission === 'granted') {
+    if ("Notification" in window && Notification.permission === "granted") {
       new Notification(title, {
         body: message,
-        icon: '/favicon.ico'
+        icon: "/favicon.ico",
+        badge: "/favicon.ico",
       });
     }
   };
 
-  const sendEmergency = (alert: Alert) => {
-    if (!socket || socket.readyState !== WebSocket.OPEN) {
-      console.error("Socket not open");
-      return;
+  const handleMessage = (data: any) => {
+    try {
+      const parsedData = JSON.parse(data);
+      
+      switch (parsedData.type) {
+        case "EMERGENCY_ALERT":
+          handleIncomingAlert(parsedData.payload, "Police Alert", "New crime incident reported");
+          break;
+        case "FIRE_ALERT":
+          handleIncomingAlert(parsedData.payload, "Fire Alert", "New fire emergency reported");
+          break;
+        case "MEDICAL_ALERT":
+          handleIncomingAlert(parsedData.payload, "Medical Alert", "New medical emergency reported");
+          break;
+        case "ALERT_UPDATED":
+          if (onAlertUpdate) {
+            onAlertUpdate(parsedData.payload.id, parsedData.payload.status);
+          }
+          break;
+        case "ALERT_CANCELLED":
+          if (onAlertCancel) {
+            onAlertCancel(parsedData.payload.id);
+          }
+          break;
+        default:
+          break;
+      }
+    } catch (error) {
+      // Handle parsing error silently
     }
-    socket.send(
-      JSON.stringify({
-        type: "NEW_ALERT",
-        payload: alert,
-      })
-    );
   };
-  
-  const sendEmergencyUpdate = (alert: Alert) => {
-    if (!socket || socket.readyState !== WebSocket.OPEN) {
-      console.error("Socket not open");
-      return;
-    }
-    console.log(alert);
-    socket.send(
-      JSON.stringify({
-        type: "UPDATE_ALERT_STATUS",
-        payload: alert,
-      })
-    );
-  };
-  
-  return { 
-    sendEmergency, 
-    sendEmergencyUpdate, 
-    receivedAlerts, 
-    setReceivedAlerts 
-  };
-};
 
-export const useDashboardSocket = (userId: string, userRole: string) => {
-  const [socket, setSocket] = useState<WebSocket | null>(null);
-  const [receivedAlerts, setReceivedAlerts] = useState<Alert[]>([]);
+  const connectWebSocket = () => {
+    if (reconnectAttempts >= maxReconnectAttempts) {
+      return;
+    }
+
+    try {
+      const ws = new WebSocket(`${WS_URL}/${userId}/?${userRole}`);
+      wsRef.current = ws;
+
+      ws.onopen = () => {
+        setIsConnected(true);
+        setReconnectAttempts(0);
+      };
+
+      ws.onmessage = (event) => {
+        handleMessage(event.data);
+      };
+
+      ws.onclose = () => {
+        setIsConnected(false);
+        setTimeout(() => {
+          setReconnectAttempts(prev => prev + 1);
+          connectWebSocket();
+        }, 3000);
+      };
+
+      ws.onerror = () => {
+        setIsConnected(false);
+      };
+    } catch (error) {
+      setIsConnected(false);
+    }
+  };
+
+  const sendMessage = (message: any) => {
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify(message));
+    }
+  };
+
+  const updateAlertStatus = (alertId: string, newStatus: string) => {
+    sendMessage({
+      type: "UPDATE_ALERT_STATUS",
+      payload: {
+        alertId,
+        newStatus,
+      },
+    });
+  };
+
+  const cancelAlert = (alertId: string) => {
+    sendMessage({
+      type: "CANCEL_ALERT",
+      payload: {
+        alertId,
+      },
+    });
+  };
+
+  const reportEmergency = (alert: any) => {
+    sendMessage({
+      type: "REPORT_EMERGENCY",
+      payload: alert,
+    });
+  };
 
   useEffect(() => {
-    if (!userRole || !userId) {
-      return;
+    if (session?.user?.id && userRole) {
+      connectWebSocket();
     }
-
-    const dashboardUserId = `dashboard-${userRole}-${Date.now()}`;
-    const ws = new WebSocket(`${WS_URL}/${dashboardUserId}/?${userRole}`);
-    
-    ws.onopen = () => {};
-
-    ws.onmessage = (message) => {
-      const data = JSON.parse(message.data);
-
-      if (data.type === "welcome") {}
-
-      if (data.type === "CRIME" && userRole === "POLICE") {
-        handleIncomingAlert(data.payload);
-      }
-      
-      if (data.type === "FIRE" && userRole === "FIRE") {
-        handleIncomingAlert(data.payload);
-      }
-      
-      if (data.type === "MEDICAL" && userRole === "MEDICAL") {
-        handleIncomingAlert(data.payload);
-      }
-      
-      if (data.type === "ACCIDENT" && userRole === "POLICE") {
-        handleIncomingAlert(data.payload);
-      }
-
-      if (data.type === "HIGH_PRIORITY_ALERT") {
-        handleIncomingAlert(data.payload);
-      }
-      
-      if (data.type === "UPDATE_ALERT_STATUS") {
-        handleAlertUpdate(data.payload);
-      }
-      if (data.type === "ALERT_CANCELLED") {
-        handleAlertCancellation(data.payload);
-      }
-    };
-
-    ws.onerror = (err) => {
-      console.error("Dashboard WebSocket error:", err);
-              console.error("Dashboard WebSocket URL was:", `${WS_URL}/${dashboardUserId}/?${userRole}`);
-      console.error("Dashboard userId:", userId, "userRole:", userRole);
-    };
-
-    ws.onclose = () => {};
-
-    setSocket(ws);
 
     return () => {
-      ws.close();
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
     };
-  }, [userId, userRole]);
-
-  const handleIncomingAlert = useCallback((payload: Alert) => {
-    setReceivedAlerts(prev => {
-      const existingAlert = prev.find(alert => alert.id === payload.id);
-      if (existingAlert) {
-        return prev;
-      }
-      
-      const alertWithTimestamp = {
-        ...payload,
-        receivedAt: Date.now(),
-        autoDisappearAt: Date.now() + (2 * 60 * 1000) // 2 minutes from now
-      };
-      
-      const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
-      const filteredAlerts = prev.filter(alert => {
-        const alertTime = new Date(alert.timeStamp);
-        return alertTime > twentyFourHoursAgo;
-      });
-      
-      const newAlerts = [alertWithTimestamp, ...filteredAlerts];
-      
-      if (newAlerts.length > 50) {
-        newAlerts.splice(50);
-      }
-      
-      localStorage.setItem(`dashboard-alerts-${userRole}`, JSON.stringify(newAlerts));
-      
-      console.log("Dashboard updated receivedAlerts:", newAlerts);
-      return newAlerts;
-    });
-  }, [userRole]);
-
-  const handleAlertUpdate = useCallback((payload: Alert) => {
-    setReceivedAlerts(prev => {
-      const updated = prev.map(alert => 
-        alert.id === payload.id 
-          ? { 
-              ...payload, 
-              receivedAt: alert.receivedAt, 
-              autoDisappearAt: payload.status === 'IN_PROCESS' ? null : alert.autoDisappearAt 
-            } 
-          : alert
-      );
-      
-      localStorage.setItem(`dashboard-alerts-${userRole}`, JSON.stringify(updated));
-      return updated;
-    });
-  }, [userRole]);
-
-  const handleAlertCancellation = useCallback((payload: Alert) => {
-    setReceivedAlerts(prev => {
-      const filtered = prev.filter(alert => alert.id !== payload.id);
-      
-      localStorage.setItem(`dashboard-alerts-${userRole}`, JSON.stringify(filtered));
-      return filtered;
-    });
-  }, [userRole]);
+  }, [session?.user?.id, userRole]);
 
   useEffect(() => {
-    const savedAlerts = localStorage.getItem(`dashboard-alerts-${userRole}`);
-    if (savedAlerts) {
-      try {
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
+    }
+  }, []);
+
+  return null;
+}
+
+interface DashboardSocketComponentProps {
+  userId: string;
+  userRole: string;
+  onAlertReceived?: (alert: Alert) => void;
+  onAlertUpdate?: (alertId: string, newStatus: string) => void;
+  onAlertCancel?: (alertId: string) => void;
+}
+
+export function DashboardSocketComponent({
+  userId,
+  userRole,
+  onAlertReceived,
+  onAlertUpdate,
+  onAlertCancel,
+}: DashboardSocketComponentProps) {
+  const { data: session } = useSession();
+  const wsRef = useRef<WebSocket | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [reconnectAttempts, setReconnectAttempts] = useState(0);
+  const [receivedAlerts, setReceivedAlerts] = useState<Alert[]>([]);
+  const maxReconnectAttempts = 5;
+
+  const handleIncomingAlert = (alert: Alert, title: string, message: string) => {
+    setReceivedAlerts(prev => [...prev, alert]);
+    
+    if (onAlertReceived) {
+      onAlertReceived(alert);
+    }
+
+    if ("Notification" in window && Notification.permission === "granted") {
+      new Notification(title, {
+        body: message,
+        icon: "/favicon.ico",
+        badge: "/favicon.ico",
+      });
+    }
+  };
+
+  const handleMessage = (data: any) => {
+    try {
+      const parsedData = JSON.parse(data);
+      
+      switch (parsedData.type) {
+        case "EMERGENCY_ALERT":
+          handleIncomingAlert(parsedData.payload, "Police Alert", "New crime incident reported");
+          break;
+        case "FIRE_ALERT":
+          handleIncomingAlert(parsedData.payload, "Fire Alert", "New fire emergency reported");
+          break;
+        case "MEDICAL_ALERT":
+          handleIncomingAlert(parsedData.payload, "Medical Alert", "New medical emergency reported");
+          break;
+        case "ALERT_UPDATED":
+          setReceivedAlerts(prev => 
+            prev.map(alert => 
+              alert.id === parsedData.payload.id 
+                ? { ...alert, status: parsedData.payload.status }
+                : alert
+            )
+          );
+          if (onAlertUpdate) {
+            onAlertUpdate(parsedData.payload.id, parsedData.payload.status);
+          }
+          break;
+        case "ALERT_CANCELLED":
+          setReceivedAlerts(prev => 
+            prev.filter(alert => alert.id !== parsedData.payload.id)
+          );
+          if (onAlertCancel) {
+            onAlertCancel(parsedData.payload.id);
+          }
+          break;
+        default:
+          break;
+      }
+    } catch (error) {
+      // Handle parsing error silently
+    }
+  };
+
+  const connectWebSocket = () => {
+    if (reconnectAttempts >= maxReconnectAttempts) {
+      return;
+    }
+
+    try {
+      const dashboardUserId = userId;
+      const ws = new WebSocket(`${WS_URL}/${dashboardUserId}/?${userRole}`);
+      wsRef.current = ws;
+
+      ws.onopen = () => {
+        setIsConnected(true);
+        setReconnectAttempts(0);
+      };
+
+      ws.onmessage = (event) => {
+        handleMessage(event.data);
+      };
+
+      ws.onclose = () => {
+        setIsConnected(false);
+        setTimeout(() => {
+          setReconnectAttempts(prev => prev + 1);
+          connectWebSocket();
+        }, 3000);
+      };
+
+      ws.onerror = () => {
+        setIsConnected(false);
+      };
+    } catch (error) {
+      setIsConnected(false);
+    }
+  };
+
+  const sendMessage = (message: any) => {
+    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+      wsRef.current.send(JSON.stringify(message));
+    }
+  };
+
+  const updateAlertStatus = (alertId: string, newStatus: string) => {
+    sendMessage({
+      type: "UPDATE_ALERT_STATUS",
+      payload: {
+        alertId,
+        newStatus,
+      },
+    });
+  };
+
+  const cancelAlert = (alertId: string) => {
+    sendMessage({
+      type: "CANCEL_ALERT",
+      payload: {
+        alertId,
+      },
+    });
+  };
+
+  const loadSavedAlerts = async () => {
+    try {
+      const savedAlerts = localStorage.getItem(`alerts_${userId}`);
+      if (savedAlerts) {
         const parsedAlerts = JSON.parse(savedAlerts);
         setReceivedAlerts(parsedAlerts);
-      } catch (error) {
-        console.error("Error loading saved alerts:", error);
-        localStorage.removeItem(`dashboard-alerts-${userRole}`);
       }
+    } catch (error) {
+      // Handle error silently
     }
-  }, [userRole]);
+  };
 
   useEffect(() => {
-    const roles = ["POLICE", "FIRE", "MEDICAL"];
-    roles.forEach(role => {
-      if (role !== userRole) {
-        localStorage.removeItem(`dashboard-alerts-${role}`);
+    if (session?.user?.id && userRole) {
+      connectWebSocket();
+      loadSavedAlerts();
+    }
+
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close();
       }
-    });
-  }, [userRole]);
+    };
+  }, [session?.user?.id, userRole]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      const now = Date.now();
-      setReceivedAlerts(prev => {
-        const filtered = prev.filter(alert => {
-          if (alert.status === 'IN_PROCESS') {
-            return true;
-          }
-          
-          if (alert.autoDisappearAt && now > alert.autoDisappearAt) {
-            return false;
-          }
-          
-          return true;
-        });
-        
-        localStorage.setItem(`dashboard-alerts-${userRole}`, JSON.stringify(filtered));
-        return filtered;
-      });
-    }, 10000); // Check every 10 seconds
-
-    return () => clearInterval(interval);
-  }, [userRole]);
-
-  const sendEmergencyUpdate = (alert: Alert) => {
-    if (!socket || socket.readyState !== WebSocket.OPEN) {
-      console.error("Dashboard Socket not open");
-      return;
+    if ("Notification" in window && Notification.permission === "default") {
+      Notification.requestPermission();
     }
-    socket.send(
-      JSON.stringify({
-        type: "UPDATE_ALERT_STATUS",
-        payload: alert,
-      })
-    );
-  };
+  }, []);
 
-  const sendCancelAlert = (alertId: string) => {
-    if (!socket || socket.readyState !== WebSocket.OPEN) {
-      console.error("Dashboard Socket not open");
-      return;
-    }
-    socket.send(
-      JSON.stringify({
-        type: "CANCEL_ALERT",
-        payload: { alertId },
-      })
-    );
-  };
-  
-  return { 
-    sendEmergencyUpdate, 
-    receivedAlerts, 
-    setReceivedAlerts,
-    sendCancelAlert
-  };
-};
+  useEffect(() => {
+    localStorage.setItem(`alerts_${userId}`, JSON.stringify(receivedAlerts));
+  }, [receivedAlerts, userId]);
+
+  return null;
+}

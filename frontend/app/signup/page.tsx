@@ -89,7 +89,6 @@ export default function SignupPage() {
         redirect: false,
       });
     } catch (error) {
-      console.error("Google signup error:", error);
       setError("Failed to sign up with Google");
     } finally {
       setIsLoading(false);
@@ -158,7 +157,6 @@ export default function SignupPage() {
         }, 1000);
       }
     } catch (error) {
-      console.error("Signup error:", error);
       setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);

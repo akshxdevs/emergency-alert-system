@@ -18,8 +18,6 @@ const handler = NextAuth({
       },
       async authorize(credentials) {
         try {
-          console.log("Attempting credentials login for:", credentials?.email);
-          
           const res = await axios.post(
             "https://emergency-alert-system-bffp.onrender.com/api/v1/user/signin",
             {
@@ -29,11 +27,8 @@ const handler = NextAuth({
           );
 
           const user = res.data?.user;
-          console.log("Backend response:", res.data);
-          console.log("User object:", user);
 
           if (!user) {
-            console.log("No user returned from backend");
             return null;
           }
 
@@ -46,17 +41,15 @@ const handler = NextAuth({
             image: user.image || null,
           };
 
-          console.log("User for NextAuth:", userForNextAuth);
           return userForNextAuth;
         } catch (err: unknown) {
-          console.error("Credentials login error details:", err);
           return null;
         }
       },
     }),
   ],
 
-  secret: process.env.NEXTAUTH_SECRET || "fallback-secret-key-for-development",
+  secret: process.env.NEXTAUTH_SECRET || "akshxsceret@@#@#",
 
   session: {
     strategy: "jwt",
@@ -90,14 +83,13 @@ const handler = NextAuth({
             return "/signup/google-callback";
           }
         } catch (error) {
-          console.error("Error checking user existence:", error);
           return false;
         }
       }
       return true;
     },
 
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
@@ -106,6 +98,11 @@ const handler = NextAuth({
         token.role = user.role;
         token.image = user.image;
       }
+      
+      if (account?.provider === "google") {
+        token.provider = "google";
+      }
+      
       return token;
     },
 
@@ -124,6 +121,7 @@ const handler = NextAuth({
 
   pages: {
     signIn: "/login",
+    error: "/login",
   },
 });
 

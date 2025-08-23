@@ -47,7 +47,6 @@ const roleOptions: RoleOption[] = [
 
 export default function GoogleCallbackPage() {
   const { data: session, status } = useSession();
-
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
@@ -106,13 +105,11 @@ export default function GoogleCallbackPage() {
       const userId = data.user.id;
       const userRole = data.user.role;
       
-      if (userRole === "CIVILIAN") {
-        router.push(`/home/${userId}`);
-      } else {
-        router.push(`/dashboard/${userRole.toLowerCase()}/${userId}`);
-      }
+      window.location.href = userRole === "CIVILIAN" 
+        ? `/home/${userId}` 
+        : `/dashboard/${userRole.toLowerCase()}/${userId}`;
+        
     } catch (error) {
-      console.error("Google signup error:", error);
       setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
@@ -132,7 +129,13 @@ export default function GoogleCallbackPage() {
   }
 
   if (!session) {
-    return null;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="text-white text-center">
+          <p>No session found. Redirecting...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -143,7 +146,6 @@ export default function GoogleCallbackPage() {
         transition={{ duration: 0.6 }}
         className="bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl w-full max-w-md border border-white/30"
       >
-        {/* Header */}
         <div className="text-center mb-8">
           <div className="mb-4">
             {session.user?.image && (
@@ -164,7 +166,6 @@ export default function GoogleCallbackPage() {
           </p>
         </div>
 
-        {/* Role Selection */}
         <div className="space-y-4">
           {roleOptions.map((role) => (
             <motion.button
@@ -186,7 +187,6 @@ export default function GoogleCallbackPage() {
           ))}
         </div>
 
-        {/* Error Display */}
         {error && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -197,7 +197,6 @@ export default function GoogleCallbackPage() {
           </motion.div>
         )}
 
-        {/* Loading State */}
         {isLoading && (
           <motion.div
             initial={{ opacity: 0 }}

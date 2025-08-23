@@ -21,37 +21,49 @@ export default function LoginLandingPage() {
     try {
       const result = await signIn("google", {
         redirect: false,
+        callbackUrl: "/signup/google-callback"
       });
 
       if (result?.error) {
-        setError("Failed to sign in with Google");
+        setError("Failed to sign in with Google. Please try again.");
         return;
       }
 
       if (result?.ok) {
         setTimeout(async () => {
-          const session = await getSession();
-          const userId = session?.user?.id;
-          const userRole = session?.user?.role;
+          try {
+            const session = await getSession();
+            
+            if (!session?.user) {
+              setError("Session not found after Google sign in");
+              return;
+            }
 
-          if (userId) {
+            const userId = session.user.id;
+            const userRole = session.user.role;
+
+            if (!userId) {
+              setError("User ID not found in session");
+              return;
+            }
+
+            if (!userRole) {
+              router.push("/signup/google-callback");
+              return;
+            }
+
             if (userRole === "CIVILIAN") {
               router.push(`/home/${userId}`);
-            } else if (userRole) {
-              router.push(
-                `/dashboard/${String(userRole).toLowerCase()}/${userId}`
-              );
             } else {
-              setError("User role not found");
+              router.push(`/dashboard/${String(userRole).toLowerCase()}/${userId}`);
             }
-          } else {
-            setError("User ID not found in session");
+          } catch (sessionError) {
+            setError("Failed to get user session");
           }
-        }, 1000);
+        }, 2000);
       }
     } catch (error) {
-      console.error("Google sign in error:", error);
-      setError("Failed to sign in with Google");
+      setError("Failed to sign in with Google. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -76,27 +88,38 @@ export default function LoginLandingPage() {
 
       if (result?.ok) {
         setTimeout(async () => {
-          const session = await getSession();
-          const userId = session?.user?.id;
-          const userRole = session?.user?.role;
+          try {
+            const session = await getSession();
+            
+            if (!session?.user) {
+              setError("Session not found after sign in");
+              return;
+            }
 
-          if (userId) {
+            const userId = session.user.id;
+            const userRole = session.user.role;
+
+            if (!userId) {
+              setError("User ID not found in session");
+              return;
+            }
+
+            if (!userRole) {
+              setError("User role not found");
+              return;
+            }
+
             if (userRole === "CIVILIAN") {
               router.push(`/home/${userId}`);
-            } else if (userRole) {
-              router.push(
-                `/dashboard/${String(userRole).toLowerCase()}/${userId}`
-              );
             } else {
-              setError("User role not found");
+              router.push(`/dashboard/${String(userRole).toLowerCase()}/${userId}`);
             }
-          } else {
-            setError("User ID not found in session");
+          } catch (sessionError) {
+            setError("Failed to get user session");
           }
         }, 1000);
       }
     } catch (error) {
-      console.error("Sign in error:", error);
       setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);
@@ -132,9 +155,7 @@ export default function LoginLandingPage() {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl w-full max-w-md p-6"
         >
-          {/* Login Form */}
           <form onSubmit={handleEmailSignIn} className="space-y-4 px-5 py-2">
-            {/* Email Field */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -176,7 +197,6 @@ export default function LoginLandingPage() {
               </div>
             </motion.div>
 
-            {/* Password Field */}
             <motion.div
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -244,7 +264,6 @@ export default function LoginLandingPage() {
               </div>
             </motion.div>
 
-            {/* Error Display */}
             <AnimatePresence>
               {error && (
                 <motion.div
