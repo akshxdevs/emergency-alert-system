@@ -88,7 +88,7 @@ export default function SignupPage() {
         callbackUrl: "/signup/google-callback",
         redirect: false,
       });
-    } catch (error) {
+    } catch {
       setError("Failed to sign up with Google");
     } finally {
       setIsLoading(false);
@@ -156,7 +156,7 @@ export default function SignupPage() {
           }
         }, 1000);
       }
-    } catch (error) {
+    } catch {
       setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);

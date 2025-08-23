@@ -57,12 +57,12 @@ export default function LoginLandingPage() {
             } else {
               router.push(`/dashboard/${String(userRole).toLowerCase()}/${userId}`);
             }
-          } catch (sessionError) {
+          } catch {
             setError("Failed to get user session");
           }
         }, 2000);
       }
-    } catch (error) {
+    } catch {
       setError("Failed to sign in with Google. Please try again.");
     } finally {
       setIsLoading(false);
@@ -114,12 +114,12 @@ export default function LoginLandingPage() {
             } else {
               router.push(`/dashboard/${String(userRole).toLowerCase()}/${userId}`);
             }
-          } catch (sessionError) {
+          } catch {
             setError("Failed to get user session");
           }
         }, 1000);
       }
-    } catch (error) {
+    } catch {
       setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);

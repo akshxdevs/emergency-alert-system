@@ -40,13 +40,13 @@ export default function HomePage() {
   const [isMapDragging, setIsMapDragging] = useState(false);
   const params = useParams();
 
-  const roleAssignedTo: Record<string, string> = {
+  const roleAssignedTo = useMemo(() => ({
     CRIME: "POLICE",
     FIRE: "FIRE",
     MEDICAL: "MEDICAL",
     ACCIDENT: "POLICE",
     OTHER: "POLICE",
-  };
+  } as Record<string, string>), []);
 
   useEffect(() => {
     const sessionUserId = session?.user?.id;
@@ -58,7 +58,7 @@ export default function HomePage() {
     
     const role: string = params[""]?.[0] as string;
     setUserRole(role);
-  }, [session, userRole]);
+  }, [session, params]);
   
   const { sendEmergency } = useEmergencySocket(userId || "anonymous-user", userRole || "CIVILIAN");
 
@@ -112,7 +112,7 @@ export default function HomePage() {
         long: lng || 0,
       }],
     };
-    sendEmergency(alertPayload);
+    sendEmergency(alertPayload as unknown as Record<string, unknown>);
   }, [hazardType, priority, description, lat, lng, roleAssignedTo, sendEmergency, userId]);
 
   const handleLocationButtonClick = useCallback(() => {

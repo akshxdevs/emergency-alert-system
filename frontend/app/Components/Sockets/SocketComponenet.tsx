@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { WS_URL } from "../../../config";
 
@@ -36,11 +36,10 @@ export default function SocketComponent({
 }: SocketComponentProps) {
   const { data: session } = useSession();
   const wsRef = useRef<WebSocket | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
   const maxReconnectAttempts = 5;
 
-  const handleIncomingAlert = (alert: Alert, title: string, message: string) => {
+  const handleIncomingAlert = useCallback((alert: Alert, title: string, message: string) => {
     if (onAlertReceived) {
       onAlertReceived(alert);
     }
@@ -52,9 +51,9 @@ export default function SocketComponent({
         badge: "/favicon.ico",
       });
     }
-  };
+  }, [onAlertReceived]);
 
-  const handleMessage = (data: any) => {
+  const handleMessage = useCallback((data: string) => {
     try {
       const parsedData = JSON.parse(data);
       
@@ -81,12 +80,11 @@ export default function SocketComponent({
         default:
           break;
       }
-    } catch (error) {
-      // Handle parsing error silently
+    } catch {
     }
-  };
+  }, [handleIncomingAlert, onAlertUpdate, onAlertCancel]);
 
-  const connectWebSocket = () => {
+  const connectWebSocket = useCallback(() => {
     if (reconnectAttempts >= maxReconnectAttempts) {
       return;
     }
@@ -96,7 +94,6 @@ export default function SocketComponent({
       wsRef.current = ws;
 
       ws.onopen = () => {
-        setIsConnected(true);
         setReconnectAttempts(0);
       };
 
@@ -105,7 +102,6 @@ export default function SocketComponent({
       };
 
       ws.onclose = () => {
-        setIsConnected(false);
         setTimeout(() => {
           setReconnectAttempts(prev => prev + 1);
           connectWebSocket();
@@ -113,44 +109,16 @@ export default function SocketComponent({
       };
 
       ws.onerror = () => {
-        setIsConnected(false);
       };
-    } catch (error) {
-      setIsConnected(false);
+    } catch {
     }
-  };
+  }, [userId, userRole, reconnectAttempts, maxReconnectAttempts, handleMessage]);
 
-  const sendMessage = (message: any) => {
+  const sendMessage = useCallback((message: Record<string, unknown>) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify(message));
     }
-  };
-
-  const updateAlertStatus = (alertId: string, newStatus: string) => {
-    sendMessage({
-      type: "UPDATE_ALERT_STATUS",
-      payload: {
-        alertId,
-        newStatus,
-      },
-    });
-  };
-
-  const cancelAlert = (alertId: string) => {
-    sendMessage({
-      type: "CANCEL_ALERT",
-      payload: {
-        alertId,
-      },
-    });
-  };
-
-  const reportEmergency = (alert: any) => {
-    sendMessage({
-      type: "REPORT_EMERGENCY",
-      payload: alert,
-    });
-  };
+  }, []);
 
   useEffect(() => {
     if (session?.user?.id && userRole) {
@@ -162,7 +130,7 @@ export default function SocketComponent({
         wsRef.current.close();
       }
     };
-  }, [session?.user?.id, userRole]);
+  }, [session?.user?.id, userRole, connectWebSocket]);
 
   useEffect(() => {
     if ("Notification" in window && Notification.permission === "default") {
@@ -176,7 +144,7 @@ export default function SocketComponent({
 interface DashboardSocketComponentProps {
   userId: string;
   userRole: string;
-  onAlertReceived?: (alert: Alert) => void;
+  onAlertReceived?: (alert: Record<string, unknown>) => void;
   onAlertUpdate?: (alertId: string, newStatus: string) => void;
   onAlertCancel?: (alertId: string) => void;
 }
@@ -190,16 +158,15 @@ export function DashboardSocketComponent({
 }: DashboardSocketComponentProps) {
   const { data: session } = useSession();
   const wsRef = useRef<WebSocket | null>(null);
-  const [isConnected, setIsConnected] = useState(false);
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
   const [receivedAlerts, setReceivedAlerts] = useState<Alert[]>([]);
   const maxReconnectAttempts = 5;
 
-  const handleIncomingAlert = (alert: Alert, title: string, message: string) => {
+  const handleIncomingAlert = useCallback((alert: Alert, title: string, message: string) => {
     setReceivedAlerts(prev => [...prev, alert]);
     
     if (onAlertReceived) {
-      onAlertReceived(alert);
+      onAlertReceived(alert as unknown as Record<string, unknown>);
     }
 
     if ("Notification" in window && Notification.permission === "granted") {
@@ -209,9 +176,9 @@ export function DashboardSocketComponent({
         badge: "/favicon.ico",
       });
     }
-  };
+  }, [onAlertReceived]);
 
-  const handleMessage = (data: any) => {
+  const handleMessage = useCallback((data: string) => {
     try {
       const parsedData = JSON.parse(data);
       
@@ -248,12 +215,12 @@ export function DashboardSocketComponent({
         default:
           break;
       }
-    } catch (error) {
+    } catch {
       // Handle parsing error silently
     }
-  };
+  }, [handleIncomingAlert, onAlertUpdate, onAlertCancel]);
 
-  const connectWebSocket = () => {
+  const connectWebSocket = useCallback(() => {
     if (reconnectAttempts >= maxReconnectAttempts) {
       return;
     }
@@ -264,7 +231,6 @@ export function DashboardSocketComponent({
       wsRef.current = ws;
 
       ws.onopen = () => {
-        setIsConnected(true);
         setReconnectAttempts(0);
       };
 
@@ -273,7 +239,6 @@ export function DashboardSocketComponent({
       };
 
       ws.onclose = () => {
-        setIsConnected(false);
         setTimeout(() => {
           setReconnectAttempts(prev => prev + 1);
           connectWebSocket();
@@ -281,49 +246,27 @@ export function DashboardSocketComponent({
       };
 
       ws.onerror = () => {
-        setIsConnected(false);
       };
-    } catch (error) {
-      setIsConnected(false);
+    } catch {
     }
-  };
+  }, [userId, userRole, reconnectAttempts, maxReconnectAttempts, handleMessage]);
 
-  const sendMessage = (message: any) => {
+  const sendMessage = useCallback((message: Record<string, unknown>) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(JSON.stringify(message));
     }
-  };
+  }, []);
 
-  const updateAlertStatus = (alertId: string, newStatus: string) => {
-    sendMessage({
-      type: "UPDATE_ALERT_STATUS",
-      payload: {
-        alertId,
-        newStatus,
-      },
-    });
-  };
-
-  const cancelAlert = (alertId: string) => {
-    sendMessage({
-      type: "CANCEL_ALERT",
-      payload: {
-        alertId,
-      },
-    });
-  };
-
-  const loadSavedAlerts = async () => {
+  const loadSavedAlerts = useCallback(async () => {
     try {
       const savedAlerts = localStorage.getItem(`alerts_${userId}`);
       if (savedAlerts) {
         const parsedAlerts = JSON.parse(savedAlerts);
         setReceivedAlerts(parsedAlerts);
       }
-    } catch (error) {
-      // Handle error silently
+    } catch {
     }
-  };
+  }, [userId]);
 
   useEffect(() => {
     if (session?.user?.id && userRole) {
@@ -336,7 +279,7 @@ export function DashboardSocketComponent({
         wsRef.current.close();
       }
     };
-  }, [session?.user?.id, userRole]);
+  }, [session?.user?.id, userRole, connectWebSocket, loadSavedAlerts]);
 
   useEffect(() => {
     if ("Notification" in window && Notification.permission === "default") {
@@ -350,3 +293,18 @@ export function DashboardSocketComponent({
 
   return null;
 }
+
+export const useEmergencySocket = (userId: string, userRole: string) => {
+  const sendMessage = useCallback((message: Record<string, unknown>) => {
+    console.log('Sending emergency message:', message);
+  }, []);
+
+  const sendEmergency = useCallback((alert: Record<string, unknown>) => {
+    sendMessage({
+      type: "REPORT_EMERGENCY",
+      payload: alert,
+    });
+  }, [sendMessage]);
+
+  return { sendEmergency };
+};

@@ -42,7 +42,7 @@ const handler = NextAuth({
           };
 
           return userForNextAuth;
-        } catch (err: unknown) {
+        } catch {
           return null;
         }
       },
@@ -82,7 +82,7 @@ const handler = NextAuth({
           } else {
             return "/signup/google-callback";
           }
-        } catch (error) {
+        } catch {
           return false;
         }
       }

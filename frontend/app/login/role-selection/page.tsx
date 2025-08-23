@@ -43,13 +43,11 @@ const roleOptions: RoleOption[] = [
 ];
 
 export default function RoleSelectionPage() {
-  const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const handleRoleSelection = async (roleId: string) => {
-    setSelectedRole(roleId);
     setIsLoading(true);
     setError(null);
 
@@ -72,7 +70,7 @@ export default function RoleSelectionPage() {
       }
 
       router.push(`/dashboard/${roleId.toLowerCase()}/${data.userId}`);
-    } catch (error) {
+    } catch {
       setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);

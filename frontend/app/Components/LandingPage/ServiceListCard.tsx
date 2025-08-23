@@ -70,7 +70,7 @@ export const ServiceListCard = () => {
         }, 4000);
 
         return () => clearInterval(interval);
-    }, []);
+    }, [emergencyImages.length]);
 
         const containerVariants = {
       hidden: { opacity: 0 },

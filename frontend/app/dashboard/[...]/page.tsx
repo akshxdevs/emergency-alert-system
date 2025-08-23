@@ -30,7 +30,6 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   const urlRole = Array.isArray(params) ? params[0] : params?.role;
-  const userId = Array.isArray(params) ? params[1] : params?.userId;
 
   const determineRole = (urlRole: string): string => {
     const roleMap: { [key: string]: string } = {
@@ -61,17 +60,17 @@ export default function DashboardPage() {
     setIsLoading(false);
   }, [session, status, urlRole, determinedRole]);
 
-  const handleAlertReceived = (alert: any) => {
+  const handleAlertReceived = (alert: Record<string, unknown>) => {
     const convertedAlert: Alert = {
-      id: alert.id,
-      type: alert.type,
-      reportedBy: alert.reportedBy,
-      status: alert.status,
-      assignedTo: alert.assignedTo || "",
-      timeStamp: alert.createdAt || new Date().toISOString(),
-      description: alert.description,
-      priority: alert.priority,
-      location: Array.isArray(alert.location) ? alert.location : [alert.location],
+      id: alert.id as string,
+      type: alert.type as string,
+      reportedBy: alert.reportedBy as string,
+      status: alert.status as string,
+      assignedTo: (alert.assignedTo as string) || "",
+      timeStamp: (alert.createdAt as string) || new Date().toISOString(),
+      description: alert.description as string,
+      priority: alert.priority as string | number,
+      location: Array.isArray(alert.location) ? alert.location as Array<{ lat: number; long: number }> : [alert.location as { lat: number; long: number }],
       autoDisappearAt: null
     };
     setAlerts(prev => [convertedAlert, ...prev]);

@@ -20,6 +20,6 @@ export const UseAlertListener = (userId:string,userRole:string,onMessage:(data:u
         return () => {
             ws.close();
         };
-    },[userId,onMessage])
+    },[userId, userRole, onMessage])
 
 }

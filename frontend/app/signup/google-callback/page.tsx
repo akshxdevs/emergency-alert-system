@@ -109,7 +109,7 @@ export default function GoogleCallbackPage() {
         ? `/home/${userId}` 
         : `/dashboard/${userRole.toLowerCase()}/${userId}`;
         
-    } catch (error) {
+    } catch {
       setError("Something went wrong. Please try again.");
     } finally {
       setIsLoading(false);

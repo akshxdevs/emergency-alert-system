@@ -69,7 +69,7 @@ const MapSelector = memo(({
         map.setView([externalLat, externalLng], 15);
         setMarkerPos({ lat: externalLat, lng: externalLng });
       }
-    }, [externalLat, externalLng, map]);
+    }, [map]);
 
     return null;
   });
