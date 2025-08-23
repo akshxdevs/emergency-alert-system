@@ -4,7 +4,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
 import { NEXTAUTH_URL } from "../../../../config";
 
-// Validate required environment variables
 const requiredEnvVars = {
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
@@ -19,14 +18,11 @@ if (missingVars.length > 0) {
   console.error('Missing required environment variables:', missingVars);
 }
 
-// Debug environment variables
 console.log("NextAuth Configuration Check:");
 console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID ? "Set" : "Missing");
 console.log("GOOGLE_CLIENT_SECRET:", process.env.GOOGLE_CLIENT_SECRET ? "Set" : "Missing");
 console.log("NEXTAUTH_URL:", NEXTAUTH_URL);
 console.log("NEXTAUTH_SECRET:", process.env.NEXTAUTH_SECRET ? "Set" : "Missing");
-
-// Force redeploy to load environment variables
 const handler = NextAuth({
   providers: [
     GoogleProvider({

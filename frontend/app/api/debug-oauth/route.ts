@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  // Check all environment variables
   const envCheck = {
     GOOGLE_CLIENT_ID: {
       exists: !!process.env.GOOGLE_CLIENT_ID,
@@ -25,7 +24,6 @@ export async function GET() {
     }
   };
 
-  // Check for common issues
   const issues = [];
   if (!envCheck.GOOGLE_CLIENT_ID.exists) issues.push('GOOGLE_CLIENT_ID is missing');
   if (!envCheck.GOOGLE_CLIENT_SECRET.exists) issues.push('GOOGLE_CLIENT_SECRET is missing');

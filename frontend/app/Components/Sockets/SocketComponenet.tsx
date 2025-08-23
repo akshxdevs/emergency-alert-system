@@ -114,13 +114,6 @@ export default function SocketComponent({
     }
   }, [userId, userRole, reconnectAttempts, maxReconnectAttempts, handleMessage]);
 
-  // sendMessage function available for future use
-  // const sendMessage = useCallback((message: Record<string, unknown>) => {
-  //   if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-  //     wsRef.current.send(JSON.stringify(message));
-  //   }
-  // }, []);
-
   useEffect(() => {
     if (session?.user?.id && userRole) {
       connectWebSocket();
@@ -217,7 +210,6 @@ export function DashboardSocketComponent({
           break;
       }
     } catch {
-      // Handle parsing error silently
     }
   }, [handleIncomingAlert, onAlertUpdate, onAlertCancel]);
 
@@ -251,13 +243,6 @@ export function DashboardSocketComponent({
     } catch {
     }
   }, [userId, userRole, reconnectAttempts, maxReconnectAttempts, handleMessage]);
-
-  // sendMessage function available for future use
-  // const sendMessage = useCallback((message: Record<string, unknown>) => {
-  //   if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-  //     wsRef.current.send(JSON.stringify(message));
-  //   }
-  // }, []);
 
   const loadSavedAlerts = useCallback(async () => {
     try {
