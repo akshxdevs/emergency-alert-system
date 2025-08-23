@@ -84,11 +84,11 @@
                   ],
                 });
               } catch (error) {
-                console.log('⚠️ Kafka not available, storing alert directly');
+                console.log('Kafka not available, storing alert directly');
                 await redisClient.set(`alert:${fullAlert.id}`, JSON.stringify(fullAlert));
               }
             } else {
-              console.log('⚠️ Kafka producer not available, storing alert directly');
+              console.log('Kafka producer not available, storing alert directly');
               await redisClient.set(`alert:${fullAlert.id}`, JSON.stringify(fullAlert));
             }
 
@@ -282,7 +282,7 @@
     (async () => {
       try {
         if (!producer || !consumer) {
-          console.log('⚠️ Kafka not available - no valid credentials provided');
+          console.log('Kafka not available - no valid credentials provided');
           return;
         }
         
@@ -296,8 +296,8 @@
           await consumer.subscribe({ topic: "alert-updates" });
         } catch (subscribeError: any) {
           if (subscribeError.type === 'TOPIC_AUTHORIZATION_FAILED') {
-            console.log('⚠️ Topic subscription failed - topics may not exist or insufficient permissions');
-            console.log('ℹ️ Application will continue without Kafka consumer');
+            console.log('Topic subscription failed - topics may not exist or insufficient permissions');
+            console.log('Application will continue without Kafka consumer');
             return;
           }
           throw subscribeError;
@@ -377,9 +377,9 @@
           },
       });
         kafkaAvailable = true;
-        console.log('✅ Kafka consumer initialized successfully');
+        console.log('Kafka consumer initialized successfully');
       } catch (error) {
-        console.log('⚠️ Kafka not available, continuing without Kafka');
+        console.log('Kafka not available, continuing without Kafka');
         console.error('Kafka error:', error);
       }
     })();

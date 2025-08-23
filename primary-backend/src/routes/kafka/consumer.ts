@@ -47,9 +47,9 @@ export const initializeConsumer = async () => {
     
     try {
         await consumer.connect();
-        console.log('✅ Connected to RedPanda Kafka consumer');
+        console.log('Connected to RedPanda Kafka consumer');
     } catch (error) {
-        console.log('❌ RedPanda Kafka consumer not available, continuing without Kafka');
+        console.log('RedPanda Kafka consumer not available, continuing without Kafka');
         console.error('Kafka consumer error:', error);
     }
 };
