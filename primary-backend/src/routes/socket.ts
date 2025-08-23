@@ -5,7 +5,7 @@
   import { consumer } from "./kafka/consumer";
   import { redisClient } from "./redis/init";
   import { prismaClient } from "../db/db";
-  import { StatusReport } from "@prisma/client";
+import { StatusReport } from "@prisma/client";
 
   const clients = new Map<string, WebSocket>();
   const roleClients = new Map<string, Set<WebSocket>>();
@@ -87,7 +87,6 @@
                 console.log('Kafka not available, storing alert directly to database');
                 await redisClient.set(`alert:${fullAlert.id}`, JSON.stringify(fullAlert));
                 
-                // Save directly to database when Kafka fails
                 try {
                   const createAlert = await prismaClient.emergency.create({
                     data: {
@@ -133,8 +132,6 @@
             } else {
               console.log('Kafka producer not available, storing alert directly to database');
               await redisClient.set(`alert:${fullAlert.id}`, JSON.stringify(fullAlert));
-              
-              // Save directly to database when Kafka is not available
               try {
                 const createAlert = await prismaClient.emergency.create({
                   data: {
@@ -316,7 +313,7 @@
       const cancelled = await prismaClient.emergency.update({
         where: { id: alertId },
         data: {
-          status: StatusReport.RESOLVED, // Use RESOLVED instead of CANCELLED
+          status: StatusReport.RESOLVED,
         },
       });
       return cancelled;
@@ -329,7 +326,7 @@
       const pendingAlerts = await prismaClient.emergency.findMany({
         where: {
           status: StatusReport.IN_PROCESS,
-          assignedTo: userRole as any, // Type assertion for UserRole
+          assignedTo: userRole as any,
         },
         include: {
           location: true,
@@ -347,12 +344,12 @@
               long: loc.long,
             })),
             receivedAt: Date.now(),
-            autoDisappearAt: null, // IN_PROCESS alerts don't auto-disappear
+            autoDisappearAt: null,
           };
           
           socket.send(
             JSON.stringify({
-              type: alert.type, // Send as the alert type (CRIME, FIRE, etc.)
+                type: alert.type,
               payload: alertWithLocation,
             })
           );
