@@ -40,7 +40,7 @@ export const HeaderCard = () => {
 
   return (
     <motion.div
-      className="finisher-header relative w-full min-h-[120px] sm:min-h-[200px] md:min-h-[400px] lg:min-h-[500px] xl:min-h-[600px]"
+      className="finisher-header relative w-full min-h-[235px] sm:min-h-[200px] md:min-h-[400px] lg:min-h-[500px] xl:min-h-[600px]"
       id="finisher-header"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -52,7 +52,6 @@ export const HeaderCard = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
         >
-          {/* Animated Icon */}
           <motion.div
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
@@ -64,7 +63,6 @@ export const HeaderCard = () => {
             }}
             className="relative mb-2 sm:mb-4"
           >
-            {/* Subtle Glow Effect */}
             <motion.div
               className="absolute inset-0 bg-orange-200/20 rounded-full blur-lg opacity-0"
               animate={{ opacity: isHovered ? 0.2 : 0 }}
@@ -72,7 +70,6 @@ export const HeaderCard = () => {
             />
           </motion.div>
 
-          {/* Animated Title */}
             <motion.h1 
                 className="font-BricolageGrotesque text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-semibold leading-tight text-slate-900 px-2"
                 initial={{ opacity: 0, y: 20 }}
@@ -108,7 +105,6 @@ export const HeaderCard = () => {
                 </motion.span>
             </motion.h1>
 
-          {/* Animated Subtitle */}
           <motion.p 
             className="font-gilroyLight text-sm sm:text-base md:text-lg lg:text-xl text-slate-200 max-w-xs sm:max-w-sm md:max-w-2xl font-lightSD px-4 mt-2 sm:mt-4"
             initial={{ opacity: 0, y: 20 }}
@@ -118,7 +114,6 @@ export const HeaderCard = () => {
             Built to protect. Designed to alert. Trusted in every crisis.
           </motion.p>
 
-          {/* Enhanced Button */}
           <motion.button 
             onClick={() => router.push("/login")} 
             className="flex font-BricolageGrotesque gap-2 mt-4 sm:mt-6 md:mt-8 text-white bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 px-6 sm:px-8 md:px-12 lg:px-16 py-2.5 sm:py-3 md:py-4 rounded-full shadow-lg relative overflow-hidden group transition-all duration-300"
@@ -133,12 +128,10 @@ export const HeaderCard = () => {
             onMouseEnter={() => setIsButtonHovered(true)}
             onMouseLeave={() => setIsButtonHovered(false)}
           >
-            {/* Animated Background */}
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-orange-600 to-amber-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
             />
             
-            {/* Button Content */}
             <motion.span 
               className="relative z-10 flex items-center gap-2 text-sm sm:text-base md:text-lg"
               animate={{ x: isButtonHovered ? 3 : 0 }}
@@ -159,7 +152,6 @@ export const HeaderCard = () => {
               </motion.svg>
             </motion.span>
 
-            {/* Subtle Ripple Effect */}
             <AnimatePresence>
               {isButtonHovered && (
                 <motion.div
@@ -173,7 +165,6 @@ export const HeaderCard = () => {
             </AnimatePresence>
           </motion.button>
 
-          {/* Subtle Floating Elements - Hidden on mobile for better performance */}
           <motion.div
             className="absolute top-10 left-4 sm:left-10 text-xl sm:text-2xl md:text-3xl opacity-10 hidden sm:block"
             animate={{ 
