@@ -30,7 +30,6 @@ export const AppBarLP = () => {
     >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 lg:px-12">
         <div className="flex justify-between items-center">
-          {/* Logo Section */}
           <motion.div 
             className="flex items-center gap-3"
             whileHover={{ scale: 1.02 }}
@@ -47,14 +46,12 @@ export const AppBarLP = () => {
             </div>
             <span className={`font-BricolageGrotesque text-base sm:text-lg md:text-xl font-semibold transition-colors duration-300 ${
               safeTheme === 'dark' ? 'text-gray-100' : 'text-slate-800'
-            } hidden md:block`}>
+            } `}>
               Emergency Alert
             </span>
           </motion.div>
 
-          {/* Right Section */}
           <div className="flex gap-3 sm:gap-4 md:gap-6 items-center">
-            {/* Theme Toggle Button */}
             <motion.button
               onClick={toggleTheme}
               className={`p-2 sm:p-2.5 rounded-xl border transition-all duration-200 group ${
@@ -97,8 +94,6 @@ export const AppBarLP = () => {
                 </svg>
               )}
             </motion.button>
-
-            {/* Begin Setup Button */}
             <motion.button
               onClick={() => router.push("/login")}
               className="font-BricolageGrotesque px-4 sm:px-6 md:px-6 py-2 sm:py-2.5 md:py-1 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-200 text-sm sm:text-base md:text-lg whitespace-nowrap"
