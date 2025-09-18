@@ -16,7 +16,7 @@ export const AkshxFooter = () => {
 
   return (
     <motion.footer 
-      className={`w-full py-4 transition-all duration-500 ${
+      className={`w-full transition-all duration-500 ${
         safeTheme === 'dark' 
           ? 'bg-gradient-to-r from-zinc-800 via-zinc-950 to-zinc-800' 
           : 'bg-gradient-to-r from-slate-50 to-blue-50/50'
@@ -25,11 +25,10 @@ export const AkshxFooter = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
     >
-      <div className="max-w-7xl mx-auto px-6 md:px-8">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6 md:gap-8">
-          {/* Logo Section */}
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col gap-5 sm:gap-0 md:flex-row justify-between items-center">
           <motion.div 
-            className="flex items-center flex-1 md:flex-none"
+            className="flex items-center gap-1 flex-1 md:flex-none hidden md:flex"
             whileHover={{ scale: 1.05 }}
             transition={{ duration: 0.2 }}
           >
@@ -44,12 +43,11 @@ export const AkshxFooter = () => {
             </div>
             <span className={`font-BricolageGrotesque text-lg md:text-xl font-semibold transition-colors duration-300 ${
               safeTheme === 'dark' ? 'text-white' : 'text-slate-800'
-            } hidden md:block`}>
+            }`}>
               Emergency Alert
             </span>
           </motion.div>
 
-          {/* Developer Credit */}
           <motion.div 
             className={`flex flex-col items-center font-BricolageGrotesque text-base md:text-lg text-center flex-1 ${
               safeTheme === 'dark' ? 'text-gray-200' : 'text-slate-700'
@@ -64,7 +62,7 @@ export const AkshxFooter = () => {
             >
               akshxdevs
             </a></span>
-            <div className={`border-t pt-1 transition-colors duration-300 ${
+            <div className={`border-t transition-colors duration-300 ${
               safeTheme === 'dark' ? 'border-gray-600/40' : 'border-slate-200/40'
             }`}>
               <p className={`text-center text-xs font-medium transition-colors duration-300 ${
@@ -75,7 +73,6 @@ export const AkshxFooter = () => {
             </div>
           </motion.div>
 
-          {/* Social Links */}
           <motion.div 
             className="flex items-center gap-4 flex-1 md:flex-none justify-center md:justify-end"
             initial={{ opacity: 0, scale: 0.8 }}
