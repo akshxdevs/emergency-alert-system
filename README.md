@@ -12,7 +12,7 @@ The system ensures rapid, reliable, and multi-channel alert delivery with real-t
 
 * **Frontend URL:** `https://alertsystem.akshxdevs.com`
 * **Environment:** Production / Staging
-* **Tech Stack:** Node.js, Express, MongoDB, WebSockets, REST API, React
+* **Tech Stack:** Node.js, Express, Prisma, Postgres, WebSockets, REST API, React
 
 Your system is live and ready for operational use.
 
@@ -142,7 +142,7 @@ emergency-alert-system/
 
 ### Tech Stack
 
-* **Backend:** Node.js, Express, MongoDB
+* **Backend:** Node.js, Express, Postgres, Prisma
 * **Frontend:** React / Next.js
 * **Real-Time:** Socket.IO
 * **Authentication:** JWT-based
@@ -155,7 +155,8 @@ emergency-alert-system/
 ### Prerequisites
 
 * Node.js `18+`
-* MongoDB locally or cloud (MongoDB Atlas)
+* Postgres locally or cloud (Postgres Atlas)
+* Prisma
 * Yarn or npm
 * Any modern browser
 
@@ -313,7 +314,7 @@ Use responsibly in real-world safety-critical environments.
 * **Type:** Web2 Real-Time Emergency Alert System
 * **Backend:** Node.js + Express
 * **Frontend:** React
-* **Database:** MongoDB
+* **Database:** Postgres
 * **Focus:** Speed · Reliability · Safety
 
 ---
