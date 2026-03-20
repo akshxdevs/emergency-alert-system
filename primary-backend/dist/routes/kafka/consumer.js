@@ -2,19 +2,17 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.initializeConsumer = exports.consumer = void 0;
 const kafkajs_1 = require("kafkajs");
-const kafkaBrokers = process.env.KAFKA_BROKERS?.split(',') || ['d2ka4bpmodb6qsnjj8e0.any.ap-south-1.mpx.prd.cloud.redpanda.com:9092'];
-const saslMechanism = process.env.KAFKA_SASL_MECHANISM || 'scram-sha-256';
-// Only create Kafka instance if credentials are provided
-const kafkaUsername = process.env.KAFKA_USERNAME;
-const kafkaPassword = process.env.KAFKA_PASSWORD;
-// Check if credentials are properly set (not placeholder values)
-const hasValidCredentials = kafkaUsername &&
-    kafkaPassword &&
-    kafkaUsername !== 'your_username' &&
-    kafkaPassword !== 'your_password';
+const config_1 = require("../../config");
+const kafkaBrokers = config_1.KAFKA_BROKERS;
+const saslMechanism = config_1.KAFKA_SASL_MECHANISM;
+const kafkaUsername = config_1.KAFKA_USERNAME;
+const kafkaPassword = config_1.KAFKA_PASSWORD;
+const hasValidCredentials = Boolean(kafkaBrokers.length && kafkaUsername && kafkaPassword);
 let kafka = null;
 let consumerInstance = null;
 if (hasValidCredentials) {
+    const username = kafkaUsername;
+    const password = kafkaPassword;
     kafka = new kafkajs_1.Kafka({
         clientId: 'emergency-alert-service',
         brokers: kafkaBrokers,
@@ -22,13 +20,13 @@ if (hasValidCredentials) {
         sasl: saslMechanism === 'scram-sha-256'
             ? {
                 mechanism: 'scram-sha-256',
-                username: kafkaUsername,
-                password: kafkaPassword
+                username,
+                password
             }
             : {
                 mechanism: 'scram-sha-512',
-                username: kafkaUsername,
-                password: kafkaPassword
+                username,
+                password
             }
     });
     consumerInstance = kafka.consumer({ groupId: 'alert-group' });
