@@ -1,5 +1,4 @@
 import { Router, Request, Response } from "express";
-import Redis from "ioredis";
 import jwt from "jsonwebtoken";
 import { prismaClient } from "../db/db";
 import { JWT_SECRET } from "../config";
@@ -7,9 +6,6 @@ import bcrypt from "bcrypt";
 import { SigninSchema, GoogleSignupSchema, LoginSchema } from "../types";
 import { UserRole } from "@prisma/client";
 const router = Router();
-const redis = new Redis();
-const OTP_LIMIT = 3;
-const OTP_EXPIRY = 100;
 
 router.get("/check-email", async (req: Request, res: Response) => {
   try {
@@ -127,7 +123,7 @@ router.post("/signup", async (req: Request, res: Response) => {
       },
     });
     if (existingUser) {
-      return res.status(402).send({ message: "User already exist" });
+      return res.status(409).send({ message: "User already exist" });
     }
     const HashedPassword = await bcrypt.hash(password, 10);
     const user = await prismaClient.user.create({
@@ -157,37 +153,30 @@ router.post("/signup", async (req: Request, res: Response) => {
 
 router.post("/signin", async (req: Request, res: Response) => {
   try {
-    console.log("Signin request received:", req.body);
-    
     const parsedBody = LoginSchema.safeParse(req.body);
     if (!parsedBody.success) {
-      console.log("Validation error:", parsedBody.error.errors);
       return res
         .status(400)
         .json({ message: "Invalid Input", error: parsedBody.error.errors });
     }
     const { email, password } = parsedBody.data;
-    console.log("Looking for user with email:", email);
-    
+
     const user = await prismaClient.user.findFirst({
       where: {
         email,
       },
     });
-    
-    console.log("Found user:", user ? "Yes" : "No");
-    
+
     if (!user) {
       return res.status(401).send({ message: "Invalid Email Or Password!" });
     }
-    
+
     const passwordValidation = await bcrypt.compare(password, user.password);
-    console.log("Password validation:", passwordValidation ? "Success" : "Failed");
-    
+
     if (!passwordValidation) {
       return res.status(401).send({ message: "Password Mismatch!" });
     }
-    
+
     const token = jwt.sign(
       {
         id: user.id,
@@ -207,12 +196,11 @@ router.post("/signin", async (req: Request, res: Response) => {
       token,
       message: "User Login Sucessfully",
     };
-    
-    console.log("Sending response:", response);
+
     res.json(response);
   } catch (error) {
     console.error("Signin error:", error);
-    res.status(403).send({ message: "Something went wrong!" });
+    res.status(500).send({ message: "Something went wrong!" });
   }
 });
 
