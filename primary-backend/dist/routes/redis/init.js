@@ -5,14 +5,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.redisClient = void 0;
 const ioredis_1 = __importDefault(require("ioredis"));
-const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
-exports.redisClient = new ioredis_1.default(redisUrl, {
+const config_1 = require("../../config");
+exports.redisClient = new ioredis_1.default(config_1.REDIS_URL, {
     tls: {
         rejectUnauthorized: false
     }
 });
 exports.redisClient.on('connect', () => {
-    console.log('Connected to Upstash Redis');
+    console.log('Connected to Redis');
 });
 exports.redisClient.on('error', (err) => {
     console.error('Redis connection error:', err);
