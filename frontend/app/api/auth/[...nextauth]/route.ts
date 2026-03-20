@@ -2,32 +2,18 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import axios from "axios";
-import { NEXTAUTH_URL } from "../../../../config";
+import { BACKEND_URL } from "../../../../config";
+import {
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  NEXTAUTH_SECRET,
+} from "../../../../server-config";
 
-const requiredEnvVars = {
-  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
-  NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
-};
-
-const missingVars = Object.entries(requiredEnvVars)
-  .filter(([, value]) => !value)
-  .map(([key]) => key);
-
-if (missingVars.length > 0) {
-  console.error('Missing required environment variables:', missingVars);
-}
-
-console.log("NextAuth Configuration Check:");
-console.log("GOOGLE_CLIENT_ID:", process.env.GOOGLE_CLIENT_ID ? "Set" : "Missing");
-console.log("GOOGLE_CLIENT_SECRET:", process.env.GOOGLE_CLIENT_SECRET ? "Set" : "Missing");
-console.log("NEXTAUTH_URL:", NEXTAUTH_URL);
-console.log("NEXTAUTH_SECRET:", process.env.NEXTAUTH_SECRET ? "Set" : "Missing");
 const handler = NextAuth({
   providers: [
     GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+      clientId: GOOGLE_CLIENT_ID,
+      clientSecret: GOOGLE_CLIENT_SECRET,
     }),
 
     CredentialsProvider({
@@ -39,7 +25,7 @@ const handler = NextAuth({
       async authorize(credentials) {
         try {
           const res = await axios.post(
-            "https://emergency-alert-system-bffp.onrender.com/api/v1/user/signin",
+            `${BACKEND_URL}/user/signin`,
             {
               email: credentials?.email,
               password: credentials?.password,
@@ -69,29 +55,27 @@ const handler = NextAuth({
     }),
   ],
 
-  secret: process.env.NEXTAUTH_SECRET || "akshxsceret@@#@#",
+  secret: NEXTAUTH_SECRET,
 
   session: {
     strategy: "jwt",
   },
 
-  debug: true,
+  debug: process.env.NODE_ENV !== "production",
 
   callbacks: {
     async signIn({ user, account }) {
       if (account?.provider === "google") {
         try {
-          console.log("Google sign-in attempt for:", user.email);
-          
           const existingUserResponse = await axios.get(
-            `https://emergency-alert-system-bffp.onrender.com/api/v1/user/check-email?email=${user.email}`
+            `${BACKEND_URL}/user/check-email?email=${encodeURIComponent(user.email ?? "")}`
           );
 
           const { exists } = existingUserResponse.data;
 
           if (exists) {
             const userResponse = await axios.get(
-              `https://emergency-alert-system-bffp.onrender.com/api/v1/user/by-email?email=${user.email}`
+              `${BACKEND_URL}/user/by-email?email=${encodeURIComponent(user.email ?? "")}`
             );
 
             const existingUser = userResponse.data.user;
@@ -99,11 +83,8 @@ const handler = NextAuth({
             user.id = existingUser.id;
             user.username = existingUser.username;
             user.role = existingUser.role;
-            
-            console.log("Existing user found, signing in:", existingUser.id);
             return true;
           } else {
-            console.log("New user, redirecting to signup callback");
             return "/signup/google-callback";
           }
         } catch (error) {
