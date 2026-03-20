@@ -1,4 +1,6 @@
-const socket = new WebSocket("ws://localhost:3000/user123");
+const WebSocket = require("ws");
+
+const socket = new WebSocket("ws://localhost:5000/user123/?POLICE");
 
 socket.onopen = () => {
   console.log("✅ Connected to WebSocket server");
@@ -8,12 +10,20 @@ socket.onopen = () => {
     type: "CRIME",
     reportedBy: "user123",
     assignedTo: "POLICE",
-    status: "REPORT",
+    status: "REPORTED",
+    priority: "HIGH",
     timeStamp: new Date().toISOString(),
-    description: "🚨 Suspicious activity spotted!"
+    description: "Suspicious activity spotted",
+    location: {
+      lat: 28.6139,
+      long: 77.2090,
+    },
   };
 
-  socket.send(JSON.stringify(alert));
+  socket.send(JSON.stringify({
+    type: "NEW_ALERT",
+    payload: alert,
+  }));
 };
 
 socket.onmessage = (msg) => {
