@@ -1,0 +1,9 @@
+{
+  "name": "emergency-alert-system",
+  "private": true,
+  "scripts": {
+    "build": "npm --prefix primary-backend run build && npm --prefix frontend run build",
+    "test": "npm --prefix primary-backend test && npm --prefix frontend run validate",
+    "validate": "npm run build && npm run test"
+  }
+}
