@@ -6,6 +6,11 @@
   import { redisClient } from "./redis/init";
   import { prismaClient } from "../db/db";
 import { StatusReport } from "@prisma/client";
+import {
+  isValidAlertPriority,
+  isValidStatusReport,
+  parseUpgradeRequestUrl,
+} from "../lib/alert-protocol";
 
   const clients = new Map<string, WebSocket>();
   const roleClients = new Map<string, Set<WebSocket>>();
@@ -14,35 +19,25 @@ import { StatusReport } from "@prisma/client";
     const wss = new WebSocketServer({ noServer: true });
 
     server.on("upgrade", (req: IncomingMessage, socket: Socket, head: Buffer) => {
-      const userId = req.url?.split("/")[1] as string;
-      const userRole = req.url?.split("/?")[1] as string;
-      if (!userId || !userRole) {
+      const connectionInfo = parseUpgradeRequestUrl(req.url);
+      if (!connectionInfo) {
         socket.destroy();
         return;
       }
 
       wss.handleUpgrade(req, socket, head, (ws: WebSocket) => {
-        wss.emit("connection", ws, userId, userRole);
+        wss.emit("connection", ws, connectionInfo.userId, connectionInfo.userRole);
       });
     });
 
   wss.on(
     "connection",
     (socket: WebSocket, userId: string, userRole: string) => {
-      console.log(`New connection: userId=${userId}, userRole=${userRole}`);
-
       clients.set(userId, socket);
       if (!roleClients.has(userRole)) {
         roleClients.set(userRole, new Set<WebSocket>());
-        console.log(`Created new role group for: ${userRole}`);
       }
       roleClients.get(userRole)?.add(socket);
-      console.log(`Added client to role group: ${userRole}`);
-      console.log(
-        `Total clients for role ${userRole}: ${
-          roleClients.get(userRole)?.size
-        }`
-      );
 
       socket.send(
         JSON.stringify({
@@ -51,7 +46,7 @@ import { StatusReport } from "@prisma/client";
         })
       );
 
-      if (userId.includes('dashboard')) {
+      if (userRole !== "CIVILIAN") {
         sendPendingAlerts(socket, userRole);
       }
 
@@ -61,8 +56,7 @@ import { StatusReport } from "@prisma/client";
 
           if (data.type === "NEW_ALERT") {
             const alert = data.payload;
-            const allowedPriorities = ["LOW", "MEDIUM", "HIGH"];
-            if (!allowedPriorities.includes(alert.priority)) {
+            if (!isValidAlertPriority(alert.priority)) {
               socket.send(
                 JSON.stringify({
                   type: "error",
@@ -184,7 +178,7 @@ import { StatusReport } from "@prisma/client";
           }
           if (data.type === "UPDATE_ALERT_STATUS") {
             const { alertId, newStatus } = data.payload;
-            if (!Object.values(StatusReport).includes(newStatus)) {
+            if (!isValidStatusReport(newStatus)) {
               socket.send(
                 JSON.stringify({
                   type: "error",
@@ -270,27 +264,15 @@ import { StatusReport } from "@prisma/client";
       const payload = JSON.stringify(data);
       const sockets = roleClients.get(role);
 
-    console.log(`RoleBroadcast called for role: ${role}`);
-    console.log(`Available roles: ${Array.from(roleClients.keys())}`);
-    console.log(`Sockets for role ${role}:`, sockets ? sockets.size : 0);
-
     if (!sockets) {
-      console.log(`No sockets found for role: ${role}`);
       return;
     }
 
-    let sentCount = 0;
       sockets.forEach((client: WebSocket) => {
         if (client.readyState === WebSocket.OPEN) {
           client.send(payload);
-        sentCount++;
-        console.log(`Sent alert to ${role} client`);
-      } else {
-        console.log(`Client not ready, state: ${client.readyState}`);
         }
       });
-
-    console.log(`Sent alert to ${sentCount} ${role} clients`);
     }
   const updateAlertStatus = async (
     alertId: string,
@@ -334,8 +316,6 @@ import { StatusReport } from "@prisma/client";
       });
 
       if (pendingAlerts.length > 0) {
-        console.log(`Sending ${pendingAlerts.length} pending alerts to ${userRole} dashboard`);
-        
         pendingAlerts.forEach((alert) => {
           const alertWithLocation = {
             ...alert,
@@ -354,8 +334,6 @@ import { StatusReport } from "@prisma/client";
             })
           );
         });
-      } else {
-        console.log(`No pending alerts found for ${userRole} dashboard`);
       }
     } catch (err) {
       console.error("Failed to send pending alerts:", err);
