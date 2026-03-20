@@ -7,36 +7,32 @@ const consumer_1 = require("./kafka/consumer");
 const init_1 = require("./redis/init");
 const db_1 = require("../db/db");
 const client_1 = require("@prisma/client");
+const alert_protocol_1 = require("../lib/alert-protocol");
 const clients = new Map();
 const roleClients = new Map();
 const setUpSocketServer = (server) => {
     const wss = new ws_1.WebSocketServer({ noServer: true });
     server.on("upgrade", (req, socket, head) => {
-        const userId = req.url?.split("/")[1];
-        const userRole = req.url?.split("/?")[1];
-        if (!userId || !userRole) {
+        const connectionInfo = (0, alert_protocol_1.parseUpgradeRequestUrl)(req.url);
+        if (!connectionInfo) {
             socket.destroy();
             return;
         }
         wss.handleUpgrade(req, socket, head, (ws) => {
-            wss.emit("connection", ws, userId, userRole);
+            wss.emit("connection", ws, connectionInfo.userId, connectionInfo.userRole);
         });
     });
     wss.on("connection", (socket, userId, userRole) => {
-        console.log(`New connection: userId=${userId}, userRole=${userRole}`);
         clients.set(userId, socket);
         if (!roleClients.has(userRole)) {
             roleClients.set(userRole, new Set());
-            console.log(`Created new role group for: ${userRole}`);
         }
         roleClients.get(userRole)?.add(socket);
-        console.log(`Added client to role group: ${userRole}`);
-        console.log(`Total clients for role ${userRole}: ${roleClients.get(userRole)?.size}`);
         socket.send(JSON.stringify({
             type: `welcome ${userId}`,
             message: `Connected to Emergency Alert WS`,
         }));
-        if (userId.includes('dashboard')) {
+        if (userRole !== "CIVILIAN") {
             sendPendingAlerts(socket, userRole);
         }
         socket.on("message", async (messages) => {
@@ -44,8 +40,7 @@ const setUpSocketServer = (server) => {
                 const data = JSON.parse(messages.toString());
                 if (data.type === "NEW_ALERT") {
                     const alert = data.payload;
-                    const allowedPriorities = ["LOW", "MEDIUM", "HIGH"];
-                    if (!allowedPriorities.includes(alert.priority)) {
+                    if (!(0, alert_protocol_1.isValidAlertPriority)(alert.priority)) {
                         socket.send(JSON.stringify({
                             type: "error",
                             message: "Invalid priority value",
@@ -68,7 +63,6 @@ const setUpSocketServer = (server) => {
                         catch (error) {
                             console.log('Kafka not available, storing alert directly to database');
                             await init_1.redisClient.set(`alert:${fullAlert.id}`, JSON.stringify(fullAlert));
-                            // Save directly to database when Kafka fails
                             try {
                                 const createAlert = await db_1.prismaClient.emergency.create({
                                     data: {
@@ -113,7 +107,6 @@ const setUpSocketServer = (server) => {
                     else {
                         console.log('Kafka producer not available, storing alert directly to database');
                         await init_1.redisClient.set(`alert:${fullAlert.id}`, JSON.stringify(fullAlert));
-                        // Save directly to database when Kafka is not available
                         try {
                             const createAlert = await db_1.prismaClient.emergency.create({
                                 data: {
@@ -161,7 +154,7 @@ const setUpSocketServer = (server) => {
                 }
                 if (data.type === "UPDATE_ALERT_STATUS") {
                     const { alertId, newStatus } = data.payload;
-                    if (!Object.values(client_1.StatusReport).includes(newStatus)) {
+                    if (!(0, alert_protocol_1.isValidStatusReport)(newStatus)) {
                         socket.send(JSON.stringify({
                             type: "error",
                             message: `Invalid status. Must be one of: ${Object.values(client_1.StatusReport).join(",")}`,
@@ -230,25 +223,14 @@ const setUpSocketServer = (server) => {
     function roleBroadcast(role, data) {
         const payload = JSON.stringify(data);
         const sockets = roleClients.get(role);
-        console.log(`RoleBroadcast called for role: ${role}`);
-        console.log(`Available roles: ${Array.from(roleClients.keys())}`);
-        console.log(`Sockets for role ${role}:`, sockets ? sockets.size : 0);
         if (!sockets) {
-            console.log(`No sockets found for role: ${role}`);
             return;
         }
-        let sentCount = 0;
         sockets.forEach((client) => {
             if (client.readyState === ws_1.WebSocket.OPEN) {
                 client.send(payload);
-                sentCount++;
-                console.log(`Sent alert to ${role} client`);
-            }
-            else {
-                console.log(`Client not ready, state: ${client.readyState}`);
             }
         });
-        console.log(`Sent alert to ${sentCount} ${role} clients`);
     }
     const updateAlertStatus = async (alertId, newStatus) => {
         try {
@@ -269,7 +251,7 @@ const setUpSocketServer = (server) => {
             const cancelled = await db_1.prismaClient.emergency.update({
                 where: { id: alertId },
                 data: {
-                    status: client_1.StatusReport.RESOLVED, // Use RESOLVED instead of CANCELLED
+                    status: client_1.StatusReport.RESOLVED,
                 },
             });
             return cancelled;
@@ -283,14 +265,13 @@ const setUpSocketServer = (server) => {
             const pendingAlerts = await db_1.prismaClient.emergency.findMany({
                 where: {
                     status: client_1.StatusReport.IN_PROCESS,
-                    assignedTo: userRole, // Type assertion for UserRole
+                    assignedTo: userRole,
                 },
                 include: {
                     location: true,
                 },
             });
             if (pendingAlerts.length > 0) {
-                console.log(`Sending ${pendingAlerts.length} pending alerts to ${userRole} dashboard`);
                 pendingAlerts.forEach((alert) => {
                     const alertWithLocation = {
                         ...alert,
@@ -299,16 +280,13 @@ const setUpSocketServer = (server) => {
                             long: loc.long,
                         })),
                         receivedAt: Date.now(),
-                        autoDisappearAt: null, // IN_PROCESS alerts don't auto-disappear
+                        autoDisappearAt: null,
                     };
                     socket.send(JSON.stringify({
-                        type: alert.type, // Send as the alert type (CRIME, FIRE, etc.)
+                        type: alert.type,
                         payload: alertWithLocation,
                     }));
                 });
-            }
-            else {
-                console.log(`No pending alerts found for ${userRole} dashboard`);
             }
         }
         catch (err) {
