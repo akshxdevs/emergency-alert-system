@@ -1,15 +1,14 @@
 import Redis from "ioredis";
+import { REDIS_URL } from "../../config";
 
-const redisUrl = process.env.REDIS_URL || "redis://localhost:6379";
-
-export const redisClient = new Redis(redisUrl, {
+export const redisClient = new Redis(REDIS_URL, {
   tls: {
     rejectUnauthorized: false
   }
 });
 
 redisClient.on('connect', () => {
-  console.log('Connected to Upstash Redis');
+  console.log('Connected to Redis');
 });
 
 redisClient.on('error', (err: Error) => {
