@@ -1,8 +1,10 @@
 # Emergency Alert System
 
-Real-time emergency reporting and responder dispatch built as a full-stack web application with a Next.js frontend and an Express/Prisma backend.
+Real-time emergency reporting and responder dispatch across a Next.js frontend and an Express/Prisma backend.
 
 [![CI](https://github.com/akshxdevs/emergency-alert-system/actions/workflows/ci.yml/badge.svg)](https://github.com/akshxdevs/emergency-alert-system/actions/workflows/ci.yml)
+[![Node 20](https://img.shields.io/badge/node-20-339933?logo=nodedotjs&logoColor=white)](./.github/workflows/ci.yml)
+[![Next.js 14](https://img.shields.io/badge/Next.js-14-000000?logo=nextdotjs&logoColor=white)](./frontend/package.json)
 
 ## Overview
 
