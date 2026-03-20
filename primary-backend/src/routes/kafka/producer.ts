@@ -1,23 +1,24 @@
 import { Kafka } from "kafkajs";
+import {
+    KAFKA_BROKERS,
+    KAFKA_PASSWORD,
+    KAFKA_SASL_MECHANISM,
+    KAFKA_USERNAME,
+} from "../../config";
 
-const kafkaBrokers = process.env.KAFKA_BROKERS?.split(',') || ['d2ka4bpmodb6qsnjj8e0.any.ap-south-1.mpx.prd.cloud.redpanda.com:9092'];
-
-const saslMechanism = process.env.KAFKA_SASL_MECHANISM || 'scram-sha-256';
-
-// Only create Kafka instance if credentials are provided
-const kafkaUsername = process.env.KAFKA_USERNAME;
-const kafkaPassword = process.env.KAFKA_PASSWORD;
-
-// Check if credentials are properly set (not placeholder values)
-const hasValidCredentials = kafkaUsername && 
-                           kafkaPassword && 
-                           kafkaUsername !== 'your_username' && 
-                           kafkaPassword !== 'your_password';
+const kafkaBrokers = KAFKA_BROKERS;
+const saslMechanism = KAFKA_SASL_MECHANISM;
+const kafkaUsername = KAFKA_USERNAME;
+const kafkaPassword = KAFKA_PASSWORD;
+const hasValidCredentials = Boolean(kafkaBrokers.length && kafkaUsername && kafkaPassword);
 
 let kafka: Kafka | null = null;
 let producerInstance: any = null;
 
 if (hasValidCredentials) {
+    const username = kafkaUsername as string;
+    const password = kafkaPassword as string;
+
     kafka = new Kafka({
         clientId: 'emergency-alerts',
         brokers: kafkaBrokers,
@@ -25,13 +26,13 @@ if (hasValidCredentials) {
         sasl: saslMechanism === 'scram-sha-256' 
             ? {
                 mechanism: 'scram-sha-256',
-                username: kafkaUsername,
-                password: kafkaPassword
+                username,
+                password
             }
             : {
                 mechanism: 'scram-sha-512',
-                username: kafkaUsername,
-                password: kafkaPassword
+                username,
+                password
             }
     });
     producerInstance = kafka.producer();
