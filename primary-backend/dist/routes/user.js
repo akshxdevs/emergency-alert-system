@@ -5,16 +5,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userRouter = void 0;
 const express_1 = require("express");
-const ioredis_1 = __importDefault(require("ioredis"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const db_1 = require("../db/db");
 const config_1 = require("../config");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const types_1 = require("../types");
 const router = (0, express_1.Router)();
-const redis = new ioredis_1.default();
-const OTP_LIMIT = 3;
-const OTP_EXPIRY = 100;
 router.get("/check-email", async (req, res) => {
     try {
         const { email } = req.query;
@@ -107,7 +103,7 @@ router.post("/signup", async (req, res) => {
             },
         });
         if (existingUser) {
-            return res.status(402).send({ message: "User already exist" });
+            return res.status(409).send({ message: "User already exist" });
         }
         const HashedPassword = await bcrypt_1.default.hash(password, 10);
         const user = await db_1.prismaClient.user.create({
@@ -137,27 +133,22 @@ router.post("/signup", async (req, res) => {
 });
 router.post("/signin", async (req, res) => {
     try {
-        console.log("Signin request received:", req.body);
         const parsedBody = types_1.LoginSchema.safeParse(req.body);
         if (!parsedBody.success) {
-            console.log("Validation error:", parsedBody.error.errors);
             return res
                 .status(400)
                 .json({ message: "Invalid Input", error: parsedBody.error.errors });
         }
         const { email, password } = parsedBody.data;
-        console.log("Looking for user with email:", email);
         const user = await db_1.prismaClient.user.findFirst({
             where: {
                 email,
             },
         });
-        console.log("Found user:", user ? "Yes" : "No");
         if (!user) {
             return res.status(401).send({ message: "Invalid Email Or Password!" });
         }
         const passwordValidation = await bcrypt_1.default.compare(password, user.password);
-        console.log("Password validation:", passwordValidation ? "Success" : "Failed");
         if (!passwordValidation) {
             return res.status(401).send({ message: "Password Mismatch!" });
         }
@@ -175,12 +166,11 @@ router.post("/signin", async (req, res) => {
             token,
             message: "User Login Sucessfully",
         };
-        console.log("Sending response:", response);
         res.json(response);
     }
     catch (error) {
         console.error("Signin error:", error);
-        res.status(403).send({ message: "Something went wrong!" });
+        res.status(500).send({ message: "Something went wrong!" });
     }
 });
 exports.userRouter = router;
